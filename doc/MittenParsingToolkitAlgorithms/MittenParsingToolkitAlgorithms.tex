@@ -1,0 +1,633 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[margin=0.5in]{geometry}
+\usepackage[linesnumbered,ruled,vlined,norelsize]{algorithm2e}
+
+\title{Mitten Parsing Toolkit Algorithms}
+\author{Oliver Katz}
+\date{July 15, 2014}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+The Mitten Parsing Toolkit (MPTK) is a simply implemented library for language parsing. It allows for basic parsing functionality, giving the developer the ability to construct a compiler with a handmade feel, yet retains $O(n)$ efficiency which is competetive with other existing language parsing libraries.
+
+This document contains the definitions and algorithms used by MPTK for language parsing. It assumes text source code and uses a specific language model which limits it to certain types of languages. Its design is heavily influenced by C-like languages and is thus optimized for them. The tokenization is relatively universal, but the semantic analyzer could easily be replaced by an alternate parser for other language types. The algorithms are analyzed for efficiency and compared to other existing parsers.
+
+The components of parsing (lexical and semantic analysis) are explained in detail in section \ref{sec:Background}, with no assumption of prior knowledge.
+
+\section{Background}
+\label{sec:Background}
+
+\subsection{Existing Language Parsing Libraries}
+There are many existing language parsing libraries. MPTK's lexical analysis will be compared with
+\begin{description}
+\item[Lex] Written by Mike Lesk and Eric Schmidt and first described in 1975 \cite{LEX_Book}, it is a highly used lexer generator commonly paired with yacc. It reads a text input stream and generates C source code which can perfom tokenization on any text input stream of the target language.
+\end{description}
+
+MPTK's semantic analyzers will be compared against
+\begin{description}
+\item[Yacc] It was wriiten by Stephen C. Johnson at AT\&T in 1970 \cite{YACC_Book}. UNIX used to use it as its default parser generator, although it was since become replaced with Bison and other modern alternatives. 
+\item[GNU Bison] Bison is the parser generator included in the GNU Project. Originally written by Robert Corbett in 1998, it can generate parsers in C/C++ and Java.
+\end{description}
+
+This pamphlet will contain comparisons between MPTK and these existing libraries. The primary difference between these two are the approach to parsing. Lex provides the ability for a developer to create a well-structured description of the lexical result of an input source code using an existing algorithm for identifying string patterns. MPTK provides a fixed, but configurable result, using an existing algorithm for lexical analysis. It is not as flexible as Lex, but for most languages it can be implemented in fewer lines of code with competetive efficiency.
+
+Yacc \cite{YACC_Book} and Bison both generate parsers using a fixed type of parsing algorithm (LALR or GLR). The developer configures this fixed algorithm in order to create a completely parsed AST result. MPTK provides a set of algorithms which can be paired in a pipeline to create a partially parsed AST result. The rest of the parsing must be done manually by the developer.
+
+\subsection{Lexical Analysis}
+Lexical analysis, sometimes referred to a tokenization, is the process of dividing a string of characters into tokens, the smallest unit of meaning within a programming language's syntax. An example of a tokenization would be:\newline
+
+\verb|"hello, world"| $\rightarrow$ [\verb|"hello"|, \verb|","|, \verb|" "|, \verb|"world"|]\newline
+
+Also, keep in mind that strings may be encoded in memory using many different character encodings. They do not need to be directly supported by an implementation of MPTK's algorithms, but strings with different character widths do.
+
+\subsection{Semantic Analysis}
+Semantic analysis is the process of parsing a sequence of tokens (generally resulting from lexical analysis) into a structured abstract syntax tree (AST). An example parsing would be:\newline
+
+[\verb|"f"|, \verb|"("|, \verb|"x"|, \verb|","|, \verb|"5"|, \verb|")"|] $\rightarrow$ \verb|"f", (argument list: (argument: "x"), (argument: "y"))|\newline
+
+These two algorithms combine to create a full language parser. The AST can be passed to a code generator which infers the programmer's meaning and generates output code (assembly, machine code, bytecode, etc.) accordingly. 
+
+\section{Lexical Analysis Algorithms}
+
+\subsection{Definitions}
+
+\begin{description}
+\item[Whitespace] Referred to as `space' in ISO/EIC 8859-1 \cite{ISO_CharacterEncodings}, whitespace consists of a sequence of whitespace characters of nonzero length. Whitespace characters may be spaces, tabs, or newlines.
+
+\item[Letters] Alphabetical letters in the character encoding.
+
+\item[Digits] Numeric digits in the character encoding.
+
+\item[Printable Characters] Referred to as `graphic' in ISO/EIC 8859-1 \cite{ISO_CharacterEncodings}, characters that print a visible graphic to the screen upon being rendered.
+
+\item[Punctuation/Symbol Characters] Printable characters that are not letters or digits.
+
+\item[Single-Wide Characters] Characters that can be encoded in one byte.
+
+\item[Double-Wide Characters] Characters that can be encoded in two bytes.
+
+\item[Quad-Wide Characters] Characters that can be encoded in four bytes.
+
+\item[Line Number] The number of newline characters plus one prior to the specified character or token.
+
+\item[Column Number] The number of non-newline characters prior to the specified character or token and after either the beginning of the file or the most recent newline character if it exists.
+
+\item[Token] Constructs which contain the following information:
+	\begin{itemize}
+	\item Start index in the source text.
+	\item Length of the token in the source text.
+	\item Line number of the first character.
+	\item Column number of the first character.
+	\item Tag ID (optional)
+	\end{itemize}
+
+\item[Deliminator] A string which acts as a separator between tokens, often a token itself.
+\end{description}
+
+\subsection{Simplest Implementation}
+\label{sec:SimplestImplementation}
+
+\subsubsection{Overview}
+\label{sec:OverviewOfTheAlgorithm}
+The algorithm runs through the source text once and results in a sequence of tokens by splitting the source text up by deliminators. Deliminators may be string constants or string patterns. 
+
+The source text is iterated and, at each character, the proceeding characters are compared with the deliminator set. For example, if we have the string: \verb|"1+x++"| and the deliminators \verb|"+"| and \verb|"++"|: \newline
+
+\verb|"1+x++"| $\rightarrow$ \verb|["1", "+", "x", "++"]| \newline
+
+The following is a trace of an example execution of the algorithm:
+\begin{itemize}
+\item Got character \verb|"1"|. No deliminator matches. Continue.
+\item Got character \verb|"+"|. Deliminator \verb|"+"| matches. Create token from prior characters: \verb|"1"|. Create token from deliminator: \verb|"+"|.
+\item Got character \verb|"x"|. No deliminator matches. Continue.
+\item Got character \verb|"+"|. Deliminator \verb|"+"| matches, but so does \verb|"++"|. Go with \verb|"++"|, because it is longer. Create token from prior characters: \verb|"x"|. Create token from deliminator: \verb|"++"|.
+\item No more characters. Halt.
+\end{itemize}
+
+\newpage
+\subsubsection{Algorithm}
+$L$ is the length of the target string $T$. $D$ is the length of the longest deliminator.
+
+\begin{algorithm}[H]
+\caption{$tokenize(T)$}
+$line\gets 1$\;
+$column\gets 0$\;
+$lastline\gets 1$\;
+$lastcolumn\gets 0$\;
+
+\For{$i\gets 0, L$}{
+	$found\gets false$\;
+
+	\For{$j\gets D, 0$}{
+		\If{there are deliminators of length j}{
+			\If{$T[i:i+j]$ is a valid deliminator}{
+				$d\gets$ the valid deliminator\;
+				\If{$last < i-1$}{
+					record symbol token with value $[last:i]$ and code location $lastline:lastcolumn$\;
+				}
+
+				record deliminator token with value $T[i:i+j]$ and code location $line:column$\;
+
+				\For{characters $c$ in $d$}{
+					\uIf{$c$ is a newline}{
+						$line++$\;
+						$column\gets 0$\;
+					}
+					\Else {
+						$column++$\;
+					}
+				}
+
+				$lastline\gets line$\;
+				$lastcolumn\gets column$\;
+				$i += j-1$\;
+				$last\gets i+1$\;
+				$found\gets true$\;
+			}
+		}
+	}
+
+	\If{$!found$}{
+		\uIf{$t[i]$ is a newline}{
+			$line++$\;
+			$column\gets 0$\;
+		}
+		\Else {
+			$column++$\;
+		}
+	}
+}
+\end{algorithm}
+
+By the end of the algorithm's execution, a token sequence will be recorded. Note that a symbol token is any token which is not a deliminator.
+
+\subsubsection{Running-Time Analysis}
+The running time of this algorithm using big-O notation should be $O(LND_{avg})$ where $L$ is the length of the target string, $N$ is the number of deliminators, and $D_{avg}$ is the average deliminator length.
+
+This is because the algorithm iterates through every character in the target string (thus the $L$ factor). For each character, every deliminator of every length is checked in sequence from largest to smallest (by length). The worst case is $ND_{avg}$. If we create a variable containing the total number of characters used in the deliminator set overall ($D_{total} = ND_{avg}$) and we assume that $D_{total}$ is significantly less than $L$, as it is for most compilers, the lexical analysis will be essentially $O(L)$.
+
+\subsection{Implementation for Start/End-Point Deliminators}
+\subsubsection{Overview}
+See the overview of the simplest implementation algorithm (see section \ref{sec:OverviewOfTheAlgorithm}).
+
+The algorithm runs through the source text once and results in a sequence of tokens by splitting the source text up by deliminators. Deliminators may be string constants or string patterns. 
+
+The source text is iterated and, at each character, the proceeding characters are compared with the deliminator set. For example, if we have the string: \verb|"1+x++"| and the deliminators \verb|"+"| and \verb|"++"|: \newline
+
+\verb|"1+x++"| $\rightarrow$ \verb|["1", "+", "x", "++"]| \newline
+
+The following is a trace of an example execution of the algorithm:
+\begin{itemize}
+\item Got character \verb|"1"|. No deliminator matches. Continue.
+\item Got character \verb|"+"|. Deliminator \verb|"+"| matches. Create token from prior characters: \verb|"1"|. Create token from deliminator: \verb|"+"|.
+\item Got character \verb|"x"|. No deliminator matches. Continue.
+\item Got character \verb|"+"|. Deliminator \verb|"+"| matches, but so does \verb|"++"|. Go with \verb|"++"|, because it is longer. Create token from prior characters: \verb|"x"|. Create token from deliminator: \verb|"++"|.
+\item No more characters. Halt.
+\end{itemize}
+
+\newpage
+\subsubsection{Algorithm}
+String constant deliminators (see above implementation) can be thought of as start/end-point deliminators with no end-point. They simply split the string and are of fixed length. Start/end-point deliminators with end-points contain all of the source text from the start pattern to the first instance of the end pattern. For example, if you had the start/end-point deliminator \verb|"'"| $\rightarrow$ \verb|"'"|, it would consider the following to be one deliminator:
+\begin{verbatim}
+'hello, world'
+\end{verbatim}
+
+This is very useful for string constants and comments.
+
+$L$ is the length of the target string $T$. $D$ is the length of the longest deliminator.
+
+\begin{algorithm}[H]
+\caption{$tokenize(T)$}
+
+$line\gets 1$\;
+$column\gets 0$\;
+$lastline\gets 1$\;
+$lastcolumn\gets 0$\;
+
+\For{$i\gets 0, L$}{
+	$found\gets false$\;
+	\For{$j\gets D, 0$}{
+		\If{there are deliminators of length j}{
+			\If{T[i:i+j] is a valid deliminator}{
+				$d\gets$ the valid deliminator\;
+				\If{$last < i-1$}{
+					record symbol token with value $T[last:i]$ and code location $lastline:lastcolumn$\;
+				}
+
+				$dl\gets j$\;
+				\If{d has a specified endpoint}{
+					\While{$dl+i < L$}{
+						$l\gets$ length of d's endpoint\;
+						\If{T[i+dl:l] is the same as d}{
+							$dl\gets dl+l$\;
+							break\;
+						}
+						$dl++$\;
+					}
+				}
+
+				record deliminator token with value $T[i:i+dl]$ and code location $line:column$\;
+
+				\For{characters c in T[i:i+dl]}{
+					\uIf{c is a newline}{
+						$line\gets line+1$\;
+						$column\gets 0$\;
+					}
+					\Else {
+						$column\gets column+1$\;
+					}
+				}
+
+				$lastline\gets line$\;
+				$lastcolumn\gets column$\;
+				$i\gets i+dl-1$\;
+				$last\gets i+1$\;
+				$found\gets true$\;
+			}
+		}
+	}
+
+	\If{!found}{
+		\uIf{T[i] is a newline}{
+			$line\gets line+1$\;
+			$column\gets 0$\;
+		}
+		\Else {
+			$column\gets column+1$\;
+		}
+	}
+}
+\end{algorithm}
+
+By the end of the algorithm's execution, a token sequence will be recorded. Note that a symbol token is any token which is not a deliminator.
+
+\subsubsection{Running-Time Analysis}
+See prior analysis of the simplest implementation (section \ref{sec:SimplestImplementation}).
+
+The running time of this algorithm using big-O notation should be $O(LND_{avg})$ where $L$ is the length of the target string, $N$ is the number of deliminators, and $D_{avg}$ is the average deliminator length.
+
+This is because the algorithm iterates through every character in the target string (thus the $L$ factor). For each character, every deliminator of every length is checked in sequence from largest to smallest (by length). The worst case is $ND_{avg}$. If we create a variable containing the total number of characters used in the deliminator set overall ($D_{total} = ND_{avg}$) and we assume that $D_{total}$ is significantly less than $L$, as it is for most compilers, the lexical analysis will be essentially $O(L)$.
+
+\textit{NOTE: Since the addition of the more advanced deliminators simply causes the algorithm to iterate over some of the text without checking for deliminators, it actually improves efficiency in the best case and leaves it identical in the worst case.}
+
+\section{Semantic Analysis Algorithms}
+
+\subsection{Definitions}
+\begin{description}
+\item[Abstract Syntax Tree] Each node of an abstract syntax tree (AST) contains the following elements:
+	\begin{itemize}
+	\item A description of the type of the node (i.e. code scope bound by \verb|{| and \verb|}| or argument list bound by \verb|(| and \verb|)|).
+	\item The token at the head of the node (used for error throwing).
+	\item A list of the branches of the node. Each branch may be either a
+		\begin{itemize}
+		\item AST Node
+		\item Single token
+		\end{itemize}
+	\end{itemize}
+
+\item[Terminal Symbol] A symbol which is an elementary token of the source language (i.e. ``x").
+
+\item[Nonterminal symbol] A symbol which is defined by a production rule (i.e. an integer).
+
+\item[Production Rule] A syntactic rule of the language's grammar, mapping a rule to a nonterminal symbol.
+\end{description}
+
+\subsection{Structure Parser Algorithm}
+Source code for many programming language contains recursive syntactic elements. MPTK's structure parser creates a loosely-parsed AST which contains the structure information of recursive syntactic elements.
+
+MPTK's structure parser uses the concept of bounds and splits. Any production rule within the language's grammar which contains a nonterminal symbol \textit{bound} by in-bound and out-bound tokens is considered a bound. Any production rule within the language's grammar which consists of a sequence of any number of elements separated in between by a deliminator token is considered a split. Within MPTK, each bound rule is paired with a split rule such that the contents of the bound is always a split. A bound rule is said to be bounded by its in-bound and out-bound tokens. A split rule is said to be split by its deliminator token.
+
+Different node types should exist for different recursive elements. For example, in C-like languages, the recursive elements between \verb|{}|, \verb|()|, and \verb|[]| should be recognized with the contents of \verb|{}| split by \verb|;| and the contents of \verb|()| split by \verb|,|. 
+
+There is always a global node type which has no bound rule. It may have a paired split rule, however.
+
+\subsubsection{Overview}
+The algorithm is based on an AST builder which relies on the levels of the AST tree. It provides a writing head for an AST tree on which the following operations can be performed:
+\begin{description}
+\item[Ascend] Decrease the level of the write head by moving it to the current node's immediate parent node.
+\item[Descent] Increase the level of the write head by moving to the most recently appended branch of the current node if it exists. If none exists, cause exception.
+\item[Append] Appends a new AST node as a branch to the current AST node.
+\end{description}
+
+This functionality can be achieved through using the following data and procedures. The data included must consist of at least the following elements:
+\begin{description}
+\item[AST Root] The root node of the AST tree.
+\item[Head Stack] A stack of AST node pointers. Initially contains a pointer to the root node.
+\end{description}
+
+The curent AST node can be acquired by peeking the top element from the head stack and dereferencing it.
+
+The ascend operation can be performed via the following procedure:\newline
+\begin{algorithm}[H]
+\caption{$ascend(builder)$}
+
+pop top element from the head stack\;
+\end{algorithm}
+
+$B$ is the number of branches in the current AST node $n$. The descend operation can be performed via the following procedure:\newline
+\begin{algorithm}[H]
+\caption{$descend(builder)$}
+
+\uIf{$B = 0$}{
+	throw exception\;
+}
+\Else {
+	push the address of n[B-1] to the head stack\;
+}
+\end{algorithm}
+
+The current AST node is $n$. The AST node to be appended is $a$. The append operation can be performed via the following procedure:\newline
+\begin{algorithm}[H]
+\caption{$append(builder)$}
+
+append $a$ as a branch to $n$\;
+\end{algorithm}
+
+Each bound and split pair should specify the following parameters:
+\begin{itemize}
+\item Whether or not the end of the bound should act as the end of an element in the parent split.
+\end{itemize}
+
+\newpage
+\subsubsection{Algorithm}
+$T$ is the sequence of tokens to be parsed.\newline
+
+\begin{algorithm}[H]
+\caption{$parseStructure(A)$}
+
+$builder\gets$ a new AST builder object\;
+$stack\gets$ a descriptor of the global stack type\;
+
+\For{tokens $t$ in $T$}{
+	\uIf{$t$ is an in-bound token}{
+		append a new AST node describing the bound type associated with the in-bound token to builder\;
+		perform the descend operation on the builder\;
+		append a new AST node describing the split type associated with the in-bound token to builder\;
+		perform the descend operation on the builder\;
+		push the bound type to the stack\;
+	}
+	\uElseIf{$t$ is an out-bound token corresponding to the bound beginning indicated by the top element of stack}{
+		$head\gets$ the address of the AST node pointed to by builder's write head\;
+		perform the ascend operation on builder twice\;
+		pop the top element of the stack\;
+		\If{tmp has branches and if the end of this bound is specified to act as an element in the parent split}{
+			perform the ascend operator on builder\;
+			append new node of the split type associated with the element on the top of the stack\;
+			perform the descend operator on builder\;
+		}
+	}
+	\uElseIf{$t$ is the out-bound or deliminator token of any bound other than that which is indicated by the element at the top of the stack}{
+		throw exception\;
+	}
+	\Else {
+		perform append operation on builder using $t$\;
+	}
+}
+
+\If{size of stack $>$ 1} {
+	throw exception\;
+}
+\end{algorithm}
+
+\subsubsection{Running Time Analysis}
+The running time of this algorithm using big-O notation should be $O(L)$ where $L$ is the number of tokens in $T$. It is a relatively simple iterative algorithm, assuming that the AST builder is implemented such that each operation is $O(1)$.
+
+\subsection{Expression Parser Algorithm}
+Many programming languages include algebraic expressions with simple rules. MPTK contains a parser algorithm to handle these rules. It assumes that parenthesis, or equivalent tokens, are the bound tokens for the expression bound. It also assumes that the input to the parser, an AST node, has been successsfully parsed with a structure parser.
+
+\subsubsection{Definitions}
+\begin{description}
+\item[Expression Bound] An AST node which contains tokens representing a recursive expression.
+\item[Literal] A literal representation of a constant value. May be an integer, float, character, string, etc.
+\item[Symbol] A symbol representing a variable or other symbol within the source code.
+\item[Non-Expression Bound] Any AST node which is not an expression bound.
+\item[Rightmost Node] The node found through the rightmost procedure ($A$ is the input AST node and $B$ is the number of branches in $A$):\newline
+	\begin{algorithm}[H]
+	\caption{$rightmost(A)$}
+
+	\uIf{$A$ has no branches} {
+		return $A$\;
+	}
+	\Else {
+		return $rightmost(A[B-1])$\;
+	}
+	\end{algorithm}
+\end{description}
+
+\subsubsection{Overview}
+While the previous algorithms have all been iterative, this algorithm is recursive. It must be to deal with the recursive nature of the AST input.
+
+\newpage
+\subsubsection{Algorithm}
+$A$ is the input AST. $B$ is the number of branches in $A$. \newline
+\begin{algorithm}[H]
+\caption{$parseValue(A, stack)$}
+
+\uIf{a is an expression bound}{
+	\uIf{the number of branches in a $\neq 1$}{
+		throw exception\;
+	}
+	\Else {
+		\uIf{a[0] is an expression bound} {
+			$value\gets parse(a[0])$\;
+		}
+		\Else {
+			throw exception\;
+		}
+	}
+}
+\uElseIf{a is a literal} {
+	$value\gets a$\;
+}
+\uElseIf{a is a symbol} {
+	\uIf{a is not the last branch in A and A[i+1] is an expression bound}{
+		$value\gets$ a new AST node describing a function call\;
+		value's function symbol is a\;
+		\For{arguments $p$ in A[i+1]} {
+			append argument to function call AST $value$\;
+		}
+	}
+	\Else {
+		$value\gets a$\;
+	}
+}
+\uElseIf{a is a non-expression bound} {
+	$value\gets a$\;
+}
+
+\uIf{stack is not empty and the top element of the stack is an operator}{
+	$o\gets$ top operator element of the stack\;
+	\uIf{$o$ is a binary operator}{
+		pop the top element from the stack\;
+		\uIf{stack is empty}{
+			throw exception\;
+		}
+		\uElseIf{top element is not an expression}{
+			throw exception\;
+		}
+		\Else {
+			$lvalue\gets$ pop the top expression from the stack\;
+			\uIf{precedence of $o >$ precedence of $lvalue$}{
+				$tmp\gets$ new binary expression\;
+				tmp's left operand is the rightmost node of $lvalue$\;
+				tmp's right operand is $value$\;
+				tmp's operator is $o$\;
+				push tmp to the top of $stack$\;
+			}
+			\Else {
+				$tmp\gets$ new binary expression\;
+				tmp's left operand is $lvalue$\;
+				tmp's right operand is $value$\;
+				tmp's operator is $o$\;
+				push tmp to the top of $stack$\;
+			}
+		}
+	}
+	\uElseIf{$o$ is a unary operator}{
+		\If{$o$ is right associative}{
+			pop top item from stack\;
+			$tmp\gets$ new unary right expression\;
+			tmp's operator is $o$\;
+			tmp's operand is $value$\;
+			push tmp to the top of $stack$\;
+		}
+	}
+}
+\Else {
+	push $value$ to the top of $stack$\;
+}
+
+return $value$\;
+\end{algorithm}
+
+\newpage
+\begin{algorithm}[H]
+\caption{$parseOperator(A, stack)$}
+
+\uIf{$a$ is a binary operator} {
+	push $a$ to the top of $stack$\;
+}
+\ElseIf{$a$ is a unary operator} {
+	\uIf{$a$ can be both left and right associative}{
+		\uIf{$stack$ is empty or the top element of $stack$ is an operator}{
+			push $a$ to the stack\;
+		}
+		\ElseIf{top element of $stack$ is an expression}{
+			$value\gets$ popped top element of $stack$\;
+			\uIf{precedence of $a >$ precedence of $value$}{
+				$tmp\gets$ new unary left expression\;
+				tmp's operand is the rightmode node of $value$\;
+				tmp's operator is $a$\;
+				set $value$'s rightmost node to $tmp$\;
+				push $value$ to the top of the stack\;
+			}
+			\Else {
+				$tmp\gets$ new unary left expression\;
+				tmp's operand is $value$\;
+				tmp's operator is $a$\;
+				push $tmp$ to the top of the stack\;
+			}
+		}
+	}
+	\uElseIf{$a$ is only left associative}{
+		\If{$stack$ is empty or the top element of $stack$ is an operator}{
+			$value\gets$ popped top expression of $stack$\;
+			\uIf{precedence of $a >$ precedence of $value$}{
+				$tmp\gets$ new unary left expression\;
+				tmp's operand is $value$'s rightmost node\;
+				tmp's operator is $a$\;
+				$value$'s rightmode node is set to $tmp$\;
+				push $value$ to top of $stack$\;
+			}
+			\Else {
+				$tmp\gets$ new unary left expression\;
+				tmp's operand is $value$\;
+				tmp's operator is $a$\;
+				push $value$ to the top of $stack$ This has to be verified!\;
+			}
+		}
+	}
+	\ElseIf{$a$ is only right associative} {
+		push $a$ to the top of $stack$\;
+	}
+}
+
+return $value$\;
+\end{algorithm}
+
+\newpage
+Note that for all prior algorithms in this section, $stack$ is passed by reference.\newline
+\begin{algorithm}[H]
+\caption{$parseExpression(A)$}
+
+$stack\gets$ []\;
+\For{$i\gets 0, B$}{
+	$a\gets A[i]$\;
+	\uIf{a is an expression bound, a literal token, or a symbol}{
+		$value\gets parseValue(a, stack)$\;
+	}
+	\uElseIf{$a$ is an operator} {
+		$value\gets parseOperator(a, stack)$\;
+	}
+	\Else{
+		throw exception\;
+	}
+}
+
+\uIf{$stack$ is empty} {
+	return empty expression AST\;
+}
+\uElseIf{$stack$ has length of 1}{
+	\uIf{top element of $stack$ is an operator} {
+		throw exception\;
+	}
+	\Else {
+		$res\gets$ popped top expression off $stack$\;
+		\uIf {$res$ is a token} {
+			return expression value node created from $res$ \;
+		}
+		\Else {
+			return $res$ \;
+		}
+	}
+}
+\Else {
+	throw exception\;
+}
+\end{algorithm}
+
+\subsubsection{Running Time Analysis}
+This procedure traverses every node in the AST tree once, so it has a running time of $O(N)$ where $N$ is the number of nodes in the AST tree. In the worst case, this is equivalent to the number of tokens in the expression passed to the structure parser.
+
+\section{Efficiency Disadvantages of MPTK}
+Since MPTK uses a series of algorithms to partially parse an AST result, it will not be as efficient as a single parsing algorithm to perform a complete parsing. MPTK is still $O(n)$, but the actual running time may differ between competetive libraries.
+
+The rationale for this design was to allow the developer as much freedom as possible in writing a compiler. Creating a parsing with a parsing generator is a more complex environment than hand coding an algorithm to parse a partially parsed AST.
+
+\begin{thebibliography}{9}
+\bibitem{ISO_CharacterEncodings}
+	ISO/EIC 8859-1,
+	\emph{Final Text of DIS 8859-1, 8-bit single-byte coded graphic character sets -- Part 1: Latin alphabet No. 1}.
+	1998.
+
+\bibitem{LEX_Book}
+	Lesk, M. E,. \& Schmidt, E. (1975). \emph{Lex - A Lexical Analyzer Generator}. Murray Hill, NJ: Bell Laboratories.
+
+\bibitem{YACC_Book}
+	Johnson, S. C. (1975). \emph{Yacc: Yet Another Compiler-Compiler}. Murray Hill, NJ: Bell Laboratories.
+\end{thebibliography}
+
+%\appendix
+%\section*{Appendix}
+%\renewcommand{\thesubsection}{\Alph{subsection}}
+
+%\subsection{Parsing a Python-like Language}
+
+\end{document}

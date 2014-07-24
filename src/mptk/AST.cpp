@@ -119,4 +119,25 @@ namespace mptk
 	{
 		append(createLeaf(t));
 	}
+
+	string AST::display()
+	{
+		stringstream ss;
+
+		if (isBranched)
+		{
+			ss << "(" << nameValue << ":";
+			for (auto i : branchValues)
+				ss << " " << i.display();
+			if (branchValues.empty())
+				ss << "null";
+			ss << ")";
+		}
+		else
+		{
+			ss << "'" << leafValue.value << "'";
+		}
+
+		return ss.str();
+	}
 }

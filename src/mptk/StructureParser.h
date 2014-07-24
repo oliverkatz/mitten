@@ -34,23 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPTK.h
+/* File:    StructureParser.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * MPTK is a language parsing library. It is designed to be implemented in a
- * single header file. It provides the ability for a developer to write a
- * compiler with a handmade feel without the significant workload required to
- * implement even a simple lexer and parser. It maintains a competetive
- * efficiency of O(n) with lex and yacc.
- *
- * For a description of how the algorithms used by MPTK work or a detailed
- * efficiency analysis, see "MPTK Language Parsing Algorithms" (2014), a
- * pamplet which can be found on the MPTK website.
- *
- * For a tutorial on how to use MPTK, see the MPTK website or "MPTK
- * Beginner Tutorial" (2014), which can be found on the MPTK website.
+ * Parses token sequences into ASTs using splits and bounds.
  */
 
 /* Changelog:
@@ -59,19 +48,49 @@
  * Initial release.
  */
 
-#ifndef __MPTK_H
-#define __MPTK_H
+#ifndef __MPTK_STRUCTURE_PARSER_H
+#define __MPTK_STRUCTURE_PARSER_H
 
-#define MPTK_VERSION_MAJOR 0
-#define MPTK_VERSION_MINOR 1
-#define MPTK_VERSION_STR "0.01-alpha"
-#define MPTK_VERSION 0x001
+#include <iostream>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <stdexcept>
 
-#include "Utils.h"
 #include "Token.h"
-#include "Lexer.h"
 #include "AST.h"
+#include "ASTBuilder.h"
 #include "Error.h"
-#include "StructureParser.h"
+
+namespace mptk
+{
+	class StructureParser
+	{
+	protected:
+		typedef struct Bound
+		{
+			std::string end, split, boundName, elementName;
+			bool endIsParentSplit;
+
+			Bound() : endIsParentSplit(false) {}
+			Bound(std::string n, std::string e) : boundName(n), end(e) {}
+			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
+
+			Bound &setEndIsParentSplit(bool v);
+		} Bound;
+
+		std::string globalBoundName, globalSplitName;
+		std::unordered_map<std::string, Bound> bounds;
+		std::unordered_set<std::string> boundEnds;
+
+	public:
+		StructureParser(std::string en = "", std::string sp = "");
+
+		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
+
+		AST parse(std::vector<Token> toks, std::vector<Error> &e);
+	};
+}
 
 #endif

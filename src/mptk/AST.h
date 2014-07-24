@@ -54,6 +54,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 #include <stdexcept>
 
 #include "Token.h"
@@ -83,6 +84,8 @@ namespace mptk
 
 		void append(AST a);
 		void append(Token t);
+
+		std::string display();
 	};
 }
 

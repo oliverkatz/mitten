@@ -56,6 +56,7 @@ namespace mptk
 {
 	ASTBuilder::ASTBuilder()
 	{
+		rootNode = AST::createNode("global");
 		headStack.push(&rootNode);
 	}
 

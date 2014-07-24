@@ -363,7 +363,7 @@ $T$ is the sequence of tokens to be parsed.\newline
 \caption{$parseStructure(A)$}
 
 $builder\gets$ a new AST builder object\;
-$stack\gets$ a descriptor of the global stack type\;
+$stack\gets$ a new empty stack\;
 
 \For{tokens $t$ in $T$}{
 	\uIf{$t$ is an in-bound token}{
@@ -377,11 +377,15 @@ $stack\gets$ a descriptor of the global stack type\;
 		$head\gets$ the address of the AST node pointed to by builder's write head\;
 		perform the ascend operation on builder twice\;
 		pop the top element of the stack\;
-		\If{tmp has branches and if the end of this bound is specified to act as an element in the parent split}{
-			perform the ascend operator on builder\;
+		\If{AST at $head$ has branches and if the end of this bound is specified to act as an element in the parent split}{
 			append new node of the split type associated with the element on the top of the stack\;
 			perform the descend operator on builder\;
 		}
+	}
+	\uElseIf{$t$ is a split token corresponding to the bound beginning indicated by the top element of stack}{
+		perform the ascend operation on builder\;
+		append new node of the split type associated with the element on the top of the stack\;
+		perform the descend operation on builder\;
 	}
 	\uElseIf{$t$ is the out-bound or deliminator token of any bound other than that which is indicated by the element at the top of the stack}{
 		throw exception\;

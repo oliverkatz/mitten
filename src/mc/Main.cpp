@@ -24,8 +24,15 @@ int main(int argc, char *argv[])
 	lexer.deliminate("\"", "\"");
 
 	vector<Token> toks = lexer.lex(page);
-	for (auto i : toks)
-		cout << "'" << i.value << "'\n";
+	
+	StructureParser structureParser = StructureParser("block", ";");
+	structureParser.bind("scope", "{", "}", "line", ";").setEndIsParentSplit(true);
+	structureParser.bind("arglist", "(", ")", "arg", ",");
+
+	vector<Error> errors;
+	AST ast = structureParser.parse(toks, errors);
+
+	cout << ast.display() << "\n";
 
 	return 0;
 }

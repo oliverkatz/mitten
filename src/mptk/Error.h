@@ -34,23 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPTK.h
+/* File:    Error.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * MPTK is a language parsing library. It is designed to be implemented in a
- * single header file. It provides the ability for a developer to write a
- * compiler with a handmade feel without the significant workload required to
- * implement even a simple lexer and parser. It maintains a competetive
- * efficiency of O(n) with lex and yacc.
- *
- * For a description of how the algorithms used by MPTK work or a detailed
- * efficiency analysis, see "MPTK Language Parsing Algorithms" (2014), a
- * pamplet which can be found on the MPTK website.
- *
- * For a tutorial on how to use MPTK, see the MPTK website or "MPTK
- * Beginner Tutorial" (2014), which can be found on the MPTK website.
+ * Errors are stored in this class.
  */
 
 /* Changelog:
@@ -59,19 +48,29 @@
  * Initial release.
  */
 
-#ifndef __MPTK_H
-#define __MPTK_H
+#ifndef __MPTK_ERROR_H
+#define __MPTK_ERROR_H
 
-#define MPTK_VERSION_MAJOR 0
-#define MPTK_VERSION_MINOR 1
-#define MPTK_VERSION_STR "0.01-alpha"
-#define MPTK_VERSION 0x001
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stdexcept>
 
-#include "Utils.h"
 #include "Token.h"
-#include "Lexer.h"
-#include "AST.h"
-#include "Error.h"
-#include "StructureParser.h"
+
+namespace mptk
+{
+	class Error
+	{
+	public:
+		std::string message;
+		Token source;
+
+		Error() {}
+		Error(Token s, std::string m) : source(s), message(m) {}
+	};
+
+	void internalErrorDump(std::vector<Error> e);
+}
 
 #endif

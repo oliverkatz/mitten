@@ -11,7 +11,7 @@
 
 include ../config.mk
 
-OBJ=Utils.o Lexer.o AST.o ASTBuilder.o
+OBJ=Utils.o Lexer.o AST.o ASTBuilder.o Error.o StructureParser.o
 
 all : libMPTK.a
 

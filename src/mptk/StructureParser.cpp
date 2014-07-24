@@ -34,23 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPTK.h
+/* File:    StructureParser.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * MPTK is a language parsing library. It is designed to be implemented in a
- * single header file. It provides the ability for a developer to write a
- * compiler with a handmade feel without the significant workload required to
- * implement even a simple lexer and parser. It maintains a competetive
- * efficiency of O(n) with lex and yacc.
- *
- * For a description of how the algorithms used by MPTK work or a detailed
- * efficiency analysis, see "MPTK Language Parsing Algorithms" (2014), a
- * pamplet which can be found on the MPTK website.
- *
- * For a tutorial on how to use MPTK, see the MPTK website or "MPTK
- * Beginner Tutorial" (2014), which can be found on the MPTK website.
+ * Parses token sequences into ASTs using splits and bounds.
  */
 
 /* Changelog:
@@ -59,19 +48,79 @@
  * Initial release.
  */
 
-#ifndef __MPTK_H
-#define __MPTK_H
-
-#define MPTK_VERSION_MAJOR 0
-#define MPTK_VERSION_MINOR 1
-#define MPTK_VERSION_STR "0.01-alpha"
-#define MPTK_VERSION 0x001
-
-#include "Utils.h"
-#include "Token.h"
-#include "Lexer.h"
-#include "AST.h"
-#include "Error.h"
 #include "StructureParser.h"
 
-#endif
+using namespace std;
+
+namespace mptk
+{
+	StructureParser::Bound &StructureParser::Bound::setEndIsParentSplit(bool v)
+	{
+		endIsParentSplit = v;
+		return *this;
+	}
+
+	StructureParser::StructureParser(string en, string sp)
+	{
+		globalBoundName = en;
+		globalSplitName = sp;
+	}
+
+	StructureParser::Bound &StructureParser::bind(string n, string st, string e, string en, string sp)
+	{
+		bounds[st] = Bound(n, e, en, sp);
+		boundEnds.insert(e);
+		return bounds[st];
+	}
+
+	AST StructureParser::parse(vector<Token> toks, vector<Error> &e)
+	{
+		ASTBuilder builder;
+		stack<string> boundStack;
+
+		for (auto i : toks)
+		{
+			if (bounds.find(i.value) != bounds.end())
+			{
+				builder.append(AST::createNode(bounds[i.value].boundName));
+				builder.descend();
+				builder.append(AST::createNode(bounds[i.value].elementName));
+				builder.descend();
+				boundStack.push(i.value);
+			}
+			else if (!boundStack.empty() && bounds[boundStack.top()].end.compare(i.value) == 0)
+			{
+				AST *head = &(builder.head());
+				builder.ascend();
+				builder.ascend();
+				boundStack.pop();
+				if (!boundStack.empty() && (head->size() > 0 && bounds[boundStack.top()].endIsParentSplit))
+				{
+					builder.append(AST::createNode(bounds[boundStack.top()].elementName));
+					builder.descend();
+				}
+			}
+			else if (!boundStack.empty() && bounds[boundStack.top()].split.compare(i.value) == 0)
+			{
+				builder.ascend();
+				builder.append(AST::createNode(bounds[boundStack.top()].elementName));
+				builder.descend();
+			}
+			else if (boundEnds.find(i.value) != boundEnds.end())
+			{
+				e.push_back(Error(i, "mismatched bounds"));
+			}
+			else
+			{
+				builder.append(i);
+			}
+		}
+
+		if (!toks.empty() && boundStack.size() > 1)
+		{
+			e.push_back(Error(toks[0], "incomplete bounds"));
+		}
+
+		return builder.root();
+	}
+}

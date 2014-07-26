@@ -61,7 +61,7 @@ namespace mitten
 
 	bool StringLiteralTagger::isStringLiteral(string s)
 	{
-		
+		return (s.find(inQuote) == 0 && s.rfind(unQuote) == s.size()-unQuote.size());
 	}
 
 	string StringLiteralTagger::parse(Token t)
@@ -71,6 +71,9 @@ namespace mitten
 
 	string StringLiteralTagger::parse(string s)
 	{
-		return s;
+		string tmp = s.substr(inQuote.size(), s.size()-inQuote.size()-unQuote.size());
+		if (allowEscapes)
+			tmp = evaluateEscapeCodes(tmp);
+		return tmp;
 	}
 }

@@ -13,6 +13,7 @@ MAKE=make
 MAKEFLAGS=
 
 all :
+	$(MAKE) $(MAKEFLAGS) -C src/munit all
 	$(MAKE) $(MAKEFLAGS) -C src/mptk all
 	$(MAKE) $(MAKEFLAGS) -C src/mc all
 
@@ -20,6 +21,7 @@ docs :
 	$(MAKE) $(MAKEFLAGS) -C doc/MittenParsingToolkitAlgorithms all
 
 clean :
+	$(MAKE) $(MAKEFLAGS) -C src/munit clean
 	$(MAKE) $(MAKEFLAGS) -C src/mptk clean
 	$(MAKE) $(MAKEFLAGS) -C src/mc clean
 	$(MAKE) $(MAKEFLAGS) -C doc/MittenParsingToolkitAlgorithms clean

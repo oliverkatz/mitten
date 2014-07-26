@@ -79,7 +79,7 @@ namespace mitten
 					gotDot = true;
 				}
 			}
-			else if (s[i] == 'e')
+			else if (s[i] == 'e' && (i != 0 && i != s.size()-1))
 			{
 				if (!allowScientific)
 				{
@@ -90,7 +90,7 @@ namespace mitten
 			{
 				continue;
 			}
-			else
+			else if (s[i] != '-')
 			{
 				return false;
 			}

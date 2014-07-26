@@ -174,7 +174,7 @@ namespace mitten
 		if (n.size() > longestName)
 			longestName = n.size();
 
-		cout << "  " << n << "... " << (r ? "passed." : "failed!") << "\n";
+		cout << "  " << n << "... " << (r ? "\033[0;32mpassed.\033[0;0m" : "\033[0;31mfailed!\033[0;0m") << "\n";
 	}
 
 	bool Test::pass()

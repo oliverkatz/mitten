@@ -56,6 +56,7 @@
 #include <vector>
 #include <unordered_map>
 
+#include "Utils.h"
 #include "Token.h"
 
 namespace mitten
@@ -63,12 +64,11 @@ namespace mitten
 	class StringLiteralTagger
 	{
 	public:
-		bool allowEscapes, allowMultiLine;
+		bool allowEscapes;
 
-		std::string inQuoteSingle, unQuoteSingle;
-		std::string inQuoteMultiLine, unQuoteMultiLine;
+		std::string inQuote, unQuote;
 
-		StringLiteralTagger() : allowEscapes(true), allowMultiLine(true), inQuoteSingle("\""), unQuoteSingle("\""), inQuoteMultiLine("\"\"\""), unQuoteMultiLine("\"\"\"") {}
+		StringLiteralTagger() : allowEscapes(true), inQuote("\""), unQuote("\"") {}
 
 		bool isStringLiteral(Token t);
 		bool isStringLiteral(std::string s);

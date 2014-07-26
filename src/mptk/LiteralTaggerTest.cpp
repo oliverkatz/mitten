@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    IntegerLiteralTagger.cpp
+/* File:    LiteralTaggerTest.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Detects integer literals.
+ * Unit test using MUnit.
  */
 
 /* Changelog:
@@ -48,49 +48,74 @@
  * Initial release.
  */
 
+#include <iostream>
+#include <MUnit.h>
+
+#include "BooleanLiteralTagger.h"
+#include "CharacterLiteralTagger.h"
+#include "FloatingLiteralTagger.h"
 #include "IntegerLiteralTagger.h"
+#include "StringLiteralTagger.h"
 
 using namespace std;
+using namespace mitten;
 
-namespace mitten
+int main()
 {
-	bool IntegerLiteralTagger::isIntegerLiteral(Token t)
-	{
-		return isIntegerLiteral(t.value);
-	}
+	Test test = Test("LiteralTaggerTest");
 
-	bool IntegerLiteralTagger::isIntegerLiteral(string s)
-	{
-		if (s.compare("0x") == 0)
-			return false;
+	BooleanLiteralTagger blt;
+	CharacterLiteralTagger clt;
+	FloatingLiteralTagger flt;
+	IntegerLiteralTagger ilt;
+	StringLiteralTagger slt;
 
-		if (s.back() == 'h' && (isdigit(s[0]) || (s[0] >= 'a' && s[0] <= 'f') || (s[0] >= 'A' && s[0] <= 'F')))
-			s = "0x" + s.substr(0, s.size()-1);
+	test.assert(blt.isBooleanLiteral("true"));
+	test.assert(blt.isBooleanLiteral("false"));
+	test.assert(!blt.isBooleanLiteral("blah"));
+	test.assert(blt.parse("true"));
+	test.assert(!blt.parse("false"));
 
-		try
-		{
-			stoi(s, NULL, 0);
-			return true;
-		}
-		catch(invalid_argument &e)
-		{
-			return false;
-		}
-	}
+	test.assert(clt.isCharacterLiteral("'a'"));
+	test.assert(!clt.isCharacterLiteral("'a"));
+	test.assert(!clt.isCharacterLiteral("a'"));
+	test.assert(!clt.isCharacterLiteral("a"));
+	test.assert(!clt.isCharacterLiteral(""));
+	test.assert(clt.isCharacterLiteral("'\\a'"));
+	test.assert(clt.parse("'a'") == 'a');
+	test.assert(clt.parse("'\\a'") == '\a');
 
-	int IntegerLiteralTagger::parse(Token t)
-	{
-		return parse(t.value);
-	}
+	test.assert(flt.isFloatingLiteral("0"));
+	test.assert(flt.isFloatingLiteral("0.1"));
+	test.assert(!flt.isFloatingLiteral("0.a"));
+	test.assert(flt.isFloatingLiteral("-5000"));
+	test.assert(flt.isFloatingLiteral("3.5e2"));
+	test.assert(!flt.isFloatingLiteral("3.5e"));
+	test.assert(!flt.isFloatingLiteral("e5"));
+	test.assert(flt.parse("5.0") == 5.0);
+	test.assert(flt.parse("5.0e2") == 500.0);
 
-	int IntegerLiteralTagger::parse(string s)
-	{
-		if (s.compare("0x") == 0)
-			throw runtime_error("invalid integer format");
+	test.assert(ilt.isIntegerLiteral("0"));
+	test.assert(!ilt.isIntegerLiteral("a"));
+	test.assert(ilt.isIntegerLiteral("0x0"));
+	test.assert(!ilt.isIntegerLiteral("0x"));
+	test.assert(ilt.isIntegerLiteral("0x050FA"));
+	test.assert(ilt.isIntegerLiteral("003"));
+	test.assert(ilt.isIntegerLiteral("00"));
+	test.assert(ilt.isIntegerLiteral("FFFFh"));
+	test.assert(ilt.isIntegerLiteral("-25"));
+	test.assert(ilt.parse("0") == 0);
+	test.assert(ilt.parse("0x20") == 0x20);
+	test.assert(ilt.parse("20h") == 0x20);
+	test.assert(ilt.parse("033") == 033);
+	test.assert(ilt.parse("-25") == -25);
 
-		if (s.back() == 'h' && (isdigit(s[0]) || (s[0] >= 'a' && s[0] <= 'f') || (s[0] >= 'A' && s[0] <= 'F')))
-			s = "0x" + s.substr(0, s.size()-1);
+	test.assert(slt.isStringLiteral("\"\""));
+	test.assert(slt.isStringLiteral("\"hi\""));
+	test.assert(slt.isStringLiteral("\"hello, world\\n\""));
+	test.assert(!slt.isStringLiteral("\"hello, world\\n"));
+	test.assert(!slt.isStringLiteral("hello, world\\n\""));
+	test.assert(slt.parse("\"hi\\n\"").compare("hi\n") == 0);
 
-		return stoi(s, NULL, 0);
-	}
+	return (int)(test.write());
 }

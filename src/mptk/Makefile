@@ -14,7 +14,7 @@ include ../config.mk
 CXXFLAGS+=-I../munit -L../munit -L.
 
 OBJ=Utils.o BooleanLiteralTagger.o CharacterLiteralTagger.o FloatingLiteralTagger.o IntegerLiteralTagger.o StringLiteralTagger.o Lexer.o AST.o ASTBuilder.o ErrorHandler.o StructureParser.o ExpressionParser.o
-TEST=UtilsTest
+TEST=UtilsTest LiteralTaggerTest
 
 all : libMPTK.a
 
@@ -29,4 +29,7 @@ test : $(TEST)
 	@for i in $(TEST); do echo "Running $$i:"; ./$$i; echo; done
 
 UtilsTest : UtilsTest.cpp libMPTK.a
+	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
+
+LiteralTaggerTest : LiteralTaggerTest.cpp libMPTK.a
 	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK

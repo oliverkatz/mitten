@@ -52,7 +52,7 @@
 
 using namespace std;
 
-namespace mptk
+namespace mitten
 {
 	StructureParser::Bound &StructureParser::Bound::setEndIsParentSplit(bool v)
 	{
@@ -73,7 +73,7 @@ namespace mptk
 		return bounds[st];
 	}
 
-	AST StructureParser::parse(vector<Token> toks, vector<Error> &e)
+	AST StructureParser::parse(vector<Token> toks, ErrorHandler &e)
 	{
 		ASTBuilder builder;
 		stack<string> boundStack;
@@ -108,7 +108,19 @@ namespace mptk
 			}
 			else if (boundEnds.find(i.value) != boundEnds.end())
 			{
-				e.push_back(Error(i, "mismatched bounds"));
+				bool found = false;
+				for (auto j : bounds)
+				{
+					if (j.second.end.compare(i.value) == 0)
+					{
+						e.mismatchedStructureBounds(i, j.first, i.value);
+						found = true;
+						break;
+					}
+				}
+
+				if (!found)
+					throw runtime_error("bound set improperly configured");
 			}
 			else
 			{
@@ -118,7 +130,7 @@ namespace mptk
 
 		if (!toks.empty() && boundStack.size() > 1)
 		{
-			e.push_back(Error(toks[0], "incomplete bounds"));
+			e.incompleteStructureBound(toks[0], boundStack.top(), bounds[boundStack.top()].end);
 		}
 
 		return builder.root();

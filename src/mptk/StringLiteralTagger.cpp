@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
+/* File:    StringLiteralTagger.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
+ * Detects string literals.
  */
 
 /* Changelog:
@@ -48,49 +48,29 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_STRUCTURE_PARSER_H
-#define __MITTEN_STRUCTURE_PARSER_H
+#include "StringLiteralTagger.h"
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <stdexcept>
-
-#include "Token.h"
-#include "AST.h"
-#include "ASTBuilder.h"
-#include "ErrorHandler.h"
+using namespace std;
 
 namespace mitten
 {
-	class StructureParser
+	bool StringLiteralTagger::isStringLiteral(Token t)
 	{
-	protected:
-		typedef struct Bound
-		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
+		return isStringLiteral(t.value);
+	}
 
-			Bound() : endIsParentSplit(false) {}
-			Bound(std::string n, std::string e) : boundName(n), end(e) {}
-			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
+	bool StringLiteralTagger::isStringLiteral(string s)
+	{
+		
+	}
 
-			Bound &setEndIsParentSplit(bool v);
-		} Bound;
+	string StringLiteralTagger::parse(Token t)
+	{
+		return parse(t.value);
+	}
 
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
-
-	public:
-		StructureParser(std::string en = "", std::string sp = "");
-
-		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
-
-		AST parse(std::vector<Token> toks, ErrorHandler &e);
-	};
+	string StringLiteralTagger::parse(string s)
+	{
+		return s;
+	}
 }
-
-#endif

@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
+/* File:    ExpressionParser.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
+ * Parses ASTs into ordered expression ASTs.
  */
 
 /* Changelog:
@@ -48,8 +48,8 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_STRUCTURE_PARSER_H
-#define __MITTEN_STRUCTURE_PARSER_H
+#ifndef __MITTEN_EXPRESSION_PARSER_H
+#define __MITTEN_EXPRESSION_PARSER_H
 
 #include <iostream>
 #include <string>
@@ -65,31 +65,36 @@
 
 namespace mitten
 {
-	class StructureParser
+	class ExpressionParser
 	{
 	protected:
-		typedef struct Bound
+		typedef struct OperatorInfo
 		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
+			bool unary;
+			bool leftAssociative, rightAssociative;
 
-			Bound() : endIsParentSplit(false) {}
-			Bound(std::string n, std::string e) : boundName(n), end(e) {}
-			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
+			OperatorInfo() : unary(true), leftAssociative(false), rightAssociative(false) {}
+			OperatorInfo(bool u, bool l, bool r) : unary(u), leftAssociative(l), rightAssociative(r) {}
+		} OperatorInfo;
 
-			Bound &setEndIsParentSplit(bool v);
-		} Bound;
+		std::string expressionBound, expressionElement;
+		std::unordered_map<std::string, OperatorInfo> operators;
 
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
+		virtual bool isSymbol(std::string s);
+		virtual bool isLiteral(std::string s);
 
 	public:
-		StructureParser(std::string en = "", std::string sp = "");
+		ExpressionParser() {}
 
-		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
+		void setExpressionBound(std::string b);
+		void setExpressionElement(std::string e);
 
-		AST parse(std::vector<Token> toks, ErrorHandler &e);
+		void addUnaryLeftOperator(std::string o);
+		void addUnaryRightOperator(std::string o);
+		void addUnaryBothOperator(std::string o);
+		void addBinaryOperator(std::string o);
+
+		AST parse(AST ast, ErrorHandler &e);
 	};
 }
 

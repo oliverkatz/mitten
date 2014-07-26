@@ -49,14 +49,25 @@
  * Initial release.
  */
 
-#ifndef __MPTK_TOKEN_H
-#define __MPTK_TOKEN_H
+#ifndef __MITTEN_TOKEN_H
+#define __MITTEN_TOKEN_H
 
 #include <iostream>
 #include <string>
 
-namespace mptk
+namespace mitten
 {
+	typedef enum
+	{
+		Deliminator,
+		SymbolTag,
+		BooleanLiteralTag,
+		IntegerLiteralTag,
+		FloatingLiteralTag,
+		CharacterLiteralTag,
+		StringLiteralTag
+	} TokenTag;
+
 	/* Class: Token
 	 * ------------
 	 * Contains the information required in a simple token.
@@ -66,6 +77,7 @@ namespace mptk
 	public:
 		int line, column; // line and column numbers
 		std::string value; // the string content of the token
+		TokenTag tag;
 
 		/* Constructor
 		 * -----------
@@ -80,7 +92,7 @@ namespace mptk
 		 * 'l' - the line number
 		 * 'c' - the column number
 		 */
-		Token(std::string v, int l, int c) : line(l), column(c), value(v) {}
+		Token(std::string v, int l, int c, TokenTag t = Deliminator) : line(l), column(c), value(v), tag(t) {}
 	};
 }
 

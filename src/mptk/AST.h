@@ -48,8 +48,8 @@
  * Initial release.
  */
 
-#ifndef __MPTK_AST_H
-#define __MPTK_AST_H
+#ifndef __MITTEN_AST_H
+#define __MITTEN_AST_H
 
 #include <iostream>
 #include <string>
@@ -59,7 +59,7 @@
 
 #include "Token.h"
 
-namespace mptk
+namespace mitten
 {
 	class AST
 	{
@@ -75,12 +75,16 @@ namespace mptk
 		static AST createLeaf(Token t);
 		static AST createNode(std::string n);
 
+		bool isLeaf();
+		bool isBranch();
 		std::string &name();
 		Token &leaf();
 		size_t size();
 		AST &operator [] (size_t n);
 		std::vector<AST>::iterator begin();
 		std::vector<AST>::iterator end();
+
+		AST &rightmost();
 
 		void append(AST a);
 		void append(Token t);

@@ -52,7 +52,7 @@
 
 using namespace std;
 
-namespace mptk
+namespace mitten
 {
 	AST AST::createLeaf(Token t)
 	{
@@ -68,6 +68,16 @@ namespace mptk
 		tmp.isBranched = true;
 		tmp.nameValue = n;
 		return tmp;
+	}
+
+	bool AST::isLeaf()
+	{
+		return !isBranched;
+	}
+
+	bool AST::isBranch()
+	{
+		return isBranched;
 	}
 
 	string &AST::name()
@@ -108,6 +118,14 @@ namespace mptk
 		if (!isBranched)
 			throw runtime_error("cannot get iterator for AST leaf");
 		return branchValues.end();
+	}
+
+	AST &AST::rightmost()
+	{
+		if (!isBranched || branchValues.empty())
+			return *this;
+		else
+			return branchValues.back().rightmost();
 	}
 
 	void AST::append(AST a)

@@ -52,7 +52,7 @@
 
 using namespace std;
 
-namespace mptk
+namespace mitten
 {
 	ASTBuilder::ASTBuilder()
 	{

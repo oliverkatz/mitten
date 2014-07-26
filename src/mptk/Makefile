@@ -11,7 +11,7 @@
 
 include ../config.mk
 
-OBJ=Utils.o Lexer.o AST.o ASTBuilder.o Error.o StructureParser.o
+OBJ=Utils.o BooleanLiteralTagger.o CharacterLiteralTagger.o FloatingLiteralTagger.o IntegerLiteralTagger.o StringLiteralTagger.o Lexer.o AST.o ASTBuilder.o ErrorHandler.o StructureParser.o ExpressionParser.o
 
 all : libMPTK.a
 

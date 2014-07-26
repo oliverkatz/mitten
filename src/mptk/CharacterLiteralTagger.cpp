@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
+/* File:    CharacterLiteralTagger.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
+ * Detects character literals.
  */
 
 /* Changelog:
@@ -48,49 +48,64 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_STRUCTURE_PARSER_H
-#define __MITTEN_STRUCTURE_PARSER_H
+#include "CharacterLiteralTagger.h"
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <stdexcept>
-
-#include "Token.h"
-#include "AST.h"
-#include "ASTBuilder.h"
-#include "ErrorHandler.h"
+using namespace std;
 
 namespace mitten
 {
-	class StructureParser
+	bool CharacterLiteralTagger::isCharacterLiteral(Token t)
 	{
-	protected:
-		typedef struct Bound
+		return isCharacterLiteral(t.value);
+	}
+
+	bool CharacterLiteralTagger::isCharacterLiteral(string s)
+	{
+		if (s.empty())
+			return false;
+
+		if (s.find(inQuote) == 0 && s.rfind(unQuote) == s.size()-unQuote.size())
 		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
+			if (s.size() == 1+inQuote.size()+unQuote.size())
+			{
+				return true;
+			}
+			else if (s.size() > 1+inQuote.size()+unQuote.size())
+			{
+				return allowEscapes;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
 
-			Bound() : endIsParentSplit(false) {}
-			Bound(std::string n, std::string e) : boundName(n), end(e) {}
-			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
+	char CharacterLiteralTagger::parse(Token t)
+	{
+		return parse(t.value);
+	}
 
-			Bound &setEndIsParentSplit(bool v);
-		} Bound;
+	char CharacterLiteralTagger::parse(string s)
+	{
+		if (s.empty())
+			throw runtime_error("invalid character literal");
 
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
-
-	public:
-		StructureParser(std::string en = "", std::string sp = "");
-
-		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
-
-		AST parse(std::vector<Token> toks, ErrorHandler &e);
-	};
+		if (s.find(inQuote) == 0 && s.rfind(unQuote) == s.size()-unQuote.size())
+		{
+			if (s.size() == 1+inQuote.size()+unQuote.size())
+			{
+				return s[inQuote.size()];
+			}
+			else if (s.size() > 1+inQuote.size()+unQuote.size())
+			{
+				string tmp = evaluateEscapeCodes(s.substr(inQuote.size(), s.size()-inQuote.size()-unQuote.size()));
+				return tmp[0];
+			}
+		}
+		else
+		{
+			throw runtime_error("invalid character literal");
+		}
+	}
 }
-
-#endif

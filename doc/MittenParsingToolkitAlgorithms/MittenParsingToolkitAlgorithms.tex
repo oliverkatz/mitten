@@ -438,13 +438,12 @@ $A$ is the input AST. $B$ is the number of branches in $A$. \newline
 	\uIf{the number of branches in a $\neq 1$}{
 		throw exception\;
 	}
+	\uElseIf {a[0] is an expression element} {
+		$value\gets parse(a[0])$\;
+	}
 	\Else {
-		\uIf{a[0] is an expression bound} {
-			$value\gets parse(a[0])$\;
-		}
-		\Else {
-			throw exception\;
-		}
+		throw exception\;
+	}
 	}
 }
 \uElseIf{a is a literal} {

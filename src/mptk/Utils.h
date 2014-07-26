@@ -48,15 +48,16 @@
  * Initial release.
  */
 
-#ifndef __MPTK_Utils_H
-#define __MPTK_Utils_H
+#ifndef __MITTEN_UTILS_H
+#define __MITTEN_UTILS_H
 
 #include <iostream>
 #include <string>
 #include <streambuf>
 #include <fstream>
+#include <stdexcept>
 
-namespace mptk
+namespace mitten
 {
 	/* Function: readFile
 	 * ------------------
@@ -65,6 +66,10 @@ namespace mptk
 	 * returns - the contents of the file
 	 */
 	std::string readFile(std::string path);
+
+	// TODO: Move these into MString
+	std::string evaluateEscapeCodes(std::string s);
+	std::string makePrintable(std::string s);
 }
 
 #endif

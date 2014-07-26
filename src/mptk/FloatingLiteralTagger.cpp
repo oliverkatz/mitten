@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
+/* File:    FloatingLiteralTagger.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
+ * Detects floating-point literals.
  */
 
 /* Changelog:
@@ -48,49 +48,80 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_STRUCTURE_PARSER_H
-#define __MITTEN_STRUCTURE_PARSER_H
+#include "FloatingLiteralTagger.h"
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <stdexcept>
-
-#include "Token.h"
-#include "AST.h"
-#include "ASTBuilder.h"
-#include "ErrorHandler.h"
+using namespace std;
 
 namespace mitten
 {
-	class StructureParser
+	bool FloatingLiteralTagger::isFloatingLiteral(Token t)
 	{
-	protected:
-		typedef struct Bound
+		return isFloatingLiteral(t.value);
+	}
+
+	bool FloatingLiteralTagger::isFloatingLiteral(string s)
+	{
+		bool gotDot = false;
+		for (int i = 0; i < s.size(); i++)
 		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
+			if (s[i] == '-' && i != 0)
+			{
+				return false;
+			}
+			else if (s[i] == '.')
+			{
+				if (gotDot)
+				{
+					return false;
+				}
+				else
+				{
+					gotDot = true;
+				}
+			}
+			else if (s[i] == 'e')
+			{
+				if (!allowScientific)
+				{
+					return false;
+				}
+			}
+			else if (isdigit(s[i]))
+			{
+				continue;
+			}
+			else
+			{
+				return false;
+			}
+		}
 
-			Bound() : endIsParentSplit(false) {}
-			Bound(std::string n, std::string e) : boundName(n), end(e) {}
-			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
+		return true;
+	}
 
-			Bound &setEndIsParentSplit(bool v);
-		} Bound;
+	double FloatingLiteralTagger::parse(Token t)
+	{
+		return parse(t.value);
+	}
 
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
-
-	public:
-		StructureParser(std::string en = "", std::string sp = "");
-
-		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
-
-		AST parse(std::vector<Token> toks, ErrorHandler &e);
-	};
+	double FloatingLiteralTagger::parse(string s)
+	{
+		if (s.find("e") != string::npos)
+		{
+			if (!allowScientific)
+			{
+				throw runtime_error("scientific floats not allowed");
+			}
+			else
+			{
+				double base = stod(s.substr(0, s.find("e")));
+				double exp10 = stod(s.substr(s.find("e")+1));
+				return base*pow(10, exp10);
+			}
+		}
+		else
+		{
+			return stod(s);
+		}
+	}
 }
-
-#endif

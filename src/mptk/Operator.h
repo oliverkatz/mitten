@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
+/* File:    Operator.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
+ * Operator types for describing and partially using basic opeators for languages.
  */
 
 /* Changelog:
@@ -48,48 +48,26 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_STRUCTURE_PARSER_H
-#define __MITTEN_STRUCTURE_PARSER_H
+#ifndef __MITTEN_OPERATOR_H
+#define __MITTEN_OPERATOR_H
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <unordered_set>
+#include <sstream>
 #include <stdexcept>
 
 #include "Token.h"
-#include "AST.h"
-#include "ASTBuilder.h"
-#include "ErrorHandler.h"
 
 namespace mitten
 {
-	class StructureParser
+	class Operator
 	{
-	protected:
-		typedef struct Bound
-		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
-
-			Bound() : endIsParentSplit(false) {}
-			Bound(std::string n, std::string e) : boundName(n), end(e) {}
-			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
-
-			Bound &setEndIsParentSplit(bool v);
-		} Bound;
-
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
-
 	public:
-		StructureParser(std::string en = "", std::string sp = "");
+		typedef 
 
-		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
-
-		AST parse(std::vector<Token> toks, ErrorHandler &e);
+	protected:
+		bool 
 	};
 }
 

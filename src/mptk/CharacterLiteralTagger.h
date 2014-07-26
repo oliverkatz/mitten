@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Error.h
+/* File:    CharacterLiteralTagger.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Errors are stored in this class.
+ * Detects character literals.
  */
 
 /* Changelog:
@@ -48,29 +48,33 @@
  * Initial release.
  */
 
-#ifndef __MPTK_ERROR_H
-#define __MPTK_ERROR_H
+#ifndef __MITTEN_CHARACTER_LITERAL_PARSER_H
+#define __MITTEN_CHARACTER_LITERAL_PARSER_H
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include <stdexcept>
+#include <unordered_map>
 
+#include "Utils.h"
 #include "Token.h"
 
-namespace mptk
+namespace mitten
 {
-	class Error
+	class CharacterLiteralTagger
 	{
 	public:
-		std::string message;
-		Token source;
+		bool allowEscapes;
 
-		Error() {}
-		Error(Token s, std::string m) : source(s), message(m) {}
+		std::string inQuote, unQuote;
+
+		CharacterLiteralTagger() : allowEscapes(true), inQuote("'"), unQuote("'") {}
+
+		bool isCharacterLiteral(Token t);
+		bool isCharacterLiteral(std::string s);
+		char parse(Token t);
+		char parse(std::string s);
 	};
-
-	void internalErrorDump(std::vector<Error> e);
 }
 
 #endif

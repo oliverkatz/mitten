@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
+/* File:    FloatingLiteralTagger.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
+ * Detects floating-point literals.
  */
 
 /* Changelog:
@@ -48,48 +48,31 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_STRUCTURE_PARSER_H
-#define __MITTEN_STRUCTURE_PARSER_H
+#ifndef __MITTEN_FLOATING_LITERAL_TAGGER_H
+#define __MITTEN_FLOATING_LITERAL_TAGGER_H
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <unordered_set>
-#include <stdexcept>
+
+#include <math.h>
 
 #include "Token.h"
-#include "AST.h"
-#include "ASTBuilder.h"
-#include "ErrorHandler.h"
 
 namespace mitten
 {
-	class StructureParser
+	class FloatingLiteralTagger
 	{
-	protected:
-		typedef struct Bound
-		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
-
-			Bound() : endIsParentSplit(false) {}
-			Bound(std::string n, std::string e) : boundName(n), end(e) {}
-			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
-
-			Bound &setEndIsParentSplit(bool v);
-		} Bound;
-
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
-
 	public:
-		StructureParser(std::string en = "", std::string sp = "");
+		bool allowScientific;
 
-		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
+		FloatingLiteralTagger() : allowScientific(true) {}
 
-		AST parse(std::vector<Token> toks, ErrorHandler &e);
+		bool isFloatingLiteral(Token t);
+		bool isFloatingLiteral(std::string s);
+		double parse(Token t);
+		double parse(std::string s);
 	};
 }
 

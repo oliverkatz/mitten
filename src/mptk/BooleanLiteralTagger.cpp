@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
+/* File:    BooleanLiteralTagger.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
+ * Detects boolean literals.
  */
 
 /* Changelog:
@@ -48,49 +48,40 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_STRUCTURE_PARSER_H
-#define __MITTEN_STRUCTURE_PARSER_H
+#include "BooleanLiteralTagger.h"
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <stdexcept>
-
-#include "Token.h"
-#include "AST.h"
-#include "ASTBuilder.h"
-#include "ErrorHandler.h"
+using namespace std;
 
 namespace mitten
 {
-	class StructureParser
+	bool BooleanLiteralTagger::isBooleanLiteral(Token t)
 	{
-	protected:
-		typedef struct Bound
-		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
+		return isBooleanLiteral(t.value);
+	}
 
-			Bound() : endIsParentSplit(false) {}
-			Bound(std::string n, std::string e) : boundName(n), end(e) {}
-			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
+	bool BooleanLiteralTagger::isBooleanLiteral(string s)
+	{
+		if (s.compare(trueToken) == 0)
+			return true;
 
-			Bound &setEndIsParentSplit(bool v);
-		} Bound;
+		if (s.compare(falseToken) == 0)
+			return true;
 
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
+		return false;
+	}
 
-	public:
-		StructureParser(std::string en = "", std::string sp = "");
+	bool BooleanLiteralTagger::parse(Token t)
+	{
+		return parse(t.value);
+	}
 
-		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
-
-		AST parse(std::vector<Token> toks, ErrorHandler &e);
-	};
+	bool BooleanLiteralTagger::parse(string s)
+	{
+		if (s.compare(trueToken) == 0)
+			return true;
+		else if (s.compare(falseToken) == 0)
+			return false;
+		else
+			throw runtime_error("invald boolean literal");
+	}
 }
-
-#endif

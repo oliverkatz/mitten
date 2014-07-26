@@ -50,7 +50,7 @@
 
 #include "Lexer.h"
 
-namespace mptk
+namespace mitten
 {
 	Lexer::StringConstPattern::StringConstPattern(std::string v)
 	{

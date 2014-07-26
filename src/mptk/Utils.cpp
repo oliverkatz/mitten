@@ -50,13 +50,162 @@
 
 #include "Utils.h"
 
-namespace mptk
+using namespace std;
+
+namespace mitten
 {
-	std::string readFile(std::string path)
+	string readFile(string path)
 	{
-		std::ifstream f(path.c_str());
-		std::string str((std::istreambuf_iterator<char>(f)),
-		                 std::istreambuf_iterator<char>());
+		ifstream f(path.c_str());
+		string str((istreambuf_iterator<char>(f)),
+		            istreambuf_iterator<char>());
 		return str;
+	}
+
+	string evaluateEscapeCodes(string s)
+	{
+		string rtn;
+
+		for (int i = 0; i < s.size(); i++)
+		{
+			if (s[i] == '\\')
+			{
+				if (i == s.size()-1)
+				{
+					throw runtime_error("escape code ended prematurely");
+				}
+				else
+				{
+					if (s[i+1] == 'a')
+					{
+						rtn += '\a';
+						i++;
+					}
+					else if (s[i+1] == 'b')
+					{
+						rtn += '\b';
+						i++;
+					}
+					else if (s[i+1] == 'f')
+					{
+						rtn += '\f';
+						i++;
+					}
+					else if (s[i+1] == 'n')
+					{
+						rtn += '\n';
+						i++;
+					}
+					else if (s[i+1] == 'r')
+					{
+						rtn += '\r';
+						i++;
+					}
+					else if (s[i+1] == 't')
+					{
+						rtn += '\t';
+						i++;
+					}
+					else if (s[i+1] == 'v')
+					{
+						rtn += '\v';
+						i++;
+					}
+					else if (s[i+1] == '\\')
+					{
+						rtn += '\\';
+						i++;
+					}
+					else if (s[i+1] == '\'')
+					{
+						rtn += '\'';
+						i++;
+					}
+					else if (s[i+1] == '\"')
+					{
+						rtn += '\"';
+						i++;
+					}
+					else if (s[i+1] == '?')
+					{
+						rtn += '\?';
+						i++;
+					}
+					else if (s[i+1] >= '0' && s[i+1] <= '7')
+					{
+						if (i+3 < s.size())
+						{
+							char tmp = stoi(s.substr(i+1, 3), NULL, 8);
+							rtn += tmp;
+							i += 3;
+						}
+						else
+						{
+							throw runtime_error("escape code ended prematurely");
+						}
+					}
+					else if (s[i+1] == 'x')
+					{
+						if (i+3 < s.size())
+						{
+							/*char d16 = s[i+2]-'0';
+							switch(s[i+2])
+							{
+								case 'a': d16 = 10; break;
+								case 'A': d16 = 10; break;
+								case 'b': d16 = 11; break;
+								case 'B': d16 = 11; break;
+								case 'c': d16 = 12; break;
+								case 'C': d16 = 12; break;
+								case 'd': d16 = 13; break;
+								case 'D': d16 = 13; break;
+								case 'e': d16 = 14; break;
+								case 'E': d16 = 14; break;
+								case 'f': d16 = 15; break;
+								case 'F': d16 = 15; break;
+								default: break;
+							}
+
+							char d1 = s[i+3]-'0';
+							switch(s[i+3])
+							{
+								case 'a': d1 = 10; break;
+								case 'A': d1 = 10; break;
+								case 'b': d1 = 11; break;
+								case 'B': d1 = 11; break;
+								case 'c': d1 = 12; break;
+								case 'C': d1 = 12; break;
+								case 'd': d1 = 13; break;
+								case 'D': d1 = 13; break;
+								case 'e': d1 = 14; break;
+								case 'E': d1 = 14; break;
+								case 'f': d1 = 15; break;
+								case 'F': d1 = 15; break;
+								default: break;
+							}
+
+							char tmp = d1 + d16*16;*/
+							char tmp = stoi(s.substr(i+2, 2), NULL, 16);
+							rtn += tmp;
+							i += 3;
+						}
+						else
+						{
+							throw runtime_error("escape code ended prematurely");
+						}
+					}
+					else
+					{
+						throw runtime_error("unexpected character");
+					}
+				}
+			}
+			else
+			{
+				rtn += s[i];
+			}
+		}
+
+		return rtn;
 	}
 }

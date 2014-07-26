@@ -48,8 +48,8 @@
  * Initial release.
  */
 
-#ifndef __MPTK_AST_BUILDER_H
-#define __MPTK_AST_BUILDER_H
+#ifndef __MITTEN_AST_BUILDER_H
+#define __MITTEN_AST_BUILDER_H
 
 #include <iostream>
 #include <stack>
@@ -57,7 +57,7 @@
 #include "Token.h"
 #include "AST.h"
 
-namespace mptk
+namespace mitten
 {
 	class ASTBuilder
 	{

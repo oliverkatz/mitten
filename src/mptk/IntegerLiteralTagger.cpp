@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Error.cpp
+/* File:    IntegerLiteralTagger.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Errors are stored in this class.
+ * Detects integer literals.
  */
 
 /* Changelog:
@@ -48,17 +48,37 @@
  * Initial release.
  */
 
-#include "Error.h"
+#include "IntegerLiteralTagger.h"
 
 using namespace std;
 
-namespace mptk
+namespace mitten
 {
-	void internalErrorDump(vector<Error> e)
+	bool IntegerLiteralTagger::isIntegerLiteral(Token t)
 	{
-		for (auto i : e)
+		return isIntegerLiteral(t.value);
+	}
+
+	bool IntegerLiteralTagger::isIntegerLiteral(string s)
+	{
+		try
 		{
-			cerr << i.source.line << ":" << i.source.column << ": " << i.message << "\n";
+			stoi(s, NULL, 0);
+			return true;
 		}
+		catch(invalid_argument &e)
+		{
+			return false;
+		}
+	}
+
+	int IntegerLiteralTagger::parse(Token t)
+	{
+		return parse(t.value);
+	}
+
+	int IntegerLiteralTagger::parse(string s)
+	{
+		return stoi(s, NULL, 0);
 	}
 }

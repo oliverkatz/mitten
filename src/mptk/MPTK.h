@@ -59,8 +59,8 @@
  * Initial release.
  */
 
-#ifndef __MPTK_H
-#define __MPTK_H
+#ifndef __MITTEN_MPTK_H
+#define __MITTEN_MPTK_H
 
 #define MPTK_VERSION_MAJOR 0
 #define MPTK_VERSION_MINOR 1

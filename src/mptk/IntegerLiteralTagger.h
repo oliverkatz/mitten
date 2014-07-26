@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
+/* File:    IntegerLiteralTagger.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
+ * Detects integer literals.
  */
 
 /* Changelog:
@@ -48,48 +48,35 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_STRUCTURE_PARSER_H
-#define __MITTEN_STRUCTURE_PARSER_H
+#ifndef __MITTEN_INTEGER_LITERAL_TAGGER_H
+#define __MITTEN_INTEGER_LITERAL_TAGGER_H
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <unordered_set>
-#include <stdexcept>
 
 #include "Token.h"
-#include "AST.h"
-#include "ASTBuilder.h"
-#include "ErrorHandler.h"
 
 namespace mitten
 {
-	class StructureParser
+	class IntegerLiteralTagger
 	{
-	protected:
-		typedef struct Bound
-		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
-
-			Bound() : endIsParentSplit(false) {}
-			Bound(std::string n, std::string e) : boundName(n), end(e) {}
-			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
-
-			Bound &setEndIsParentSplit(bool v);
-		} Bound;
-
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
-
 	public:
-		StructureParser(std::string en = "", std::string sp = "");
+		bool allowDecimal;
+		bool allowOctal;
+		bool allowHexadecimalLowercase;
+		bool allowHexadecimalUppercase;
+		bool allowNegative;
 
-		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
+		IntegerLiteralTagger() : allowDecimal(true), allowOctal(true), 
+			allowHexadecimalLowercase(true), allowHexadecimalUppercase(true),
+			allowNegative(true) {}
 
-		AST parse(std::vector<Token> toks, ErrorHandler &e);
+		bool isIntegerLiteral(Token t);
+		bool isIntegerLiteral(std::string s);
+		int parse(Token t);
+		int parse(std::string s);
 	};
 }
 

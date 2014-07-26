@@ -48,8 +48,8 @@
  * Initial release.
  */
 
-#ifndef __MPTK_LEXER_H
-#define __MPTK_LEXER_H
+#ifndef __MITTEN_LEXER_H
+#define __MITTEN_LEXER_H
 
 #include <iostream>
 #include <string>
@@ -58,7 +58,7 @@
 
 #include "Token.h"
 
-namespace mptk
+namespace mitten
 {
 	/* Enumerator: DeliminatorFlags
 	 * ----------------------------

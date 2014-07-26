@@ -19,9 +19,11 @@ all :
 
 docs :
 	$(MAKE) $(MAKEFLAGS) -C doc/MittenParsingToolkitAlgorithms all
+	$(MAKE) $(MAKEFLAGS) -C doc/MPTKTutorial html
 
 clean :
 	$(MAKE) $(MAKEFLAGS) -C src/munit clean
 	$(MAKE) $(MAKEFLAGS) -C src/mptk clean
 	$(MAKE) $(MAKEFLAGS) -C src/mc clean
 	$(MAKE) $(MAKEFLAGS) -C doc/MittenParsingToolkitAlgorithms clean
+	$(MAKE) $(MAKEFLAGS) -C doc/MPTKTutorial clean

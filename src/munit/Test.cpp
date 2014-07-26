@@ -54,17 +54,11 @@ using namespace std;
 
 namespace mitten
 {
-	string readFile(string path)
-	{
-		ifstream f(path.c_str());
-		string str((istreambuf_iterator<char>(f)),
-		            istreambuf_iterator<char>());
-		return str;
-	}
-
 	Test Test::read(string n)
 	{
-		string page = readFile(n+".mut");
+		ifstream f(string(n+".mut").c_str());
+		string page((istreambuf_iterator<char>(f)),
+		            istreambuf_iterator<char>());
 
 		if (page.find("\n") == string::npos || page.find("\n") == page.size()-1)
 		{
@@ -179,6 +173,8 @@ namespace mitten
 			currentlyPassing = false;
 		if (n.size() > longestName)
 			longestName = n.size();
+
+		cout << "  " << n << "... " << (r ? "passed." : "failed!") << "\n";
 	}
 
 	bool Test::pass()

@@ -34,13 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Token.h
+/* File:    SymbolTagger.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Tokens are basic units of syntax, stored by the 'Token' class, declared 
- * here.
+ * Detects symbols.
  */
 
 /* Changelog:
@@ -49,50 +48,30 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_TOKEN_H
-#define __MITTEN_TOKEN_H
+#ifndef __MITTEN_SYMBOL_TAGGER_H
+#define __MITTEN_SYMBOL_TAGGER_H
 
 #include <iostream>
 #include <string>
+#include <vector>
+#include <unordered_map>
+
+#include "Token.h"
 
 namespace mitten
 {
-	typedef enum
-	{
-		DeliminatorTag,
-		SymbolTag,
-		BooleanLiteralTag,
-		IntegerLiteralTag,
-		FloatingLiteralTag,
-		CharacterLiteralTag,
-		StringLiteralTag
-	} TokenTag;
-
-	/* Class: Token
-	 * ------------
-	 * Contains the information required in a simple token.
-	 */
-	class Token
+	class SymbolTagger
 	{
 	public:
-		int line, column; // line and column numbers
-		std::string value; // the string content of the token
-		TokenTag tag;
+		std::string allowedChars;
+		std::string allowedFirstChars;
 
-		/* Constructor
-		 * -----------
-		 * Intializes the line and column number to the beginning of the file.
-		 */
-		Token() : line(1), column(0) {}
+		SymbolTagger() :
+			allowedChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"),
+			allowedFirstChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_") {}
 
-		/* Constructor
-		 * -----------
-		 * Sets all of the information in the token.
-		 * 'v' - the value of the token
-		 * 'l' - the line number
-		 * 'c' - the column number
-		 */
-		Token(std::string v, int l, int c, TokenTag t = DeliminatorTag) : line(l), column(c), value(v), tag(t) {}
+		bool isSymbol(Token t);
+		bool isSymbol(std::string s);
 	};
 }
 

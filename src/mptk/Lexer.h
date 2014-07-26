@@ -57,6 +57,12 @@
 #include <unordered_map>
 
 #include "Token.h"
+#include "BooleanLiteralTagger.h"
+#include "CharacterLiteralTagger.h"
+#include "FloatingLiteralTagger.h"
+#include "IntegerLiteralTagger.h"
+#include "StringLiteralTagger.h"
+#include "SymbolTagger.h"
 
 namespace mitten
 {
@@ -146,7 +152,16 @@ namespace mitten
 		 */
 		size_t maxDelimLength;
 
+		TokenTag findTag(Token t);
+
 	public:
+		BooleanLiteralTagger boolTag;
+		IntegerLiteralTagger intTag;
+		FloatingLiteralTagger floatTag;
+		CharacterLiteralTagger charTag;
+		StringLiteralTagger stringTag;
+		SymbolTagger symbolTag;
+
 		/* Constructor
 		 * -----------
 		 * Initializes a lexer with an empty lexical grammar.

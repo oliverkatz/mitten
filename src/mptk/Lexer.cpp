@@ -69,6 +69,24 @@ namespace mitten
 		}
 	}
 
+	TokenTag Lexer::findTag(Token t)
+	{
+		if (symbolTag.isSymbol(t))
+			return SymbolTag;
+		else if (boolTag.isBooleanLiteral(t))
+			return BooleanLiteralTag;
+		else if (charTag.isCharacterLiteral(t))
+			return CharacterLiteralTag;
+		else if (stringTag.isStringLiteral(t))
+			return StringLiteralTag;
+		else if (intTag.isIntegerLiteral(t))
+			return IntegerLiteralTag;
+		else if (floatTag.isFloatingLiteral(t))
+			return FloatingLiteralTag;
+		else
+			return DeliminatorTag;
+	}
+
 	DeliminatorFlags &Lexer::deliminate(std::string s, std::string e)
 	{
 		if (s.empty())
@@ -111,6 +129,7 @@ namespace mitten
 						{
 							rtn.push_back(Token(s.substr(last, i-last), 
 								lastline, lastcolumn));
+							rtn.back().tag = findTag(rtn.back());
 						}
 
 						size_t dl = j;
@@ -131,7 +150,9 @@ namespace mitten
 						}
 
 						if (!(d.flags & Filtered))
-							rtn.push_back(Token(s.substr(i, dl), line, column));
+						{
+							rtn.push_back(Token(s.substr(i, dl), line, column, DeliminatorTag));
+						}
 						for (auto c : s.substr(i, dl))
 						{
 							if (c == '\n')

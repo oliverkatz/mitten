@@ -34,13 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Token.h
+/* File:    SymbolTagger.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Tokens are basic units of syntax, stored by the 'Token' class, declared 
- * here.
+ * Detects symbols.
  */
 
 /* Changelog:
@@ -49,51 +48,37 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_TOKEN_H
-#define __MITTEN_TOKEN_H
+#include "SymbolTagger.h"
 
-#include <iostream>
-#include <string>
+using namespace std;
 
 namespace mitten
 {
-	typedef enum
+	bool SymbolTagger::isSymbol(Token t)
 	{
-		DeliminatorTag,
-		SymbolTag,
-		BooleanLiteralTag,
-		IntegerLiteralTag,
-		FloatingLiteralTag,
-		CharacterLiteralTag,
-		StringLiteralTag
-	} TokenTag;
+		return isSymbol(t.value);
+	}
 
-	/* Class: Token
-	 * ------------
-	 * Contains the information required in a simple token.
-	 */
-	class Token
+	bool SymbolTagger::isSymbol(string s)
 	{
-	public:
-		int line, column; // line and column numbers
-		std::string value; // the string content of the token
-		TokenTag tag;
+		if (s.empty())
+		{
+			return false;
+		}
 
-		/* Constructor
-		 * -----------
-		 * Intializes the line and column number to the beginning of the file.
-		 */
-		Token() : line(1), column(0) {}
+		if (allowedFirstChars.find(s[0]) == string::npos)
+		{
+			return false;
+		}
 
-		/* Constructor
-		 * -----------
-		 * Sets all of the information in the token.
-		 * 'v' - the value of the token
-		 * 'l' - the line number
-		 * 'c' - the column number
-		 */
-		Token(std::string v, int l, int c, TokenTag t = DeliminatorTag) : line(l), column(c), value(v), tag(t) {}
-	};
+		for (int i = 1; i < s.size(); i++)
+		{
+			if (allowedChars.find(s[i]) == string::npos)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
-
-#endif

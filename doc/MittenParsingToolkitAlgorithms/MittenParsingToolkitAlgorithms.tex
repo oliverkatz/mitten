@@ -430,16 +430,16 @@ While the previous algorithms have all been iterative, this algorithm is recursi
 
 \newpage
 \subsubsection{Algorithm}
-$A$ is the input AST. $B$ is the number of branches in $A$. \newline
+$a$ is the input AST branch, while $A$ is the input AST passed to $parseExpression$. $i$ is the parsing iterator used by $parseExpression$. $B$ is the number of branches in $A$. \newline
 \begin{algorithm}[H]
-\caption{$parseValue(A, stack)$}
+\caption{$parseValue(a, A, i, stack)$}
 
 \uIf{a is an expression bound}{
 	\uIf{the number of branches in a $\neq 1$}{
 		throw exception\;
 	}
-	\uElseIf {a[0] is an expression element} {
-		$value\gets parse(a[0])$\;
+	\uElseIf {a[i] is an expression element} {
+		$value\gets parseExpression(a[i])$\;
 	}
 	\Else {
 		throw exception\;
@@ -460,7 +460,7 @@ $A$ is the input AST. $B$ is the number of branches in $A$. \newline
 		$value\gets a$\;
 	}
 }
-\uElseIf{a is a non-expression bound} {
+\uElseIf{a is a non-expression bound} { % this is just for freaky shit
 	$value\gets a$\;
 }
 
@@ -481,7 +481,8 @@ $A$ is the input AST. $B$ is the number of branches in $A$. \newline
 				tmp's left operand is the rightmost node of $lvalue$\;
 				tmp's right operand is $value$\;
 				tmp's operator is $o$\;
-				push tmp to the top of $stack$\;
+				lvalue's rightmost node is set to be tmp\;
+				push lvalue to the top of $stack$\;
 			}
 			\Else {
 				$tmp\gets$ new binary expression\;
@@ -510,6 +511,8 @@ return $value$\;
 \end{algorithm}
 
 \newpage
+
+$A$ is the input AST. $B$ is the number of branches in $A$. \newline
 \begin{algorithm}[H]
 \caption{$parseOperator(A, stack)$}
 
@@ -552,7 +555,7 @@ return $value$\;
 				$tmp\gets$ new unary left expression\;
 				tmp's operand is $value$\;
 				tmp's operator is $a$\;
-				push $value$ to the top of $stack$ This has to be verified!\;
+				push $value$ to the top of $stack$\;
 			}
 		}
 	}
@@ -565,11 +568,11 @@ return $value$\;
 \end{algorithm}
 
 \newpage
-Note that for all prior algorithms in this section, $stack$ is passed by reference.\newline
+Note that for all prior algorithms in this section, $stack$ is passed by reference. $A$ is the input AST. $B$ is the number of branches in $A$. \newline
 \begin{algorithm}[H]
 \caption{$parseExpression(A)$}
 
-$stack\gets$ []\;
+$stack\gets$ []\; % what the fuck is this??
 \For{$i\gets 0, B$}{
 	$a\gets A[i]$\;
 	\uIf{a is an expression bound, a literal token, or a symbol}{

@@ -72,27 +72,36 @@ namespace mitten
 		{
 			bool unary;
 			bool leftAssociative, rightAssociative;
+			int precedence;
 
 			OperatorInfo() : unary(true), leftAssociative(false), rightAssociative(false) {}
-			OperatorInfo(bool u, bool l, bool r) : unary(u), leftAssociative(l), rightAssociative(r) {}
+			OperatorInfo(bool u, bool l, bool r, int p) : unary(u), leftAssociative(l), rightAssociative(r), precedence(p) {}
 		} OperatorInfo;
 
+		int maxPrecedence;
+
 		std::string expressionBound, expressionElement;
+		std::string functionNode;
+		std::string operationUnaryLeftNode, operationUnaryRightNode, operationBinaryNode;
 		std::unordered_map<std::string, OperatorInfo> operators;
 
 		virtual bool isSymbol(std::string s);
 		virtual bool isLiteral(std::string s);
 
 	public:
-		ExpressionParser() {}
+		ExpressionParser() : maxPrecedence(0) {}
 
 		void setExpressionBound(std::string b);
 		void setExpressionElement(std::string e);
+		void setFunctionNode(std::string f);
+		void setOperationUnaryLeftNode(std::string o);
+		void setOperationUnaryRightNode(std::string o);
+		void setOperationBinaryNode(std::string o);
 
-		void addUnaryLeftOperator(std::string o);
-		void addUnaryRightOperator(std::string o);
-		void addUnaryBothOperator(std::string o);
-		void addBinaryOperator(std::string o);
+		void addUnaryLeftOperator(std::string o, int p = -1);
+		void addUnaryRightOperator(std::string o, int p = -1);
+		void addUnaryBothOperator(std::string o, int p = -1);
+		void addBinaryOperator(std::string o, int p = -1);
 
 		AST parse(AST ast, ErrorHandler &e);
 	};

@@ -42,3 +42,37 @@ This makes working with the source code much easier and makes writing a parser m
 
 Installing
 ----------
+
+You can download Mitten from its GIT_ repository:
+
+1. Download the master branch::
+
+	$ git clone https://github.com/oliverkatz/mitten.git
+
+2. From the download directory, go into the MPTK source directory::
+
+	$ cd mitten/src/mptk
+
+3. Build MPTK::
+
+	$ make all
+
+4. Install MPTK::
+
+	$ sudo make install
+
+.. _GIT: https://github.com/oliverkatz/mitten
+
+
+Using MPTK in your Code
+-----------------------
+
+First you need to include the MPTK header file::
+
+	#include <MPTK.h>
+
+It's default download location should be */usr/include/MPTK.h*, while the rest of the MPTK headers should be stored in */usr/include/mptk*. To link the MPTK static library, use the following g++ flags::
+
+	$ g++ some.o object.o files.o -o program -lMPTK
+
+The static library's default location should be */usr/lib/libMPTK.a*. That's it!

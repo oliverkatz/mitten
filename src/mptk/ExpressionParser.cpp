@@ -122,24 +122,52 @@ namespace mitten
 		expressionElement = e;
 	}
 
-	void ExpressionParser::addUnaryLeftOperator(string o)
+	void ExpressionParser::setfunctionNode(string f)
 	{
-		operators[o] = OperatorInfo(false, true, false);
+		functionNode = f;
 	}
 
-	void ExpressionParser::addUnaryRightOperator(string o)
+	void ExpressionParser::setOperationUnaryLeftNode(string o)
 	{
-		operators[o] = OperatorInfo(false, false, true);
+		operationUnaryLeftNode = o;
 	}
 
-	void ExpressionParser::addUnaryBothOperator(string o)
+	void ExpressionParser::setOperationUnaryRightNode(string o)
 	{
-		operators[o] = OperatorInfo(false, true, true);
+		operationUnaryRightNode = o;
 	}
 
-	void ExpressionParser::addBinaryOperator(string o)
+	void ExpressionParser::setOperationBinaryNode(string o)
 	{
-		operators[o] = OperatorInfo(true, false, false);
+		operationBinaryNode = o;
+	}
+
+	void ExpressionParser::addUnaryLeftOperator(string o, int p)
+	{
+		if (p == -1)
+			p = maxPrecedence++;
+		operators[o] = OperatorInfo(false, true, false, p);
+	}
+
+	void ExpressionParser::addUnaryRightOperator(string o, int p)
+	{
+		if (p == -1)
+			p = maxPrecedence++;
+		operators[o] = OperatorInfo(false, false, true, p);
+	}
+
+	void ExpressionParser::addUnaryBothOperator(string o, int p)
+	{
+		if (p == -1)
+			p = maxPrecedence++;
+		operators[o] = OperatorInfo(false, true, true, p);
+	}
+
+	void ExpressionParser::addBinaryOperator(string o, int p)
+	{
+		if (p == -1)
+			p = maxPrecedence++;
+		operators[o] = OperatorInfo(true, false, false, p);
 	}
 
 	AST ExpressionParser::parse(AST ast, ErrorHandler &e)
@@ -179,13 +207,163 @@ namespace mitten
 				{
 					if (i != ast.size()-1 && (ast[i+1].isBranch() && ast[i+1].name().compare(expressionBound) == 0))
 					{
-						//value = AST::createNode()
+						value = AST::createNode(functionNode);
+						value.append(AST::createLeaf(a));
+
+						for (int j = 0; j < ast[i+1].size(); j++)
+						{
+							value.append(parse(ast[i+1][j], e));
+						}
 					}
+					else
+					{
+						value = a;
+					}
+				}
+				else if (a.isBranch() && a.name().compare(expressionBound) != 0)
+				{
+					value = a;
+				}
+
+				if (!expressionStack.empty() && (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value) != operators.end()))
+				{
+					string o = expressionStack.top().leaf().value;
+					AST oast = expressionStack.top();
+
+					if (operators[o].unary == false)
+					{
+						expressionStack.pop();
+
+						if (expressionStack.empty())
+						{
+							// throw exception
+						}
+						else if (expressionStack.top().isBranch() && expressionStack.top().name().compare(expressionBound) != 0)
+						{
+							// throw exception
+						}
+						else
+						{
+							AST lvalue = expressionStack.top();
+							expressionStack.pop();
+
+							int ptmp = maxPrecedence+1;
+							if (lvalue.isBranch())
+							{
+								if (lvalue.name().compare(operationUnaryLeftNode) == 0)
+								{
+									ptmp = operators[lvalue[1].leaf().value].precedence;
+								}
+								else if (lvalue.name().compare(operationUnaryRightNode) == 0)
+								{
+									ptmp = operators[lvalue[0].leaf().value].precedence;
+								}
+								else if (lvalue.name().compare(operationBinaryNode) == 0)
+								{
+									ptmp = operators[lvalue[1].leaf().value].precedence;
+								}
+								else
+								{
+									// throw exception
+								}
+							}
+
+							if (operators[o].precedence > ptmp)
+							{
+								AST tmp = AST::createNode(operationBinaryNode);
+								tmp.append(lvalue.rightmode());
+								tmp.append(oast);
+								tmp.append(value);
+								expressionStack.push(tmp);
+							}
+							else
+							{
+								AST tmp = AST::createNode(operationBinaryNode);
+								tmp.append(lvalue);
+								tmp.append(oast);
+								tmp.append(value);
+								expressionStack.push(tmp);
+							}
+						}
+					}
+					else
+					{
+						if (operators[o].rightAssociative)
+						{
+							expressionStack.pop();
+							AST tmp = AST::createNode(operationUnaryRightNode);
+							tmp.append(oast);
+							tmp.append(value);
+							expressionStack.push(tmp);
+						}
+					}
+				}
+				else
+				{
+					expressionStack.push(value);
 				}
 			}
 			else if (a.isLeaf() && operators.find(a.leaf().value) != operators.end())
 			{
+				if (!operators[a.leaf().value].unary)
+				{
+					expressionStack.push(a);
+				}
+				else
+				{
+					if (operators[a.leaf().value].left && operators[a.leaf().value].right)
+					{
+						if (expressionStack.empty() || (!expressionStack.empty() && (expressionStack.top().isBranch() && expressionStack.top().name().compare(expressionBound) == 0)))
+						{
+							value = expressionStack.top();
+							expressionStack.pop();
 
+							int ptmp = maxPrecedence+1;
+							if (value.isBranch())
+							{
+								if (value.name().compare(operationUnaryLeftNode) == 0)
+								{
+									ptmp = operators[value[1].leaf().value].precedence;
+								}
+								else if (value.name().compare(operationUnaryRightNode) == 0)
+								{
+									ptmp = operators[value[0].leaf().value].precedence;
+								}
+								else if (value.name().compare(operationBinaryNode) == 0)
+								{
+									ptmp = operators[value[1].leaf().value].precedence;
+								}
+								else
+								{
+									// throw exception
+								}
+							}
+
+							if (operators[a.leaf().value].precedence > ptmp)
+							{
+								AST tmp = AST::createNode(operationUnaryLeftNode);
+								tmp.append(value.rightmost());
+								tmp.append(a);
+								value.rightmost() = tmp;
+								expressionStack.push(value);
+							}
+							else
+							{
+								AST tmp = AST::createNode(operationUnaryLeftNode);
+								tmp.append(value);
+								tmp.append(a);
+								expressionStack.push(tmp);
+							}
+						}
+					}
+					else if (operators[a.leaf().value].left)
+					{
+						if (expressionStack.empty() || (!expressionStack.empty() && (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value) != operators.end())))
+						{
+							
+						}
+					}
+				}
 			}
 			else
 			{

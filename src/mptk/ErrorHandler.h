@@ -55,6 +55,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <sstream>
 
 #include "Token.h"
 
@@ -63,14 +64,42 @@ namespace mitten
 	class ErrorHandler
 	{
 	public:
-		virtual void mismatchedStructureBounds(Token source, std::string start, std::string ends) =0;
-		virtual void incompleteStructureBound(Token source, std::string start, std::string ends) =0;
+		virtual void mismatchedStructureBounds(Token source, std::string start, std::string end) =0;
+		virtual void incompleteStructureBound(Token source, std::string start, std::string end) =0;
+		virtual void unexpectedArgumentList(Token source) =0;
+		virtual void expectedExpression(Token source) =0;
+		virtual void operationRequiredLeftOperand(Token source) =0;
+		virtual void unexpectedTokenInExpression(Token source) =0;
+		virtual void cannotOperateOnAnOperator(Token source) =0;
 	};
 
 	class InternalErrorHandler : public ErrorHandler
 	{
+	protected:
+		std::string filename;
+		std::vector<std::string> filebody;
+		std::string page;
+		int count;
+
+		virtual void append(Token source, std::string message);
+
 	public:
-		//void 
+		InternalErrorHandler() : count(0) {}
+
+		void setFileName(std::string f);
+		void setFileBody(std::string b);
+
+		virtual void mismatchedStructureBounds(Token source, std::string start, std::string end);
+		virtual void incompleteStructureBound(Token source, std::string start, std::string end);
+		virtual void unexpectedArgumentList(Token source);
+		virtual void expectedExpression(Token source);
+		virtual void operationRequiredLeftOperand(Token source);
+		virtual void unexpectedTokenInExpression(Token source);
+		virtual void cannotOperateOnAnOperator(Token source);
+
+		bool empty();
+		bool dump();
+		void clear();
 	};
 }
 

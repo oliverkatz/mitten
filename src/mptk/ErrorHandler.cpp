@@ -54,5 +54,108 @@ using namespace std;
 
 namespace mitten
 {
-	
+	void InternalErrorHandler::append(Token source, string message)
+	{
+		if (!filename.empty())
+			page += filename+":";
+
+		page += to_string(source.line)+":"+to_string(source.column)+" - "+message+"\n";
+		page += "    from '"+source.value+"'\n";
+
+		if (!filebody.empty())
+		{
+			page += filebody[source.line-1]+"\n";
+			page += string(source.column, ' ')+"^\n";
+		}
+
+		page += "\n";
+		count++;
+	}
+
+	void InternalErrorHandler::setFileName(string f)
+	{
+		if (f.find("/") != string::npos)
+		{
+			filename = f.substr(f.rfind("/")+1);
+		}
+		else
+		{
+			filename = f;
+		}
+	}
+
+	void InternalErrorHandler::setFileBody(string b)
+	{
+		istringstream ss(b);
+
+		while (!ss.eof())
+		{
+			string tmp;
+			getline(ss, tmp);
+			filebody.push_back(tmp);
+		}
+	}
+
+	void InternalErrorHandler::mismatchedStructureBounds(Token source, std::string start, std::string end)
+	{
+		append(source, "mismatched structure bounds between '"+start+"' and '"+end+"'");
+	}
+
+	void InternalErrorHandler::incompleteStructureBound(Token source, std::string start, std::string end)
+	{
+		append(source, "incomplete structure bound started with '"+start+"', but not completed with '"+end+"'");
+	}
+
+	void InternalErrorHandler::unexpectedArgumentList(Token source)
+	{
+		append(source, "unexpected argument list - only one element required");
+	}
+
+	void InternalErrorHandler::expectedExpression(Token source)
+	{
+		append(source, "expected expression here");
+	}
+
+	void InternalErrorHandler::operationRequiredLeftOperand(Token source)
+	{
+		append(source, "operator '"+source.value+"' requires left operand");
+	}
+
+	void InternalErrorHandler::unexpectedTokenInExpression(Token source)
+	{
+		append(source, "unexpected token '"+source.value+"' in expression");
+	}
+
+	void InternalErrorHandler::cannotOperateOnAnOperator(Token source)
+	{
+		append(source, "cannot operate on an operator");
+	}
+
+	bool InternalErrorHandler::empty()
+	{
+		return (count == 0);
+	}
+
+	bool InternalErrorHandler::dump()
+	{
+		if (count == 0)
+		{
+			return false;
+		}
+		else
+		{
+			cerr << page;
+			if (count == 1)
+				cerr << "1 error.\n";
+			else
+				cerr << count << " errors.\n";
+			return true;
+		}
+	}
+
+	void InternalErrorHandler::clear()
+	{
+		page = "";
+		count = 0;
+	}
 }

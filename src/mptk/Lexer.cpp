@@ -50,6 +50,8 @@
 
 #include "Lexer.h"
 
+using namespace std;
+
 namespace mitten
 {
 	Lexer::StringConstPattern::StringConstPattern(std::string v)
@@ -125,7 +127,7 @@ namespace mitten
 					if (delims[j].find(s.substr(i, j)) != delims[j].end())
 					{
 						Deliminator d = delims[j][s.substr(i, j)];
-						if (last < i-1)
+						if (last < i)
 						{
 							rtn.push_back(Token(s.substr(last, i-last), 
 								lastline, lastcolumn));

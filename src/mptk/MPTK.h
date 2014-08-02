@@ -71,7 +71,8 @@
 #include "Token.h"
 #include "Lexer.h"
 #include "AST.h"
-#include "Error.h"
+#include "ErrorHandler.h"
 #include "StructureParser.h"
+#include "ExpressionParser.h"
 
 #endif

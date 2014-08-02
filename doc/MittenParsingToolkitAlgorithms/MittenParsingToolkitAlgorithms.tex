@@ -217,7 +217,7 @@ $lastcolumn\gets 0$\;
 		\If{there are deliminators of length j}{
 			\If{T[i:i+j] is a valid deliminator}{
 				$d\gets$ the valid deliminator\;
-				\If{$last < i-1$}{
+				\If{$last < i$}{
 					record symbol token with value $T[last:i]$ and code location $lastline:lastcolumn$\;
 				}
 
@@ -455,6 +455,7 @@ $a$ is the input AST branch, while $A$ is the input AST passed to $parseExpressi
 		\For{arguments $p$ in A[i+1]} {
 			append argument to function call AST $value$\;
 		}
+		$i++$\;
 	}
 	\Else {
 		$value\gets a$\;
@@ -542,7 +543,7 @@ $A$ is the input AST. $B$ is the number of branches in $A$. \newline
 		}
 	}
 	\uElseIf{$a$ is only left associative}{
-		\If{$stack$ is empty or the top element of $stack$ is an operator}{
+		\If{top element of $stack$ is an operator}{
 			$value\gets$ popped top expression of $stack$\;
 			\uIf{precedence of $a >$ precedence of $value$}{
 				$tmp\gets$ new unary left expression\;

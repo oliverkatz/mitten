@@ -58,10 +58,14 @@
 #include <unordered_set>
 #include <stdexcept>
 
+#include <limits.h>
+
 #include "Token.h"
 #include "AST.h"
 #include "ASTBuilder.h"
 #include "ErrorHandler.h"
+
+#define MITTEN_MAX_PRECEDENCE INT_MAX
 
 namespace mitten
 {

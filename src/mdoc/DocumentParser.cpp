@@ -48,9 +48,6 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_DOCUMENT_PARSER_H
-#define __MITTEN_DOCUMENT_PARSER_H
-
 #include "DocumentParser.h"
 
 using namespace std;
@@ -722,6 +719,12 @@ namespace mitten
 		}
 	}
 
+	void DocumentParser::read(string p)
+	{
+		path = p;
+		body = readFile(p);
+	}
+
 	bool DocumentParser::parse()
 	{
 		if (!__mdocInitted)
@@ -815,5 +818,3 @@ namespace mitten
 		return errorPage+"\n"+(errorCount == 1 ? "1 error.\n" : to_string(errorCount)+" errors.\n");
 	}
 }
-
-#endif

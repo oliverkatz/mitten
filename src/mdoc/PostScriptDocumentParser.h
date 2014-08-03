@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MDocDump.cpp
+/* File:    PostScriptDocumentParser.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Uses the MDoc library to dump debug info about an MDoc file.
+ * Compiles *.mdoc documents into postscript documents.
  */
 
 /* Changelog:
@@ -48,22 +48,69 @@
  * Initial release.
  */
 
+#ifndef __MITTEN_POSTSCRIPT_DOCUMENT_PARSER_H
+#define __MITTEN_POSTSCRIPT_DOCUMENT_PARSER_H
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <stdexcept>
+
 #include "DocumentParser.h"
 
-using namespace std;
-using namespace mitten;
-
-int main(int argc, char *argv[])
+namespace mitten
 {
-	if (argc < 2)
+	class PostScriptDocumentParser : public DocumentParser
 	{
-		cerr << "usage: mdocdump <INPUT FILE>\n";
-		return 1;
-	}
+	protected:
+		// void onText(std::string t);
+		// void onReference(std::string r);
+		void onTitle(std::string t);
+		void onSubtitle(std::string st);
+		void onAuthor(std::string a);
+		void onDate(std::string d);
+		// void onSection(std::string s, std::string r);
+		// void onSubSection(std::string s, std::string r);
+		// void onSubSubSection(std::string s, std::string r);
+		// void onSubSubSubSection(std::string s, std::string r);
+		// void onAppendix(std::string a, std::string r);
+		// void onBeginAbstract();
+		// void onEndAbstract();
+		// void onBeginFigure(std::string f, std::string r);
+		// void onEndFigure();
+		// void onBeginCode();
+		// void onEndCode();
+		// void onBeginAlgorithm();
+		// void onEndAlgorithm();
+		// void onAlgorithmInstruction(std::string s);
+		// void onAlgorithmBeginStatement(std::string sn, std::string s);
+		// void onAlgorithmEndStatement();
+		// void onBeginList(ListType lt = BulletType, ListNumberingType lnt = Numbers);
+		// void onBeginListElement(std::string l = "");
+		// void onEndListElement();
+		// void onEndList();
+		// void onNewLine();
+		// void onNewPage();
+		// void onNewParagraph();
+		// void onBeginAxiom(std::string n, std::string r);
+		// void onEndAxiom();
+		// void onBeginTheorem(std::string n, std::string r);
+		// void onEndTheorem();
+		// void onBeginCorrelary(std::string n, std::string r, std::string to);
+		// void onEndCorrelary();
 
-	DocumentParser dp;
-	dp.read(argv[1]);
-	dp.parse();
+		std::string header;
+		std::string titles;
+		std::string toc;
+		std::string document;
 
-	return 0;
+		int width, height;
+
+	public:
+		PostScriptDocumentParser();
+		std::string dumpPS();
+	};
 }
+
+#endif

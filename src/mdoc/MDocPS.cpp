@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MDocDump.cpp
+/* File:    MDocPS.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Uses the MDoc library to dump debug info about an MDoc file.
+ * Uses the MDoc library to compile *.mdoc to postscript.
  */
 
 /* Changelog:
@@ -49,6 +49,7 @@
  */
 
 #include "DocumentParser.h"
+#include "PostScriptDocumentParser.h"
 
 using namespace std;
 using namespace mitten;
@@ -57,13 +58,22 @@ int main(int argc, char *argv[])
 {
 	if (argc < 2)
 	{
-		cerr << "usage: mdocdump <INPUT FILE>\n";
+		cerr << "usage: mdocps <INPUT FILE>\n";
 		return 1;
 	}
 
-	DocumentParser dp;
+	PostScriptDocumentParser dp;
 	dp.read(argv[1]);
 	dp.parse();
+
+	std::string tmp = argv[1];
+	if (tmp.rfind(".") != string::npos)
+		tmp = tmp.substr(0, tmp.rfind("."));
+	tmp += ".ps";
+
+	ofstream f(tmp.c_str());
+	f << dp.dumpPS();
+	f.close();
 
 	return 0;
 }

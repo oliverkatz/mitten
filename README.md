@@ -7,4 +7,4 @@
 
 TODO:
 - Modify structure/expression parsers to use token tags as opposed to string pattern matching.
-- Complete internal error handler.
+- Complete MDoc as replacement documentation engine for Sphinx, Doxygen, and Latex.

@@ -13,9 +13,9 @@ include ../config.mk
 
 CXXFLAGS+=-I../mptk -L../mptk -L.
 
-OBJ=DocumentParser.o
+OBJ=DocumentParser.o PostScriptDocumentParser.o
 
-all : libMDoc.a mdocdump
+all : libMDoc.a mdocdump mdocps
 
 libMDoc.a : $(OBJ)
 	$(AR) $(ARFLAGS) libMDoc.a $^
@@ -23,5 +23,8 @@ libMDoc.a : $(OBJ)
 mdocdump : $(OBJ) MDocDump.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ -lMPTK
 
+mdocps : $(OBJ) MDocPS.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ -lMPTK
+
 clean :
-	$(RM) $(RMFLAGS) $(OBJ) libMDoc.a MDocDump.o mdocdump
+	$(RM) $(RMFLAGS) $(OBJ) libMDoc.a MDocDump.o mdocdump MDocPS.o mdocps

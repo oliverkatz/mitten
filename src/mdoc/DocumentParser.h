@@ -48,8 +48,8 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_DOCUMENT_H
-#define __MITTEN_DOCUMENT_H
+#ifndef __MITTEN_DOCUMENT_PARSER_H
+#define __MITTEN_DOCUMENT_PARSER_H
 
 #include <iostream>
 #include <string>
@@ -131,9 +131,10 @@ namespace mitten
 
 	public:
 		DocumentParser() : errorCount(0), currentlyInAlgorithm(false) {}
-		DocumentParser(std::string p) : path(p), body(readFile(p)), errorCount(0), currentlyInAlgorithm(false) {}
 
 		static void init();
+
+		void read(std::string p);
 
 		bool parse();
 		std::string dumpErrors();

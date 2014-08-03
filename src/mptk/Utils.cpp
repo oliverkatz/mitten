@@ -208,4 +208,23 @@ namespace mitten
 
 		return rtn;
 	}
+
+	string stripString(string s)
+	{
+		int o = 0;
+		int n = s.size();
+
+		while ((s[o] == ' ' || s[o] == '\t' || s[o] == '\n') && n > 0)
+		{
+			o++;
+			n--;
+		}
+
+		while ((s[o+n-1] == ' ' || s[o+n-1] == '\t' || s[o+n-1] == '\n') && n > 0)
+		{
+			n--;
+		}
+
+		return s.substr(o, n);
+	}
 }

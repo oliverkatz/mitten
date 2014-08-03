@@ -127,7 +127,7 @@ This is a little cleaner and easier to work with, especially for C-like language
 Tags
 ----
 
-MPTK automatically tags tokens with certain attributes. These attributes can be retrieved with the **Token** class's **tag** member:
+MPTK automatically tags tokens with certain attributes. These attributes can be retrieved with the **Token** class's **tag** member. The tag enumerator can have the following values:
 
 - **DeliminatorTag** - All deliminators are of this tag.
 - **SymbolTag** - All C symbols are of this tag (configurable via *Lexer::symbolTag*).
@@ -142,4 +142,18 @@ This can allow you to identify which category a token might belong to without re
 Using Tokens
 ------------
 
-You can see the **Token** class's **value** and **tag** members above. The only other two members of a token that you can access are the **line** and **column** members. These store the line number (starting from 1) and column number (starting from 0) of the first character of the token. This is useful for error handling, especially later.
+You can see the **Token** class's **value** and **tag** members above. The only other two members of a token that you can access are the **line** and **column** members. These store the line number (starting from 1) and column number (starting from 0) of the first character of the token. This is useful for error handling, especially later. ::
+
+	// create a token "hi" on line 5, column 8 with the deliminator tag.
+	Token t = Token("hi", 5, 8, DeliminatorTag);
+
+	cout << t.value << "\n";
+	cout << t.line << ":" << t.column << "\n";
+	if (t.tag == DeliminatorTag)
+		cout << "is a deliminator.\n";
+
+This code will print the following result: ::
+
+	hi
+	5:8
+	is a deliminator

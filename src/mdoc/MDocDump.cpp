@@ -34,12 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Utils.h
+/* File:    MDocDump.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Various utility functions used by MPTK.
+ * Uses the MDoc library to dump debug info about an MDoc file.
  */
 
 /* Changelog:
@@ -48,30 +48,21 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_UTILS_H
-#define __MITTEN_UTILS_H
+#include "DocumentParser.h"
 
-#include <iostream>
-#include <string>
-#include <streambuf>
-#include <fstream>
-#include <stdexcept>
+using namespace std;
+using namespace mitten;
 
-namespace mitten
+int main(int argc, char *argv[])
 {
-	/* Function: readFile
-	 * ------------------
-	 * Reads the whole contents of a text file and returns them in a string.
-	 * 'path'  - the path of the file to read
-	 * returns - the contents of the file
-	 */
-	std::string readFile(std::string path);
+	if (argc < 2)
+	{
+		cerr << "usage: mdocdump <INPUT FILE>\n";
+		return 1;
+	}
 
-	// TODO: Move these into MString
-	std::string evaluateEscapeCodes(std::string s);
-	std::string makePrintable(std::string s);
+	DocumentParser dp = DocumentParser(argv[1]);
+	dp.parse();
 
-	std::string stripString(std::string s);
+	return 0;
 }
-
-#endif

@@ -1,6 +1,6 @@
 \documentclass[10pt,a4paper]{article}
 
-\usepackage[margin=0.5in]{geometry}
+\usepackage[margin=1.0in]{geometry}
 \usepackage[linesnumbered,ruled,vlined,norelsize]{algorithm2e}
 
 \title{Mitten Parsing Toolkit Algorithms}
@@ -15,44 +15,31 @@
 
 \section{Introduction}
 
-The Mitten Parsing Toolkit (MPTK) is a simply implemented library for language parsing. It allows for basic parsing functionality, giving the developer the ability to construct a compiler with a handmade feel, yet retains $O(n)$ efficiency which is competetive with other existing language parsing libraries.
+Programming languages are designed to balance understandability from the point of view of the developer using the language and how easy it is to implement a compiler to convert code written in the language to machine code. Parsing tools provide leverage to those implementing compilers, allowing them to develop more advanced languages with simpler compilers.  All parsers, whether implemented using parsing tools or from scratch, start with the source code as input. Their result is usually an abstract syntax tree (AST), a structure that represents the source code in a pragmatically accessible way.  There are many parsing tools available to parse source code, a selection of which is covered in this pamphlet. Often, parsing tools will generate the source code of parsers based on specifications given to the parser generator. Additionally, it is possible to parse code using low-level tools (see Appendix \ref{sec:StringHandlingRequirementsOfMPTK}: String-Handling Requirements of MPTK).
 
-This document contains the definitions and algorithms used by MPTK for language parsing. It assumes text source code and uses a specific language model which limits it to certain types of languages. Its design is heavily influenced by C-like languages and is thus optimized for them. The tokenization is relatively universal, but the semantic analyzer could easily be replaced by an alternate parser for other language types. The algorithms are analyzed for efficiency and compared to other existing parsers.
+The specifications that a parser must comply with are taken from a programming language specification, a list of rules for the syntax and result of a programming language's source code. This specification is usually written declaratively. The set of rules are for how the source code should be structured, not for how it should be compiled. The latter would be a procedural specification. This is left for the compiler's implementation. Many parsing tools allow the user to specify how to parsing should proceed using a declarative grammar. This means that a simple translation from specification to grammar is the only obstacle to implementing a compiler. The issue with this method, however, is that grammars are often complicated to use and require knowledge of the parsing algorithm itself to be used effectively. This complexity leads some developers to implement compilers using low-level tools. This results in large, often over-complicated compilers that are difficult to modify due to their bulk. The balance between these two opposites is the ``parsing problem" that is considered in this pamphlet.
 
-The components of parsing (lexical and semantic analysis) are explained in detail in section \ref{sec:Background}, with no assumption of prior knowledge.
+MPTK is distinctly different from traditional parsing tools. From a philosophical point of view, it attempts to solve the parsing problem not by simplifying the grammars used by parser generators, but by extending the low-level tools to give them high-level parsing capabilities. It lets the developer hand write their own parser, but not a parser that interacts directly with the source code as a sequence of characters. It provides a level of abstraction between the text string and the parser by structuring the characters in a way that is more program-friendly. The purpose of this document is to show how this is done procedurally.
 
-\section{Background}
-\label{sec:Background}
-
-\subsection{Existing Language Parsing Libraries}
-There are many existing language parsing libraries. MPTK's lexical analysis will be compared with
-\begin{description}
-\item[Lex] Written by Mike Lesk and Eric Schmidt and first described in 1975 \cite{LEX_Book}, it is a highly used lexer generator commonly paired with yacc. It reads a text input stream and generates C source code which can perfom tokenization on any text input stream of the target language.
-\end{description}
-
-MPTK's semantic analyzers will be compared against
-\begin{description}
-\item[Yacc] It was wriiten by Stephen C. Johnson at AT\&T in 1970 \cite{YACC_Book}. UNIX used to use it as its default parser generator, although it was since become replaced with Bison and other modern alternatives. 
-\item[GNU Bison] Bison is the parser generator included in the GNU Project. Originally written by Robert Corbett in 1998, it can generate parsers in C/C++ and Java.
-\end{description}
-
-This pamphlet will contain comparisons between MPTK and these existing libraries. The primary difference between these two are the approach to parsing. Lex provides the ability for a developer to create a well-structured description of the lexical result of an input source code using an existing algorithm for identifying string patterns. MPTK provides a fixed, but configurable result, using an existing algorithm for lexical analysis. It is not as flexible as Lex, but for most languages it can be implemented in fewer lines of code with competetive efficiency.
-
-Yacc \cite{YACC_Book} and Bison both generate parsers using a fixed type of parsing algorithm (LALR or GLR). The developer configures this fixed algorithm in order to create a completely parsed AST result. MPTK provides a set of algorithms which can be paired in a pipeline to create a partially parsed AST result. The rest of the parsing must be done manually by the developer.
-
-\subsection{Lexical Analysis}
-Lexical analysis, sometimes referred to a tokenization, is the process of dividing a string of characters into tokens, the smallest unit of meaning within a programming language's syntax. An example of a tokenization would be:\newline
+All parsers are comprised of lexical and semantic analyzers. Lexical analysis, sometimes referred to a tokenization, is the process of dividing a string of characters into tokens, the smallest unit of meaning within a programming language's syntax. An example of a tokenization would be:\newline
 
 \verb|"hello, world"| $\rightarrow$ [\verb|"hello"|, \verb|","|, \verb|" "|, \verb|"world"|]\newline
 
 Also, keep in mind that strings may be encoded in memory using many different character encodings. They do not need to be directly supported by an implementation of MPTK's algorithms, but strings with different character widths do.
 
-\subsection{Semantic Analysis}
 Semantic analysis is the process of parsing a sequence of tokens (generally resulting from lexical analysis) into a structured abstract syntax tree (AST). An example parsing would be:\newline
 
 [\verb|"f"|, \verb|"("|, \verb|"x"|, \verb|","|, \verb|"5"|, \verb|")"|] $\rightarrow$ \verb|"f", (argument list: (argument: "x"), (argument: "y"))|\newline
 
-These two algorithms combine to create a full language parser. The AST can be passed to a code generator which infers the programmer's meaning and generates output code (assembly, machine code, bytecode, etc.) accordingly. 
+These two algorithms combine to create a full language parser. The AST can be passed to a code generator which infers the programmer's meaning and generates output code (assembly, machine code, bytecode, etc.) accordingly. MPTK performs both of these operations effectively, but efficiency must also be considered. Lexical analyzers are, by definition, $O(n)$. The semantic analysis algorithms used by most traditional tools are also $O(n)$. This is the benchmark that MPTK will be compared to. The following tools will be used for comparison:\newline
+\begin{description}
+\item[Lex] Written by Mike Lesk and Eric Schmidt and first described in 1975 \cite{LEX_Book}, it is a highly used lexer generator commonly paired with yacc. It reads a text input stream and generates C source code which can perfom tokenization on any text input stream of the target language.
+\item[Yacc] It was wriiten by Stephen C. Johnson at AT\&T in 1970 \cite{YACC_Book}. UNIX used to use it as its default parser generator, although it was since become replaced with Bison and other modern alternatives. The combination of lex and yacc was often considered the standard for writing industrial-strength UNIX compilers.
+\item[GNU Bison] Bison is the parser generator included in the GNU Project. Originally written by Robert Corbett in 1998, it can generate parsers in C/C++ and Java.
+\item[ANTLR] Terence Parr's brainchild since 1989, it is a commonly used parser generator written in Java. It can, however, generate parsers written in both Java and C\#. 
+\end{description}
+
+This document will go over the lexical and semantic analysis algorithms used by MPTK and show a runtime analysis for all the algorithms specified. The efficiency of these algorithms will be compared to the efficiency benchmark set by existing parsing tools.
 
 \section{Lexical Analysis Algorithms}
 
@@ -129,7 +116,7 @@ $lastcolumn\gets 0$\;
 		\If{there are deliminators of length j}{
 			\If{$T[i:i+j]$ is a valid deliminator}{
 				$d\gets$ the valid deliminator\;
-				\If{$last < i-1$}{
+				\If{$last < i$}{
 					record symbol token with value $[last:i]$ and code location $lastline:lastcolumn$\;
 				}
 
@@ -428,7 +415,6 @@ Many programming languages include algebraic expressions with simple rules. MPTK
 \subsubsection{Overview}
 While the previous algorithms have all been iterative, this algorithm is recursive. It must be to deal with the recursive nature of the AST input.
 
-\newpage
 \subsubsection{Algorithm}
 $a$ is the input AST branch, while $A$ is the input AST passed to $parseExpression$. $i$ is the parsing iterator used by $parseExpression$. $B$ is the number of branches in $A$. \newline
 \begin{algorithm}[H]
@@ -612,11 +598,6 @@ $stack\gets$ []\; % what the fuck is this??
 \subsubsection{Running Time Analysis}
 This procedure traverses every node in the AST tree once, so it has a running time of $O(N)$ where $N$ is the number of nodes in the AST tree. In the worst case, this is equivalent to the number of tokens in the expression passed to the structure parser.
 
-\section{Efficiency Disadvantages of MPTK}
-Since MPTK uses a series of algorithms to partially parse an AST result, it will not be as efficient as a single parsing algorithm to perform a complete parsing. MPTK is still $O(n)$, but the actual running time may differ between competetive libraries.
-
-The rationale for this design was to allow the developer as much freedom as possible in writing a compiler. Creating a parsing with a parsing generator is a more complex environment than hand coding an algorithm to parse a partially parsed AST.
-
 \begin{thebibliography}{9}
 \bibitem{ISO_CharacterEncodings}
 	ISO/EIC 8859-1,
@@ -630,10 +611,18 @@ The rationale for this design was to allow the developer as much freedom as poss
 	Johnson, S. C. (1975). \emph{Yacc: Yet Another Compiler-Compiler}. Murray Hill, NJ: Bell Laboratories.
 \end{thebibliography}
 
-%\appendix
-%\section*{Appendix}
-%\renewcommand{\thesubsection}{\Alph{subsection}}
+\appendix
+\section*{Appendix}
+\renewcommand{\thesubsection}{\Alph{subsection}}
 
-%\subsection{Parsing a Python-like Language}
+\subsection{String-Handling Requirements of MPTK}
+\label{sec:StringHandlingRequirementsOfMPTK}
+A string object used by MPTK must have the following operations:
+\begin{description}
+\item[Length] Its length in characters before the first null byte must be stored or calculatable. Given by the C standard library in the form of $strlen$.
+\item[At] The character at a given index must be accessable. Given in C by $s[i]$ where $s$ is a string and $i$ is the given index.
+\item[Substring] A string must be able to be sliced into smaller strings with no effect on the parent string. Given by the C standard library in the form of $substr$.
+\item[Compare] A string must be able to be compared character for character. Given by the C standard library in the form of $strcmp$.
+\end{description}
 
 \end{document}

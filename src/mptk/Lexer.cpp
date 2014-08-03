@@ -191,6 +191,12 @@ namespace mitten
 			}
 		}
 
+		if (last < s.size()-1)
+		{
+			rtn.push_back(Token(s.substr(last), lastline, lastcolumn));
+			rtn.back().tag = findTag(rtn.back());
+		}
+
 		return rtn;
 	}
 }

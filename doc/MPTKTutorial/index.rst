@@ -13,7 +13,7 @@ Contents:
 
    intro
    lexing
-
+   parsing
 
 
 .. Indices and tables

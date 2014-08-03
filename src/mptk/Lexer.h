@@ -129,14 +129,14 @@ namespace mitten
 			 * -----------
 			 * Creates deliminator with start but no end point.
 			 */
-			Deliminator(StringConstPattern p) : start(p) {}
+			Deliminator(StringConstPattern p) : start(p), flags(Defaults) {}
 
 			/* Constructor
 			 * -----------
 			 * Creates deliminator with start and end points.
 			 */
 			Deliminator(StringConstPattern s, StringConstPattern e) : 
-				start(s), end(e) {}
+				start(s), end(e), flags(Defaults) {}
 		} Deliminator;
 
 		/* Member: delims

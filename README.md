@@ -11,15 +11,9 @@ Mitten is a high-level programming language intended for use in large projects. 
 
 Mitten is comprised of a set of programs and libraries, as well as extensive documentation (i.e. the language specification). The most important library contained within this project is the Mitten Parsing ToolKit (MPTK). This is what Mitten uses to parse its source code. Although MPTK is currently only used for Mitten, it is applicable to any programming language.
 
-Todo for the Mitten Language Specification
-------------------------------------------
-* Make more awesome.
-
 Todo for MPTK 0.02-alpha
 ------------------------
-* Make more awesome.
-
-Todo for Mitten Compiler 0.02-alpha
------------------------------------
-* Use MPTK 0.02-alpha
-* Make more awesome.
+* Add character width abstraction for 8, 16, and 32 bit character encodings.
+* Decrease TokenVector class's memory footprint (proposed method uses ~20% of original memory).
+* Decrease AST class's memory footprint (proposed method uses ~50% of original memory).
+* Add indent parser.

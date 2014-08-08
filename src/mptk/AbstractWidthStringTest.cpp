@@ -34,23 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPTK.h
+/* File:    AbstractWidthStringTest.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * MPTK is a language parsing library. It is designed to be implemented in a
- * single header file. It provides the ability for a developer to write a
- * compiler with a handmade feel without the significant workload required to
- * implement even a simple lexer and parser. It maintains a competetive
- * efficiency of O(n) with lex and yacc.
- *
- * For a description of how the algorithms used by MPTK work or a detailed
- * efficiency analysis, see "MPTK Language Parsing Algorithms" (2014), a
- * pamplet which can be found on the MPTK website.
- *
- * For a tutorial on how to use MPTK, see the MPTK website or "MPTK
- * Beginner Tutorial" (2014), which can be found on the MPTK website.
+ * Unit test using MUnit.
  */
 
 /* Changelog:
@@ -59,21 +48,22 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_MPTK_H
-#define __MITTEN_MPTK_H
+#include <iostream>
+#include <MUnit.h>
 
-#define MPTK_VERSION_MAJOR 0
-#define MPTK_VERSION_MINOR 1
-#define MPTK_VERSION_STR "0.01-alpha"
-#define MPTK_VERSION 0x001
+#include "AbstractWidthString.h"
 
-#include "Utils.h"
-#include "Token.h"
-#include "Lexer.h"
-#include "AST.h"
-#include "ErrorHandler.h"
-#include "StructureParser.h"
-#include "ExpressionParser.h"
-#include "Reconstruction.h"
+using namespace std;
+using namespace mitten;
 
-#endif
+int main()
+{
+	Test test = Test("UtilsTest");
+
+	AbstractWidthString tmp8 = AbstractWidthString::fromCString8("hello, world");
+	AbstractWidthString tmp16 = AbstractWidthString::fromCString16(u"hello, world");
+	AbstractWidthString tmp32 = AbstractWidthString::fromCString32(U"hello, world");
+	AbstractWidthString slice = AbstractWidthString(tmp8);
+
+	return (int)(test.write());
+}

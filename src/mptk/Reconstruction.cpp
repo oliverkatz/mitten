@@ -34,23 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPTK.h
+/* File:    Reconstruction.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * MPTK is a language parsing library. It is designed to be implemented in a
- * single header file. It provides the ability for a developer to write a
- * compiler with a handmade feel without the significant workload required to
- * implement even a simple lexer and parser. It maintains a competetive
- * efficiency of O(n) with lex and yacc.
- *
- * For a description of how the algorithms used by MPTK work or a detailed
- * efficiency analysis, see "MPTK Language Parsing Algorithms" (2014), a
- * pamplet which can be found on the MPTK website.
- *
- * For a tutorial on how to use MPTK, see the MPTK website or "MPTK
- * Beginner Tutorial" (2014), which can be found on the MPTK website.
+ * Reconstructs files from token vectors or ASTs.
  */
 
 /* Changelog:
@@ -59,21 +48,78 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_MPTK_H
-#define __MITTEN_MPTK_H
-
-#define MPTK_VERSION_MAJOR 0
-#define MPTK_VERSION_MINOR 1
-#define MPTK_VERSION_STR "0.01-alpha"
-#define MPTK_VERSION 0x001
-
-#include "Utils.h"
-#include "Token.h"
-#include "Lexer.h"
-#include "AST.h"
-#include "ErrorHandler.h"
-#include "StructureParser.h"
-#include "ExpressionParser.h"
 #include "Reconstruction.h"
 
-#endif
+using namespace std;
+
+namespace mitten
+{
+	string reconstructFromTokenVector(vector<Token> toks, bool autoTabs)
+	{
+		string page;
+
+		int line = 1, column = 0;
+		bool firstOnLine = true;
+
+		for (auto i : toks)
+		{
+			if (i.line > line && i.tag != SyntheticTag)
+			{
+				firstOnLine = true;
+
+				while (i.line > line)
+				{
+					page += "\n";
+					line++;
+				}
+			}
+			else
+			{
+				firstOnLine = false;
+			}
+
+			if (i.tag != SyntheticTag)
+			{
+				while (i.column > column)
+				{
+					if (firstOnLine && autoTabs)
+					{
+						page += "\t";
+					}
+					else
+					{
+						page += " ";
+					}
+
+					column++;
+				}
+			}
+			else
+			{
+				page += " ";
+				column++;
+			}
+
+			page += i.value;
+			for (auto j : i.value)
+			{
+				if (j == '\n')
+				{
+					line++;
+					column = 0;
+				}
+				else
+				{
+					column++;
+				}
+			}
+		}
+
+		return page;
+	}
+
+	string reconstructFromAST(AST ast, bool autoTabs)
+	{
+		return "";
+	}
+}

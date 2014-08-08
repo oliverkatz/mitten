@@ -11,17 +11,8 @@
 
 include ../config.mk
 
-CXXFLAGS+=-I../mptk -L../mptk
-
-OBJ=util/CommandLineParser.o language/MittenErrorHandler.o language/MittenSource.o
-
-all : mc mpp
-
-mc : $(OBJ) MC.o
-	$(CXX) $(CXXFLAGS) $^ -o $@ -lMPTK
-
-mpp : $(OBJ) MPP.o
-	$(CXX) $(CXXFLAGS) $^ -o $@ -lMPTK
+all : 
+	$(TEX) $(TEXFLAGS) TheMittenProgrammingLanguage.tex
 
 clean :
-	$(RM) $(RMFLAGS) $(OBJ) MC.o mc MPP.o mpp
+	$(RM) $(RMFLAGS) $(shell echo *.aux *.log *.pdf *.toc *.out)

@@ -34,19 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MString.cpp
+/* File:    MittenSource.h
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Width-abstracted string class. Supports:
- * - ASCII
- * - UTF-8
- * - UTF-16
- * - UTF-32
- *
- * Steps away from the C++ naming conventions used by the other files to keep
- * with the STL C++11 standard for usability.
+ * Source code object for Mitten. Interface to the compiler's frontend.
  */
 
 /* Changelog:
@@ -55,11 +48,49 @@
  * Initial release.
  */
 
-#include "MString.h"
+#ifndef __MITTEN_LANGUAGE_MITTEN_SOURCE_H
+#define __MITTEN_LANGUAGE_MITTEN_SOURCE_H
 
-using namespace std;
+#include <iostream>
+#include <string>
+#include <vector>
+#include <MPTK.h>
+
+#include "MittenErrorHandler.h"
 
 namespace mitten
 {
-	
+	class MittenSource
+	{
+	protected:
+		Lexer lexer;
+		Lexer directiveLexer;
+
+		std::string path;
+		std::string page;
+		std::vector<Token> toks;
+
+		std::unordered_map<std::string, std::vector<Token> > lexicalMacros;
+
+		MittenErrorHandler meh;
+
+	public:
+		MittenSource();
+
+		bool readSourceFile(std::string p);
+		bool setSourceString(std::string s);
+
+		bool lex(bool verbose = false);
+		bool preProcessLexical(bool verbose = false);
+
+		std::string reconstruct();
+
+		void clear();
+
+		bool areErrors();
+		bool dumpErrors();
+		void clearErrors();
+	};
 }
+
+#endif

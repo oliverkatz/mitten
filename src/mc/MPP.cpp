@@ -34,23 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPTK.h
+/* File:    MPP.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * MPTK is a language parsing library. It is designed to be implemented in a
- * single header file. It provides the ability for a developer to write a
- * compiler with a handmade feel without the significant workload required to
- * implement even a simple lexer and parser. It maintains a competetive
- * efficiency of O(n) with lex and yacc.
- *
- * For a description of how the algorithms used by MPTK work or a detailed
- * efficiency analysis, see "MPTK Language Parsing Algorithms" (2014), a
- * pamplet which can be found on the MPTK website.
- *
- * For a tutorial on how to use MPTK, see the MPTK website or "MPTK
- * Beginner Tutorial" (2014), which can be found on the MPTK website.
+ * Entry point for the Mitten Compiler's preprocessor (MPP).
  */
 
 /* Changelog:
@@ -59,21 +48,61 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_MPTK_H
-#define __MITTEN_MPTK_H
+#include <iostream>
+#include <MPTK.h>
 
-#define MPTK_VERSION_MAJOR 0
-#define MPTK_VERSION_MINOR 1
-#define MPTK_VERSION_STR "0.01-alpha"
-#define MPTK_VERSION 0x001
+#include "util/CommandLineParser.h"
+#include "language/MittenErrorHandler.h"
+ #include "language/MittenSource.h"
 
-#include "Utils.h"
-#include "Token.h"
-#include "Lexer.h"
-#include "AST.h"
-#include "ErrorHandler.h"
-#include "StructureParser.h"
-#include "ExpressionParser.h"
-#include "Reconstruction.h"
+using namespace std;
+using namespace mitten;
 
-#endif
+int main(int argc, char *argv[])
+{
+	CommandLineParser clp;
+
+	clp.name = "Mitten PreProcessor (MPP)";
+	clp.version = "0.01-alpha";
+	clp.copyright = "Copyright 2014 Oliver Katz";
+
+	clp["I"].setDescription("Adds its argument to the include path.").setType("path").addExample("-I.").addExample("-I/opt/usr/include").addValue("/usr/include").requestArgument();
+
+	if (clp.parse(argc, argv))
+	{
+		return 1;
+	}
+
+	if (clp.freeArguments.empty())
+	{
+		cerr << "error: no input files\n";
+		return 2;
+	}
+	else if (clp.freeArguments.size() > 1)
+	{
+		cerr << "error: only one input file may be processed at a time\n";
+		return 3;
+	}
+
+	MittenSource source;
+	source.readSourceFile(clp.freeArguments[0]);
+
+	if (source.lex())
+	{
+		return 4;
+	}
+
+	if (source.preProcessLexical())
+	{
+		return 5;
+	}
+
+	if (source.dumpErrors())
+	{
+		return 6;
+	}
+
+	cout << source.reconstruct() << "\n";
+
+	return 0;
+}

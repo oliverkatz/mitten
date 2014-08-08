@@ -1,0 +1,3555 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage{ifpdf}
+\ifpdf 
+    \usepackage[pdftex]{graphicx}   % to include graphics
+    \pdfcompresslevel=9 
+    \usepackage[pdftex,     % sets up hyperref to use pdftex driver
+            plainpages=false,   % allows page i and 1 to exist in the same document
+            breaklinks=true,    % link texts can be broken at the end of line
+            colorlinks=true,
+            pdftitle=The Mitten Programming Language
+            pdfauthor=Oliver Katz
+           ]{hyperref} 
+    \usepackage{thumbpdf}
+\else 
+    \usepackage{graphicx}       % to include graphics
+    \usepackage{hyperref}       % to simplify the use of \href
+\fi
+
+\usepackage[margin=1.0in]{geometry}
+
+\title{The Mitten Programming Language}
+\author{Oliver Katz}
+\date{\today}
+
+\setcounter{tocdepth}{2}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+
+
+
+\section{Scope}
+This document contains a tutorial on how to use the Mitten programming language followed by a technical specification of the language itself. The tutorial assumes a knowledge of using the command line on whichever operating system you chose to use as well as a knowledge of how to use whichever Mitten compiler you chose. Look to the documentation of your operating system and Mitten compiler for more details on either of these topics. It does not assume any knowledge of programming, except a basic knowledge of computers and data storage in memory.
+
+The topics covered by the specification are:
+\begin{description}
+  \item[Syntax] The rules for the programming language itself.
+  \item[Pre-processing] Rules for the preprocessor to be written by.
+  \item[Execution] A relatively open-for-interpretation set of requirements for how the code is to be executed.
+  \item[Standard Library] Basic requirements that a standard library must follow.
+\end{description}
+
+It is aimed at people who want to write an implementation of the Mitten programming language.
+
+\newpage
+
+\section{Beginner Tutorial}
+Heads up, this tutorial doesn't expect you to know anything about programming, so if Mitten is your first programming language, that's fine! It does, however, expect you to know how to use the command line on your operating system and how to use whichever Mitten compiler you choose. If you want help on those topics, look at tutorials on how to use your Mitten compiler or perhaps recommendations of which Mitten compiler to use.\footnote{When this was being written, there were no Mitten compilers, so this sounds awfully optimistic.}
+
+\subsection{Hello, World}
+Let's start out with a simple program. All it does is print ``hello, world." to the console, but this is a big hurdle, especially for those who have just started programming. The good news is that once we get past this hurdle, you will have a good understanding of the basics of programming. Here's the code for the program (the source code):
+\begin{verbatim}
+#include <mitte.n>
+
+void main()
+{
+    print("hello, world.\n");
+}
+\end{verbatim}
+
+Let's go through it line by line. The first line, \verb|#include <mitte.n>|, is how we include the \textit{standard library} - a collection of code to do many basic tasks in Mitten (i.e. printing something to the console). By including it, we get access to all of these basic functions in our programs.
+
+The second line is empty. This is actually important to note, because whitespace (spaces, tabs, newlines) are pretty much ignored in Mitten except for their use in separating words.
+
+The third line, \verb|void main()| is the beginning of the \textit{main function}. We'll get more into how this works in a little bit, but for now the important thing to remember is that the main function is the code which is run when the program starts. Think of this as the body of the program.
+
+The fourth line is just a \verb|{|, but it denotes the beginning of the code that is contained within the main function. The \verb|}| on the last line denotes the end of the code that is contained within the main function. They are kind of like boundaries.
+
+The fifth line is the most important - it is what actually prints the message to the console.
+\begin{verbatim}
+print("hello, world.\n");
+\end{verbatim}
+
+There's a lot here. For starters, \verb|print|. This is how we access the \verb|print| \textit{function}, which is in the standard library we included on the first line. You can think of this function as similar to an algebraic function. Algebraic functions take independent variables as input and provide the value of the dependent variable as output. They are sort of like mathematical machines. Functions in Mitten (and most other programming languages, like C) are similar, but have a few basic differences. Their inputs are called arguments, not variables and they don't always output things. The \verb|print| function doesn't output a number, it simply prints its arguments to the console. The other big difference, is that the arguments and outputs don't always have to be numbers - in this case the argument we give \verb|print| is some text in quotes. This brings us to the next part of this line.
+
+Pieces of text in quotes, in programming, are called strings. This name is short for \textit{strings} of characters. You can put anything you want in a string, but there are some characters you can't include, such as newline characters. You can get around this problem by using \textit{escape codes}. These are short codes that always start with backslashes. The code for newline, for example, is '\verb|\n|'. Now you can see where the string in the \verb|print| function comes from - it is the message ``hello, world.", but followed by a newline character written as an escape code.
+
+There's just one other aspect to this line of code. There is a semicolon at the end of it. In many programming languages, semicolons are used as an end to the line of code. Think of them as periods at the end of sentences. But why don't the other lines have semicolons at the end of them? This applies only to lines of code within functions (this line is within the \verb|main| function).
+
+Save this file as \verb|hello.n| (the \verb|*.n| file extension means Mitten source code). Now, you can't run the source code directly - you need to convert it into a format that can be run on a computer. This conversion process is called \textit{compiling} and is done by a \textit{compiler}. Look to a tutorial for your Mitten compiler for how to do this. The end result, however, will almost always be an executable binary. Run it! You should get the output on your console:
+\begin{verbatim}
+hello, world.
+\end{verbatim}
+
+If it didn't work, make sure that the \verb|hello.n| file you have matches the above source code exactly. Don't worry - fixing these kinds of errors and problems are a large part of computer science. If it did work - congratulations! It's your first program.
+
+Now you understand some basic principles of programming. Next, we'll go over how to do simple math with programs.
+
+\newpage
+
+
+
+
+\subsection{Integer Math}
+Let us first go over how integer math works. It is must like algebra, but again, there are a few basic differences. In algebra, you ``define" variables by using them in equations. In Mitten, there are lots of different types of variables - variables that deal with integers, variables that deal with decimal numbers, variables that deal with strings, etc. You can't just start using a variable - you have to declare it. Let's declare an integer variable.
+\begin{verbatim}
+#include <mitte.n>
+
+void main()
+{
+    int x; // <- this is a variable declaration
+}
+\end{verbatim}
+
+You can see that this program is very similar to our hello world program. The one line we will look at is \verb|int x;|. \verb|int| means the type of variable - in this case it is short for integer. \verb|x| is the name of the variable. At the end, you see that the line is ended with a semicolon, because it is inside the main function. There is also something after the semicolon called a comment (\verb|// <- this is a variable declaration|). If you put two forward slashes (\verb|//|) in your code, everything until the end of the line will be ignored by the compiler. This is a good way to put notes and descriptions in your code to make it more easily understandable. All variable declarations will look something like this: the type followed by the variable name.
+
+Quick trick - you can declare multiple variables with the same type at once by separating the declarations with commas:
+\begin{verbatim}
+int x = 5, y = 10, z;
+\end{verbatim}
+
+Now that we have a variable, let us assign a value to it:
+\begin{verbatim}
+...
+int x = 5;
+...
+\end{verbatim}
+
+We can assign values to variables right after their declaration like this. Let's now add a line of code to print this variable with a newline after it.
+\begin{verbatim}
+...
+int x = 5;
+print(x, "\n");
+...
+\end{verbatim}
+
+\verb|print| now has two arguments: an integer x and a string \verb|"\n"|. The output of this program should be:
+\begin{verbatim}
+5
+\end{verbatim}
+
+What if we want to add 1 to \verb|x|? We write the following code:
+\begin{verbatim}
+...
+int x = 5;
+x = x + 1;
+...
+\end{verbatim}
+
+From an algebraic point of view, this makes no sense. This is one of the basic differences between algebra and programming: the \verb|=| signs do not denote equality, but assignment. What does this mean? The left side of every \verb|=| sign is always a variable, while the right side can be anything. What is on the right side is calculated and then \textit{assigned} as the new value of the variable. The \verb|x+1| on the right side of the assignment is equivalent to \verb|5+1|. The old value of \verb|x| is used, because \verb|x| hasn't been assigned yet. So the value of \verb|6| is calculated and assigned to \verb|x|. Now the program will output:
+\begin{verbatim}
+6
+\end{verbatim}
+
+For integers, the basic operations that you can do (addition, subtraction, multiplication, division) are pretty simple to write:
+\begin{verbatim}
+x + y
+x - y
+x * y
+x / y
+\end{verbatim}
+
+So let's write a program that divides 5 by 2.
+\begin{verbatim}
+...
+int x = 5;
+x = x / 2;
+...
+\end{verbatim}
+
+The output of this program is actually \verb|2|. Why not \verb|2.5|? \verb|x| is an integer variable - that means that all it can do is store integers. Since 2.5 is not an integer, it rounds. The reason it is \verb|2|, and not \verb|3| is that computers always round down (it's faster to always round down than to round to the nearest integer). 
+
+\newpage
+
+
+
+
+
+\subsection{A Cleaner way of Writing Things}
+There is a shorthand way of writing things like \verb|x = x + 1|. The \textit{assignment operators}:
+\begin{verbatim}
+x += y
+x -= y
+x *= y
+x /= y
+\end{verbatim}
+
+\verb|x += y| means that the value of \verb|y| is added to \verb|x| and then assigned to \verb|x|. It is equivalent to \verb|x = x + y|, it's just cleaner. You can do this with all of the operators.
+
+Additionally (no pun intended), since adding or subtracting one from variables is so commonly done in programming (counting up or down), there are special operators for incrementation and decrementation:
+\begin{verbatim}
+x++
+x--
+\end{verbatim}
+
+\verb|x++| is equivalent to \verb|x += 1|, and \verb|x--| is equivalent to \verb|x -= 1|. It's just shorthand - use it if you want to.
+
+\newpage
+
+
+
+
+
+\subsection{Floating-Point Math}
+In programming, decimal numbers are called floats, because of their \textit{floating} decimal point. We can use floats to store numbers like \verb|2.5|. Let's redo the divide by two example from the last section with floats:
+\begin{verbatim}
+...
+float x = 5;
+x /= 2;
+...
+\end{verbatim}
+
+We made two changes: \verb|x| is now a float, instead of an int, and now we used the assignment operator shorthand for division. The output of the program will now be \verb|2.5|, because \verb|x| can now support floating-decimal numbers. 
+
+\newpage
+
+
+
+
+\subsection{Making Your Own Functions}
+Let's make a simple function to double any number you give it. When you make a function, you need to have a type for every argument and a type for the output of the function, called the return value. Let's show how this works in source code:
+\begin{verbatim}
+int double(int x)
+{
+    // code goes here
+}
+\end{verbatim}
+
+Going through the first line, the first \verb|int| means the return type of the function - we're outputting an int. \verb|double| is the name of our function. The contents of the parenthesis are the arguments, although here we have only one. Think of each argument as a variable declaration and the argument list as a series of arguments separated by commas. Now when you call the function, whatever argument you pass it can be accessed within the function by using \verb|x|. All we want to do here is double x and then return it. How do we do that? Put the code within the braces \verb|{| and \verb|}|, also known as the \textit{scope} of the function:
+\begin{verbatim}
+int double(int x)
+{
+    return(x*2);
+}
+\end{verbatim}
+
+\verb|return| looks like a function, but it is one of the internals of Mitten. Use return to provide any value you pass it as the return value of the function. Now we can incorporate this function into a program:
+\begin{verbatim}
+#include <mitte.n>
+
+// first we declare the function.
+int double(int x)
+{
+    return (x*2);
+}
+
+void main()
+{
+    // then we call it
+    print(double(5), "\n"); // this will output '10'
+}
+\end{verbatim}
+
+Now you know how to make your own functions!
+
+\newpage
+
+
+
+
+
+\subsection{If-Statements}
+Let's make a program that only prints out a message if a number is positive. To do this, we can use \textit{if-statements}.
+\begin{verbatim}
+#include <mitte.n>
+
+void main()
+{
+    int x = -1; // right now the number is negative
+    
+    if (x > 0) // if x is greater than 0
+    {
+        print("x is positive.\n"); // print a message
+    }
+}
+\end{verbatim}
+
+An if statement only executes what's in its scope if the expression in its parenthesis is true. In this case, the expression is false (a is not greater than 0) so the message won't be printed. However, if we change \verb|x| to \verb|5|, it will!
+
+You'll notice the \verb|>| operator. This operator results in a boolean value depending on whether it is true or not. Here are all the compare operators:
+\begin{verbatim}
+x < y // x is less than y
+x <= y // x is less than or equal to y
+x > y // x is greater than y
+x >= y // x is greater than or equal to y
+x == y // x is equal to y
+x != y // x is not equal to y
+\end{verbatim}
+
+But what if we want to also print a message if x is negative? Use \verb|else|!
+\begin{verbatim}
+...
+if (x > 0)
+{
+    print("x is positive.\n");
+}
+else
+{
+    print("x is negative.\n");
+}
+\end{verbatim}
+
+Now if \verb|x| is \verb|-1|, a message will print saying that x is negative. We still have a problem, though. If \verb|x| is \verb|0|, it will print out that x is negative. \verb|0| is not negative or positive, so we need a new message:
+\begin{verbatim}
+...
+if (x > 0) // if x is positive
+{
+    print("x is positive.\n");
+}
+else if (x == 0) // otherwise if x is zero
+{
+    print("x is zero.\n");
+}
+else // otherwise (x is negative)
+{
+   print("x is negative.\n");
+}
+\end{verbatim}
+
+Now it works correctly!
+
+\newpage
+
+
+
+
+
+\subsection{Scope Shorthand}
+For certain statements, like if statements, if you don't use the scope braces, it is assumed that the next line and the next line only is the scope. For example, we could rewrite the last piece of code:
+\begin{verbatim}
+if (x > 0)
+    print("x is positive.\n");
+else if (x == 0)
+    print("x is zero.\n");
+else
+    print("x is negative.\n");
+\end{verbatim}
+
+It can look cleaner for small if-else trees and simple stuff, but for more complex code, you definitely want to use the full brace syntax.
+
+\newpage
+
+
+
+
+\subsection{While Loops}
+A loop is a kind of statement that allows you to run the same code over and over. A while loop is the simplest one:
+\begin{verbatim}
+int x = 0;
+while (x < 10)
+{
+    print(x, "\n");
+    x++;
+}
+\end{verbatim}
+
+The loop runs as long as the condition is true - like a repetitive if-statement (these are such things as dubstep is made of). The output of this program will be:
+\begin{verbatim}
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+\end{verbatim}
+
+You'll notice that is loop is basically a counting loop. There's another loop designed specifically for counting. \footnote{There's another kind of while loop called a do-while loop. There isn't a section in the tutorial on these, because they aren't as commonly used as while and for loops. You can still find how to use them later on.}
+
+\newpage
+
+
+
+
+\subsection{For Loops}
+For loops have three ``fields" in their condition:
+\begin{verbatim}
+for (int i = 0; i < 10; i++)
+{
+    print(x, "\n");
+}
+\end{verbatim}
+
+The first field is a variable declaration (\verb|int i = 0|). This variable only exists within the loop's scope - think of it as a counter or iterator. The second field (\verb|i < 10|) is a condition - just like the one you have in the while loop. The last field (\verb|i++|) is called the \textit{step expression}. It is a single line of code that runs at the end of each execution of the loop. Note that this program is essentially identical to the while loop program.
+
+\newpage
+
+
+
+\subsection{Boolean Math}
+There are operations that deal only with booleans. Some of them deal with the boolean values that you see in conditions, while some of them perform the same operations on each bit of integer values, called bitwise operations. Let's start with the boolean operations.
+\begin{verbatim}
+x && y // AND: true only if x and y are both true
+x || y // OR: true if x, y, or both are true
+!x     // NOT: true if x is false and false if x is true
+\end{verbatim}
+
+These are the basics of boolean logic. For example, if you wanted to print a message only when a number is between 1 and 10 (inclusive):
+\begin{verbatim}
+if (x >= 1 && x <= 10)
+{
+    print("x is between 1 and 10 (inclusive).\n");
+}
+\end{verbatim}
+
+However, you can also use these operations on each bit of two integer values:
+\begin{verbatim}
+x & y   // bitwise AND
+x | y   // bitwise AND
+~x      // bitwise NOT
+x << y  // shift the bits in x left by y places
+x >> y  // shift the bits in x right by y places
+x &. y  // get a bool describing whether or not the y-th bit of x is 1 or not
+x |. y  // set the y-th bit of x to 1
+x ~. y  // set the y-th bit of x to 0
+\end{verbatim}
+
+If you have two variables \verb|x| and \verb|y| which are each 8 bits (a char perhaps) and operate them with a bitwise and, then the result will be an 8 bit value. Each bit of \verb|x| will be and-ed with the corresponding bit in \verb|y| to make the result. If you use two variables of different types, the smallest value in size will be padded (automatically casted to a larger type).
+
+Like the mathematical operators, there are assignment operators for bitwise operations:
+\begin{verbatim}
+x &= y  // bitwise AND x and y and assign to x
+x |= y  // bitwise OR x and y and assign to x
+x <<= y // shift the bits of x left by y places and assign to x
+x >>= y // shift the bits of x right by y places and assign to x
+\end{verbatim}
+
+\newpage
+
+
+
+
+
+\subsection{Casting}
+So far we've only seen the different types used individually, but there is a lot more to the type system in Mitten. Namely, casting. Casting is how you convert data in one type into data of another type. Let's go over how the data is actually stored in memory.
+
+Data is stored in binary in memory. Each bit of memory can have 2 different states. Computer scientists assigned a number to each of these states: 0 and 1. This isn't very useful on its own, but if you combine 8 bits into 1 byte, you can now store 256 different states. Why 8 bits? I dunno - I'll go ask a computer scientist. So which numbers do these states correspond to? This depends on whether the data is signed or not. Signed data can be positive or negative, but unsigned data can only ever be positive. A signed byte can be -128 to +127, while an unsigned byte can be 0 to 255. Both possibilities have 256 different states. Signed types have the advantage of being able to store negative numbers, while unsigned types can store positive numbers twice as large and will throw errors if you try to set them to negative values.\footnote{This is a good way of creating variables or function arguments that aren't supposed to make negatives values.}
+
+Different integer types may have different sizes, some store their data in 1 byte, some in 2, some in 4, and some in 8. However, there are also floating types. A 1 byte float would not be able to contain much precision - so floating values are 4 and 8 bytes.
+
+Let us show how casting works with a simple example - a function that divides two integers, but returns the result as a float.
+\begin{verbatim}
+float divide(int base, int by)
+{
+    float tmp = cast[float](base);
+    tmp /= cast[float](by);
+    return tmp;
+}
+\end{verbatim}
+
+Use the \verb|cast| keyword to convert between types. The contents of the square brackets is the type to cast to. The contents of the parenthesis are the value to convert. The first cast (\verb|cast[float](base)|) converts \verb|base| from an int type to a float type. The second cast converts \verb|by|. Now if we call this function with 5 and 2 (\verb|divide(5, 2)|), the result will be 2.5, as expected.
+
+Here is a table of all the types:\newline
+\begin{center}
+\begin{tabular}{|l l l|}
+\hline
+\textbf{Type Symbol} & \textbf{Size (Bytes)} & \textbf{Descriptions} \\
+bool & 1 & Boolean \\
+char & 1 & Unsigned Integer \\
+short & 2 & Signed Integer \\
+short int & 2 & Signed Integer \\
+int & 4 & Signed Integer \\
+long & 8 & Signed Integer \\
+long int & 8 & Signed Integer \\
+float & 4 & Float \\
+double & 8 & Float \\
+long double & 16 & Float \\
+\hline
+\end{tabular}
+\end{center}
+
+You can see the bool type - this is the same type used in if-statement and loop conditions. You can set them to comparison expressions (i.e. \verb|x == 5|) or the values \verb|true| and \verb|false|. 
+
+There are also type attributes that you can put before types as separate words separated by whitespace, for example:
+\begin{verbatim}
+unsigned int
+\end{verbatim}
+
+The \verb|unsigned| attribute will make any integer type unsigned. \verb|signed| does the exact opposite. There are others, but since they relate to concepts we haven't seen yet, they will be introduced later.
+
+\newpage
+
+
+
+
+
+\subsection{References}
+Every variable can be thought of as a handle for a piece of memory. Sometimes, you want to have multiple handles for a certain piece of memory. You can do this with references. Let's start with a variable:
+\begin{verbatim}
+int x = 0;
+print(x, "\n");
+\end{verbatim}
+
+This will output \verb|0|. Now let us create a reference to \verb|x|:
+\begin{verbatim}
+int &xref = &x;
+\end{verbatim}
+
+You'll notice that the \verb|&| symbol is used twice here. The first time it denotes the fact that \verb|xref| is a reference to an int variable, but not an \verb|int| itself. The second time, it is an operator to take the address of \verb|x| in memory. If you set a reference to an address, it changes where the reference points to. However, if you set a reference to a value, it sets the value stored in the memory:
+\begin{verbatim}
+xref = 5;
+print(x, "\n");
+\end{verbatim}
+
+This will print out \verb|5|. This is because \verb|x| and \verb|xref| point towards the same memory location.
+
+You can use \verb|xref| all you want. You can even assign it to point towards a different piece of memory:
+\begin{verbatim}
+int y = 3;
+xref = &y;
+\end{verbatim}
+
+References become especially useful for functions. What if we want to write a function that swaps the values of its two arguments:
+\begin{verbatim}
+void swap(int a, int b)
+{
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+int zero = 0, one = 1;
+
+swap(zero, one);
+print(zero, " ", one, "\n");
+\end{verbatim}
+
+This program will output \verb|0 1| (unswapped), instead of \verb|1 0| (swapped). This is because function arguments are \textit{pass-by-value}.
+
+This means that when you pass values to arguments in Mitten, copies of these values are used within the function so that changes you make inside the function do not affect data outside the function. If you want to affect data outside a function, you need to use \textit{pass-by-reference}. To do this, declare arguments as references. The function will then be able to make changes to outside memory:
+\begin{verbatim}
+void swap(int &a, int &b)
+{
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+int zero = 0, one = 1;
+
+swap(zero, one);
+print(zero, " ", one, "\n");
+\end{verbatim}
+
+Now the program works correctly! You'll notice that the \verb|&| weren't required for the arguments being passed. This is because it is assumed that when you declare an argument as pass-by-reference you will always want to use it as such.
+
+Before you assign an address to a reference, it has the value of \verb|null| (\verb|0x0| in memory). You can check if a variable is \verb|null| with \verb|==| or set a reference to \verb|null|. Trying to access a reference to \verb|null| will result in an exception with the class \verb|null_exception|. 
+
+You can use nested references if you want:
+\begin{verbatim}
+int &&xref = &&x;
+\end{verbatim}
+
+This is rarely used, and really only for OS code and complex memory management.
+
+If you set a null reference (like an argument) to a value, it will automatically allocate this memory and store the value there. This is called an anonymous reference:
+\begin{verbatim}
+swap(zero, 1);
+\end{verbatim}
+
+\newpage
+
+
+
+
+\subsection{Object-Oriented Programming}
+If you've never used an object-oriented programming language before, then this will be another hurdle. Let's go over the basic concepts of object-oriented programming, starting with objects.
+
+Objects are a special kind of variable. They don't only have a state, like the variables you've seen so far - they also have behaviors. Put in more practical terms, an object is a variable that can contain other variables as well as functions. For example, if you wanted to store the low and high ends of a range in a single variable, you could put them both in an object along with a function that can check to see whether or not a given value is within that range or not. This could make the job of storing and checking ranges much easier.
+
+Classes, short for different classes of objects, are ways to define different types of objects. Think of classes as types and objects as variables. 
+
+Let's see a program that could be improved greatly with the use of object-oriented programming:
+\begin{verbatim}
+#include <mitte.n>
+
+bool is_in_range(int range_low, int range_high, int value)
+{
+    return (range_low <= value && value <= range_high);
+}
+
+void main()
+{
+    int low = 1;
+    int high = 10;
+    int x = 5;
+    
+    if (is_in_range(low, high, x))
+        print("it's in range.\n");
+}
+\end{verbatim}
+
+If we could create a range class to store ranges, then we could simply create a single range object to store the 1-10 range and then check if \verb|x| is within that range by accessing a function that is built into the object itself. Let's see how to create an empty class to start off with:
+\begin{verbatim}
+#include <mitte.n>
+
+class range
+{
+    // class contents go here
+}
+
+void main()
+{
+}
+\end{verbatim}
+
+You declare classes with \verb|class| followed by the name of the class (in this case, \verb|range|). Then everything within the class's scope is the contents of the class. Let's now add in the low and high ranges to the class:
+\begin{verbatim}
+...
+class range
+{
+    public
+    {
+        int low, high;
+    }
+}
+...
+\end{verbatim}
+
+Within the class's scope, there is another scope started with the \verb|public| keyword. This will be covered in more detail in a moment, but the important thing to note for now is that this means that all the data within the class will be accessible by functions outside of the class. Note that variables within classes are called members. We can create a new range with:
+\begin{verbatim}
+...
+void main()
+{
+    range r;
+}
+\end{verbatim}
+
+You can now use \verb|range| just like any other type! We have now created a new object \verb|r| of class \verb|range|. How then do we access the low and high ends of the range?
+\begin{verbatim}
+...
+void main()
+{
+    range r;
+    r.low = 1;
+    r.high = 10;
+}
+\end{verbatim}
+
+By putting a dot in front of the symbol for an object followed by the symbol of anything within the object's contents, you access that value within the object. You'll notice that we are manually setting the values of the range. Instead of doing this, we can use what's called a constructor - a function that is automatically called every time that an object is created:
+\begin{verbatim}
+...
+class range
+{
+    public
+    {
+        int low, high;
+        
+        range(int l, int h)
+        {
+            low = l;
+            high = h;
+        }
+    }
+}
+
+void main()
+{
+    range r = range(1, 10);
+}
+\end{verbatim}
+
+Now the name of the class also becomes a function for creating a new object. The constructor is declared within the scope of the class. You'll notice that this function has no return type. This is because returns are not allowed within constructors.
+
+Now, let us add in a function to the class which checks to see if a value is within the range:
+\begin{verbatim}
+...
+class range
+{
+    public
+    {
+        int low, high;
+        
+        range(int l, int h)
+        {
+            low = l;
+            high = h;
+        }
+        
+        bool contains(int x)
+        {
+            return (low <= x && x <= high);
+        }
+    }
+}
+
+void main()
+{
+    range r = range(1, 10);
+    int x = 5;
+    
+    if (r.contains(x))
+        print("x is in range.\n");
+}
+\end{verbatim}
+
+Functions within classes are called methods.
+
+Now you can begin to see how powerful the concept of classes can be. The code to define the class is much longer than the code to define the two variables and the function separately, but the code to access a range is now much cleaner and shorter. This kind of leverage is very helpful to the end user of your code.
+
+\newpage
+
+
+
+
+
+\subsection{Data Security}
+Often, there are cases where you don't want certain pieces of data to be accessed through the object. For example, what if we want to make sure that the range can't be changed without using a certain method. Each member and method in a class has a security attribute. \verb|public| means that it can be accessed by functions and methods outside of the class, while \verb|private| means that it can only be accessed within the class. You can use the \verb|public| and \verb|private| scopes, as seen above:
+\begin{verbatim}
+...
+class range
+{
+    public
+    {
+        int low, high;
+        
+        range(int l, int h)
+        {
+            low = l;
+            high = h;
+        }
+        
+        bool contains(int x)
+        {
+            return (low <= x && x <= high);
+        }
+    }
+}
+...
+\end{verbatim}
+
+Or you can use \verb|public| and \verb|private| as type attributes:
+\begin{verbatim}
+...
+class range
+{
+    public int low;
+    public int high;
+    
+    public range(int l, int h)
+    {
+        low = l;
+        high = h;
+    }
+    
+    public bool contains(int x)
+    {
+        return (low <= x && x <= high);
+    }
+}
+...
+\end{verbatim}
+
+Let's rewrite the class to make sure that you can't change the range except with a method:
+\begin{verbatim}
+#include <mitte.n>
+
+class range
+{
+    private int low, high;
+    
+    public
+    {
+        range(int l, int h)
+        {
+            set(l, h);
+        }
+        
+        void set(int l, int h)
+        {
+            if (l >= h)
+            {
+                print("invalid range.\n");
+            }
+            else
+            {
+                low = l;
+                high = h;
+            }
+        }
+        
+        bool contains(int x)
+        {
+            return (low <= x && x <= high);
+        }
+    }
+}
+
+void main()
+{
+    range r = range(1, 10);
+    r.set(5, 2);
+    
+    if (r.contains(5))
+        print("x is in range.\n");
+}
+\end{verbatim}
+
+Now, if you try to set the range with \verb|r.low| and \verb|r.high|, you will get a compiler error - you have to use \verb|set|. This has the advantage of being able to check the range before it is set for added security.
+
+\newpage
+
+
+
+
+
+\subsection{Inheritance}
+One of the big advantages of using classes is inheritance - you can make classes based on other classes. If we want to make a class based on \verb|range| that can also print out a message describing itself, we can create a subclass of \verb|range|:
+\begin{verbatim}
+...
+class showable_range(range)
+{
+}
+...
+\end{verbatim}
+
+You can list the classes that you inherit from in parenthesis separated by commas after the class declaration line, like you see above. Right now, since we haven't changed anything from how it was in \verb|range|, \verb|showable_range| and \verb|range| are identical. Let's fix that:
+\begin{verbatim}
+...
+class showable_range(range)
+{
+    public void show()
+    {
+        print("range: [", low, "-", high, "]\n");
+    }
+}
+...
+\end{verbatim}
+
+Now we can create a \verb|showable_range|:
+\begin{verbatim}
+...
+void main()
+{
+    showable_range r = showable_range(1, 10);
+    r.show();
+}
+\end{verbatim}
+
+Constructors, members, and methods are all inherited. Note that private members and methods cannot be accessed by subclasses. If you want to create members and methods that can be accessed by subclasses, but not outside code, use the \verb|protected| data security attribute, instead.
+
+\newpage
+
+
+
+
+
+\subsection{Exceptions}
+Sometimes errors occur within a program that aren't anticipated by the compiler, so that a compile-time error can be thrown. We need to handle these errors within the program without crashing. We can do this by using exceptions.
+
+Exceptions are objects that contain information about the failure within the program, namely the position where the error came from in the source code and the invalid values that caused the failure.
+
+Let us use exceptions to make sure that a variable isn't zero:
+\begin{verbatim}
+#include <mitte.n>
+
+void main()
+{
+    int x = 0;
+    if (x == 0)
+        throw(value_exception(x, 0));
+}
+\end{verbatim}
+
+Now the program will halt because \verb|x| is 0, but it do so after displaying all the information you should need to identify what and where the problem is.
+
+The \verb|throw| builtin is what throws the value of the exception. You can throw any value of any type (i.e. even an int), but objects of subclasses of the \verb|exception| class are the only types that will cause the information to display.
+
+\newpage
+
+
+
+
+
+\subsection{Namespaces}
+When you work on code projects with multiple files and many symbols, it can be hard to remember from where each symbol comes. That's why namespaces exist. A namespace is a scope that can contain any kind of declaration:
+\begin{verbatim}
+namespace a
+{
+    int x = 5;
+}
+\end{verbatim}
+
+Everything within the namespace appears to be normal, but in order to access symbols inside the namespace, you need to prefix them with the name of the namespace and a dot:
+\begin{verbatim}
+namespace a
+{
+    int x = 5;
+}
+
+void main()
+{
+    print(a.x, "\n");
+}
+\end{verbatim}
+
+This is good for keeping track of code and staying organized. You can have namespaces within namespaces:
+\begin{verbatim}
+namespace a
+{
+    namespace b
+    {
+        int x = 5;
+    }
+}
+
+void main()
+{
+    print(a.b.x, "\n");
+}
+\end{verbatim}
+
+In some cases, you want to not have to type in the namespace name for every symbol in it. That's where \verb|using| comes into play:
+\begin{verbatim}
+namespace a
+{
+    namespace b
+    {
+        int x = 5;
+    }
+}
+
+using ab = a.b;
+
+void main()
+{
+    print(ab.x, "\n");
+}
+\end{verbatim}
+
+This is sort of like an alias for namespaces. You can also ignore the namespace name entirely with \verb|using|:
+\begin{verbatim}
+namespace a
+{
+    namespace b
+    {
+        int x = 5;
+    }
+}
+
+using a.b;
+
+void main()
+{
+    print(x, "\n");
+}
+\end{verbatim}
+
+\newpage
+
+
+
+
+\subsection{Template Metaprogramming}
+Templates are a way of making code more reusable. If you want to write a function that prints a number, you might have to write two functions: one for ints and one for floats. With templates, you only have to write one:
+\begin{verbatim}
+template(type T) void printnum(T v)
+{
+    print("number: ", v, "\n");
+}
+\end{verbatim}
+
+By putting the \verb|template| attribute before a declaration you give that declaration template properties - it will not take types as compile-time arguments. Every time you call this function, a new ``copy" is created where the type you pass it replaces T. You can pass anything to templates (i.e. ints or strings), but you can only pass types to templates. The parenthesis (\verb|(type T)|) contain a list of arguments that you pass to the templated declaration.
+
+Here's how you call a template function:
+\begin{verbatim}
+printnum[float](5.2);
+printnum[int](5);
+\end{verbatim}
+
+When you call \verb|printnum[float](5.2)|, what is really happening in the code is that a version of \verb|printnum| is created where instead of \verb|T|, you have \verb|float|.
+
+What if you have more than one template parameter?
+\begin{verbatim}
+template(type A, type B) void printboth(A a, B b)
+{
+    print(a, " ", b, "\n");
+}
+\end{verbatim}
+
+Now you can call it with:
+\begin{verbatim}
+printboth[int, float](5, 5.2);
+\end{verbatim}
+
+\newpage
+
+
+
+
+
+\subsection{Command-Line Arguments and Exit Codes}
+Instead of defining the main function as:
+\begin{verbatim}
+void main()
+{
+    // ...
+}
+\end{verbatim}
+
+You can write it as:
+\begin{verbatim}
+int main(string args[])
+{
+    print("number of arguments: ", args.size()-1);
+    print("name of the executable: ", args[0]);
+    if (args.size() > 1)
+        print("first argument: ", args[1]);
+
+    return 5;
+}
+\end{verbatim}
+
+You can now access the arguments passed to the program through the shell in the program:
+\begin{verbatim}
+$ ./a.out
+number of arguments: 0
+name of the executable: a.out
+
+$ ./a.out hi
+number of arguments: 1
+name of the executable: a.out
+first argument: hi
+\end{verbatim}
+
+And you can also pass an exit code back to the shell:
+\begin{verbatim}
+$ ./a.out
+...
+
+$ echo $?
+5
+\end{verbatim}
+
+\newpage
+
+
+
+
+
+
+
+\section{Advanced Topics}
+These are a selection of more advanced topics in programming Mitten. They assume a more advanced knowledge.
+
+\subsection{Types}
+There are a couple of types that have special properties: \verb|auto| and \verb|any|.
+
+If you make a declaration containing the \verb|auto| type, every time you access it, the declaration is re-generated with the type of the value passed used in place of the \verb|auto| types associated with that value. It's like an automatic template:
+\begin{verbatim}
+void printnum(auto v)
+{
+    print("number: ", v, "\n");
+}
+
+printnum(5.2);
+printnum(5);
+\end{verbatim}
+
+The \verb|any| type is a little simpler. You can set an \verb|any| variable to a value of any type and then cast it to any other type with no compilation errors - only runtime exceptions. You can't access it directly without casting, although you can set one \verb|any| to the value of another \verb|any|:
+\begin{verbatim}
+void printany(any v)
+{
+    print("any: ", cast[string](v), "\n");
+}
+
+printany(5.2);
+printany(5);
+\end{verbatim}
+
+\newpage
+
+
+
+\subsection{Memory}
+Every reference-type variable has a counter paired to it. When a new reference to this memory is created or copied, the counter is incremented. When a reference is destroyed, the counter is decremented. When a reference with a ref count of 1 or less is destroyed, it means that the last reference to the memory has been destroyed and the memory is thus deallocated. This is how automatic memory management is handled in Mitten.
+
+You can access the reference counter of any reference with:
+\begin{verbatim}
+__ref_count__(x)
+\end{verbatim}
+
+Where \verb|x| is a reference variable.
+
+You can also manually manage memory with pointers:
+\begin{verbatim}
+int *x = &y;
+\end{verbatim}
+
+This means that \verb|x| is a pointer that stored the address of \verb|y| in memory. Pointers are essentially easily accessible versions of the \verb|address| type.
+
+The difference between a reference and a pointer is that a reference can only be set to null or a valid memory address, while pointers can be set to any value. Pointers are like references, but without the safety.
+
+Let's show how they work:
+\begin{verbatim}
+int data = 10;
+int *pointer = &data;
+
+*pointer = 5;
+print(data, "\n"); // this will display 5
+\end{verbatim}
+
+You use \verb|*| to dereference the pointer. A dereferenced pointer is equivalent to a reference. You can set a pointer to a reference, but you can't go the other way without casting.
+
+Continuing the example above:
+\begin{verbatim}
+pointer = 0x50; // this is not a valid address in memory
+*pointer = 5; // this will cause a segmentation fault in the program
+\end{verbatim}
+
+As you can see, pointers lack the kind of security that makes references so useful.
+
+\newpage
+
+
+
+
+\subsection{Assembly}
+It is possible to embed assembly within Mitten code:
+\begin{verbatim}
+asm
+{
+    // assembly goes here
+}
+\end{verbatim}
+
+The syntax of the assembly is implementation and machine specific, however, it is possible to also utilize asm-direct builtins to the language to write assembly without leaving Mitten's syntax.
+
+You can access registers just as you would in the assembly language through \verb|reg[<symbol>]|. Then you can use mnemonics like functions via \verb|__asm_<mnemonic>__(<args>)|. You can pass registers as values with the \verb|__asm_reg__| type:
+\begin{verbatim}
+int x = 5;
+reg[r8d] = x;
+__asm_add__(reg[r8d], 5);
+x = reg[r8d];
+print(x, "\n");
+\end{verbatim}
+
+This program will output \verb|10| on a Mitten implementation based of the NASM assembler (hypothetically). 
+
+\newpage
+
+
+
+
+
+\subsection{Functional Programming}
+\newpage
+
+
+
+
+\subsection{C Bindings}
+
+
+\newpage
+
+
+
+
+
+\subsection{Testing}
+\newpage
+
+
+
+
+
+\subsection{Debugging}
+\newpage
+
+
+
+
+
+\subsection{Building}
+\newpage
+
+
+
+
+
+\section{Example: Chatbot}
+\newpage
+
+
+
+
+
+\section{The Mitten Preprocessor}
+The Mitten preprocessor runs through and processes all the text that goes into any Mitten compiler. To do this, it uses directives - commands with an easy-to-parse syntax. They all start with a hash tag and go till the end of the line\footnote{If the file ends before a newline is found, that also works.}, for example\footnote{Hash tags are always expected to denote the start of a preprocessor in Mitten with only two exceptions. If you have hash tags inside quotes, like "\#" or '\#', then it won't start a directive. Additionally, if you use \textbackslash\# (backslash followed by a hash tag) in your code it will insert a hash tag, but it won't start a directive.}:
+\begin{verbatim}
+#define FIVE 5
+\end{verbatim}
+
+You can put whitespace before the hash tag on the line, but nothing else. The following would not work:
+\begin{verbatim}
+I watched too much anime today #define FIVE 5
+\end{verbatim}
+
+It's true, though... The Mitten preprocessor can be used to create and manage macros, include files, make text conditional, and do some more advanced tricks. This section goes over them all in detail.
+
+\newpage
+
+
+
+
+\subsection{Comments}
+One of the largest jobs the preprocessor takes care of is stripping comments from source code. Comments have no meaning for the source code, they're just there to remind the author of the code of things. There are two kinds of comments:
+\begin{verbatim}
+// this is a line comment
+\end{verbatim}
+which starts with two forward slashes back-to-back (\verb|//|) and goes till the end of the line. You can have anything you want before the \verb|//|. Then there are block comments:
+\begin{verbatim}
+/* this is 
+ * a
+ * block comment
+ */
+\end{verbatim}
+They start with a forward slash followed by an asterisk (\verb|/*|) and go till the first instance of \verb|*/|. If you don't include the ending \verb|*/| or try to nest block comments (put one inside of the other), there will be an error.
+
+\newpage
+
+
+
+
+\subsection{Macros}
+Macros are a pretty simple and powerful concept. They are essentially rules that tell the preprocessor to replace a certain word with some text. For example, you can define a macro that replaces all instances of \verb|"FIVE"| in the file with \verb|5|. Actually, that's what the previous example does! Here's how you do it:
+\begin{verbatim}
+#define <symbol> <value>
+\end{verbatim}
+
+\verb|<symbol>| is the word or ``symbol" that you want to replace. It can be anything you want - just so long as it doesn't have any whitespace in it. \verb|<value>| is the text with which you want to replace the symbol. It can be anything, including whitespace. You separate the \verb|#define| and the \verb|<symbol>| with any whitespace and the \verb|<symbol>| and the \verb|<value>| with any whitespace as well. So if we declare the following macro:
+\begin{verbatim}
+#define THIS_IS_A_MACRO this is a macro
+\end{verbatim}
+
+What does this do? If you write \verb|THIS_IS_A_MACRO| at any point in the source code after the macro is defined, it will be replaced in a copy-paste manner by \verb|this is a macro|, like this:
+\begin{verbatim}
+#define THIS_IS_A_MACRO this is a macro
+
+THIS_IS_A_MACRO
+\end{verbatim}
+
+The result after preprocessing will be: \verb|this is a macro|! This is the most basic kind of macro that you can use in the Mitten preprocessor. 
+
+Macros can only be defined once unless you intend to undefine or redefine it. If you want to undefine a macro, you can use the \verb|#undef| directive:
+\begin{verbatim}
+#undef <symbol>
+\end{verbatim}
+
+If you want to redefine a macro, you can use the \verb|#redef| directive:
+\begin{verbatim}
+#redef <symbol> <value>
+\end{verbatim}
+
+It is equivalent to undefining a macro and then using \verb|#define| to define it again.
+
+\newpage
+
+
+
+
+
+\subsection{Functional Macros}
+What if we want to create a macro that adds 1 to something. We could easily write the following:
+\begin{verbatim}
+#define ADD_ONE_TO 1+
+
+ADD_ONE_TO 5
+\end{verbatim}
+
+Which would result in \verb|1+5|. This works all well and good, but there's a much better syntax for this: functional macros. Let's start with an example and then explain it.
+\begin{verbatim}
+#define ADD_ONE(x) 1+x
+
+ADD_ONE(5)
+\end{verbatim}
+
+This has the same result as the previous example. \verb|ADD_ONE| is a functional macro with one argument: \verb|x|. When you access the macro in the last line of the example, you specify some text to be used as the ``value" of \verb|x|. All instances of \verb|x| in the value of \verb|ADD_ONE| are replaced by the provided text during the accessing before the macro evaluates. When you access the macro, you need to have both the opening and closing parentheses, otherwise an error will throw. \footnote{You can't have commas within the values of the arguments, otherwise the preprocessor will think that the value is two separate arguments instead of one. If you want to get around this, you can put \textbackslash, (a backslash followed by a comma) in your code.}
+
+You can have as many arguments as you want. Their names in the definition can be any text, as long as they don't contain whitespace. They are separated by commas and optional whitespace. For example:
+\begin{verbatim}
+#define ADD_THESE(a, b) a+b
+
+ADD_THESE(1, 2)
+\end{verbatim}
+Will result in: \verb|1+2|.
+
+If you provide a different number of arguments that the macro is defined with, an error will throw. You can have no arguments as well if you so desire. \footnote{Mitten compilers are required to support at least 1024 functional macro arguments. If this limit is surpassed, the compiler can either throw an error or handle them correctly.}
+
+\newpage
+
+
+
+
+\subsection{Multi-Line Macros}
+So far we have seen macros which are limited to a single line of code. What if you want to spread out over multiple lines? There's an easy way to do that. End the definition directive with \verb|#{| and put the directive \verb|#}| on a later line. Everything in between will be the macro value, whitespace included. For example:
+\begin{verbatim}
+#define ADD_THESE(a, b) #{
+a +
+b
+#}
+
+ADD_THESE(1, 2)
+\end{verbatim}
+
+This works for non-functional macros as well!
+
+There is also an alternate syntax which is included for legacy C support:
+\begin{verbatim}
+#define <symbol> <value line 1> \
+<value line 2> \
+<value line 3>
+\end{verbatim}
+Putting a backslash at the end of each line (other than the last) will also work. 
+
+\newpage
+
+
+
+
+\subsection{Including Files}
+For large projects, having all of your code in one file can be troublesome. If you divide your code between files, there is some code that you will need to share. You can do this sort of sharing with the \verb|#include| directive:
+\begin{verbatim}
+#include "somefile.h"
+\end{verbatim}
+
+Where \verb|somefile.h| is the name of whatever file you want to include. This file will be read and run through the preprocessor before being inserted directly into the source code of your current file. If the file can't be opened or doesn't exist, an error will be thrown. For example, if you create a file \verb|being_included.h|:
+\begin{verbatim}
+#define PLUS_ONE(x) x+1
+
+3+
+\end{verbatim}
+
+And then create another file \verb|including.n|:
+\begin{verbatim}
+#include "being_included.h"
+
+PLUS_ONE(5)
+\end{verbatim}
+
+The result is equivalent to:
+\begin{verbatim}
+3+5+1
+\end{verbatim}
+
+It's fantastic! You probably note the two extensions \verb|*.h| and \verb|*.n|. \verb|*.h| stands for the fact that it is a \textit{header} file - it does not contain any actual source code, only declarations. This will make more sense later on when we go into the Mitten programming language itself, not just the preprocessor. \verb|*.n| does not stand for anything on its own, but it indicates that the file contains actual source code. I would have used \verb|*.m|, but this extension is taken by MATLAB, Mathematica, and Objective-C. The idea behind \verb|*.n| is that you could call the standard library's primary file \verb|mitte.n|. That's what they call a consolation prize.\footnote{We love Objective-C. Just not too much.}
+
+If you want to include files in parent directories, just use \verb|../| or \verb|./|, for example\footnote{You can use either UNIX forward slashes or DOS backslashes in your path names, as long as you're consistent within any given path. Otherwise, an error will be thrown.}\footnote{You can't include files from absolute paths - an error will be thrown.}:
+\begin{verbatim}
+#include "../../being_included.h"
+\end{verbatim}
+
+It is only possible to include each file once, unless otherwise specified within the file itself.
+
+\newpage
+
+
+
+
+\subsection{Including Global Files}
+So what if you have a library installed to your operating system and want to access it. It's not necessary to put in the proper relative path to it. Use global include directives!
+\begin{verbatim}
+#include <file.h>
+\end{verbatim}
+
+\verb|file.h| can be anywhere within the compiler's \textit{include path}. This is something that you provide to the compiler by command-line parameters. So if \verb|file.h| happens to be in \verb|/usr/include/file.h| (on a UNIX system), then if the compiler's include path is \verb|/usr/include|, \verb|file.h| will be successfully found and included. If the file cannot be found, an error will be thrown containing the include path used.
+
+\newpage
+
+
+
+
+\subsection{Conditional Code}
+You can have some code that will only be included in the source if a certain condition is met, or not met. This condition can be a Mitten boolean expression or whether or not a macro is defined or not. To use a Mitten expression:
+\begin{verbatim}
+#if <expression> #{
+<code>
+#}
+\end{verbatim}
+
+This uses the same syntax\footnote{It uses the same syntax and legacy C support as multi-line macros use.} as multi-line macros use. There is also a legacy C support syntax:
+\begin{verbatim}
+#if <expression>
+<code>
+#endif
+\end{verbatim}
+
+The expression has to be simple - you can't call functions in it\footnote{Calling functions in a simple expression will result in an error being thrown. Also, you know, if the expression is invalid.}. The code can be anything you want. For example:
+\begin{verbatim}
+// somewhere earlier in the code:
+#define ENABLE_THE_CODE true
+
+// later in the code:
+#if ENABLE_THE_CODE #\
+the code....
+#}
+\end{verbatim}
+
+You can now change \verb|ENABLE_THE_CODE| to true or false to enable and disable the code. This example will result in:
+\begin{verbatim}
+the code....
+\end{verbatim}
+
+What if you want to switch between two different pieces of code? You can use an if-else directive:
+\begin{verbatim}
+#define OPERATING_SYSTEM "UNIX"
+
+#if OPERATING_SYSTEM == "UNIX" #{
+// run unix command
+#} else #{
+// run similar command for Windows
+#}
+\end{verbatim}
+
+What if you want some code to be conditional on whether or not a macro was defined? You can use the \verb|#ifdef| directive:
+\begin{verbatim}
+#define ENABLE_THE_CODE // comment this out to disable the code
+
+#ifdef ENABLE_THE_CODE #{
+the code....
+#}
+\end{verbatim}
+
+The opposite of \verb|#ifdef| is \verb|#ifndef| (if not defined). There are also legacy C support syntaxes for both of these directives:
+\begin{verbatim}
+#ifdef <symbol>
+<code>
+#endif
+
+#ifndef <symbol>
+<code>
+#endif
+\end{verbatim}
+
+\newpage
+
+
+
+\subsection{Advanced Preprocessor Tricks}
+
+\subsubsection{Compiler Configuration}
+
+The \verb|#cfg| directive configures certain options within the compiler during compile time. All of these options can be set by command-line options and it is possible to disable compiler configuration at compile time. Here's the syntax:
+\begin{verbatim}
+#cfg <option> <value>
+\end{verbatim}
+
+It's very similar to the \verb|#define| directive. \verb|<option| cannot contain whitespace, while \verb|<value>| can. They are separated by whitespace. The following table shows all the required options, although there can be more: \newline
+\begin{tabular}{| l p{10cm} |}
+\hline
+\textbf{Option} & \textbf{Description/Syntax} \\
+\verb|__include_multi__| & Set to \verb|true| or \verb|false| to enable to disable the ability of the current file to be included more than once. \\
+\verb|__include_path__| & Absolute file paths, separated by colons, to be added to the include path for all future includes. \\
+\verb|__start_function__| & The symbol name for the main function (entry point). \\
+\hline
+\end{tabular}
+
+You can access these values just like any other macro. It is possible to set these values as many times as you desire.
+
+\newpage
+
+
+
+
+\subsubsection{Variadic Functional Macros}
+
+Functional macros can have variadic arguments. This means arguments that are undefined in number. For example:
+\begin{verbatim}
+#define PRINT(x, ...) a_print_function(x, __varargs__)
+PRINT("hi", 5, 10);
+\end{verbatim}
+
+This will result in:
+\begin{verbatim}
+a_print_function("hi", 5, 10);
+\end{verbatim}
+
+Why doesn't this give an argument number error? The \verb|...| stands for any number of arguments, which can be accessed in the value of the macro with \verb|__varargs__|! The \verb|...| must be the last argument, otherwise there will be an error. If you don't pass any values to \verb|__varargs__| and there is a comma before \verb|__varargs__|, the comma will be removed. For example:
+\begin{verbatim}
+PRINT("hi.");
+\end{verbatim}
+
+Will become \verb|a_print_function("hi.");|, not \verb|a_print_function("hi.", );|, which would cause an error\footnote{If you want the comma to stay, use \textbackslash, (a backslash followed by a comma).}.
+
+Additionally, you can make one of the arguments itself variadic:
+\begin{verbatim}
+#define PRINT(x, args...) a_print_function(x, args);
+\end{verbatim}
+
+\verb|args| now simply takes the place of \verb|__varargs__|. It also has to be the last argument, otherwise an error will be thrown.
+
+\newpage
+
+
+
+
+\subsubsection{Stringification}
+If you prefix a functional macro's argument with \verb|#|, it will convert it's value into a string constant (wrap it in double quotes and replace unprintable characters with escape codes). For example:
+\begin{verbatim}
+#define PRINT(x) a_print_function(#x)
+
+PRINT(hi. );
+\end{verbatim}
+
+Will result in:
+\begin{verbatim}
+a_print_function("hi. ");
+\end{verbatim}
+
+If you do this with \verb|__varargs__| or any other variadic argument, the argument values will be separated with \verb|", "|s (commas followed by spaces). If you don't pass any values to the variadic argument, the stringification will result in an empty string.
+
+\newpage
+
+
+
+
+
+\subsubsection{Macro Overloading}
+Function macro arguments may be overloaded, meaning that two functional macros with the same symbol, but different numbers of arguments count as two separate macros. For example:
+\begin{verbatim}
+#define f(a) a
+#define f(a, b) a+b
+
+f(5, f(2))
+\end{verbatim}
+
+Will result in:
+\begin{verbatim}
+5+2
+\end{verbatim}
+
+Nifty, right? An extension of this is default values for functional macro arguments. You can put an equal sign after any argument symbol and then after that, everything before the first instance of a comma is the default value. If you do not specify the value of this argument when you access the macro, it will take on its default value\footnote{If you want to use commas in your values, use \textbackslash, (a backslash followed by a comma).} These arguments then become optional, meaning all the optional arguments have to come at the end of the argument list. For example:
+\begin{verbatim}
+#define f(a, b = 0)
+
+f(5, f(2))
+\end{verbatim}
+
+Will result in:
+\begin{verbatim}
+5+2+0
+\end{verbatim}
+
+You can't mix optional arguments and variadic arguments - there's no way to tell the difference. 
+
+\newpage
+
+
+
+
+
+\subsubsection{Repeated Text in Macros}
+You can repeat text within macros with the \verb|repeat| keyword:
+\begin{verbatim}
+#define mul(a, b) repeat(a+, b) 0
+
+mul(2, 3)
+\end{verbatim}
+
+Will result in \verb|2+2+2+0|. The first argument to repeat is any text to be repeated. The second argument is an integer literal counting the number of times for the text to be repeated. If it is not an integer literal, an error will be thrown. If it is 0, the text will not be inserted at all. If it is negative, an error will be thrown.
+
+\newpage
+
+
+
+
+
+\subsubsection{Processing and One-Including}
+If you want to run a header file through the preprocessor, but not insert it, you can use the \verb|#process| directive:
+\begin{verbatim}
+#process <file.h>
+\end{verbatim}
+
+If you want to include a header file normally, but not include any of the files that it itself includes, you can use the \verb|#include_one| directive:
+\begin{verbatim}
+#include_one <file.h>
+\end{verbatim}
+
+There is also a \verb|#process_one| directive that only processes a single header file.
+
+Why would you ever want to do either of these? The answer is C-bindings. Mitten has partial legacy support of C. It is aimed at header files - the idea being that you can include C header files directly without having to write much interface code between the C code and any Mitten code you want to write. \verb|#include_one| exists so that you can include the declarations within a C header, but not the C standard library. \verb|#process_one| exists so that you can extract the macros from the C standard library, but not the actual code. If you want to write a binding, you can start by \verb|#include_one|-ing all the libraries you need, then writing your own Mitten implementations for types, constants, etc. as needed in a header beforehand (hopefully this won't be too much code). 
+
+\newpage
+
+
+
+
+
+\subsection{Predefined Macros}
+Any Mitten compiler has some macros that have special values depending on their location or the compiler's status upon their use. You've already seen one: \verb|__varargs__|. Here's a compete list\footnote{All predefined macros are prefixed and suffixed with \_\_ (two underscores) for clarity.}\footnote{All implementations are required to assign correct values to all of these.}:
+
+\begin{tabular}{| l l p{4cm} |}
+\hline
+\textbf{Symbol} & \textbf{Example} & \textbf{Description} \\
+\verb|__compile_year__| & \verb|2014| & The year in which the current program was compiled. \\
+\verb|__compile_month__| & \verb|6| & The month (1-12) in which the current program was compiled. \\
+\verb|__compile_day__| & \verb|10| & The day (1-31) in which the current program was compiled. \\
+\verb|__compile_hour__| & \verb|20| & The hour (0-23) in which the current program was compiled. \\
+\verb|__compile_minute__| & \verb|24| & The minute (0-59) in which the current program was compiled. \\
+\verb|__compile_second__| & \verb|5| & The second (0-59) in which the current program was compiled. \\
+\verb|__compile_date__| & \verb|"Jun 9, 2014"| & A string literal representing the date on which the current program was compiled. \\
+\verb|__compile_time__| & \verb|"20:26:05"| & A string literal representing the time in which the current program was compiled. \\
+\verb|__mitten_year__| & \verb|2014| & The year in which the current Mitten standard was released. \\
+\verb|__mitten_month__| & \verb|6| & The month in which the current Mitten standard was released. \\
+\verb|__mitten_revision__| & \verb|0| & The sub-revision of the current Mitten standard release. \\
+\hline
+\end{tabular}
+
+\begin{tabular}{| l l p{4cm} |}
+\hline
+\textbf{Symbol} & \textbf{Example} & \textbf{Description} \\
+\verb|__compiler__| & \verb|"NMC"| & A string literal representing the name of the current compiler. \\
+\verb|__compiler_version_major__| & \verb|0| & The major version of the current compiler. \\
+\verb|__compiler_version_minor__| & \verb|1| & The minor version of the current compiler. \\
+\verb|__compiler_version__| & \verb|"0.01-1 Alpha"| & A string literal representing the version of the current compiler. \\
+\verb|__compiler_has_clarg__(arg)| & \verb|true| & A functional macro which returns \verb|true| or \verb|false| depending on whether the string passed is one of the command-line arguments supported by the compiler. \\
+\verb|__stdlib__| & \verb|"Mitte.n"| & A string literal representing the name of the current standard library. \\
+\verb|__stdlib_version_major__| & \verb|0| & The major version of the current standard library. \\
+\verb|__stdlib_version_minor__| & \verb|1| & The minor version of the current standard library. \\
+\verb|__stdlib_version__| & \verb|"0.01-1 Alpha"| & A string literal representing the version of the current standard library. \\
+\hline
+\end{tabular}
+
+\begin{tabular}{| l l p{4cm} |}
+\hline
+\textbf{Symbol} & \textbf{Example} & \textbf{Description} \\
+\verb|__is_defined__(macro)| & \verb|true| & A functional macro which returns \verb|true| or \verb|false| depending on whether the symbol passed is a defined macro. \\
+\verb|__is_symbol__(symbol)| & \verb|true| & A functional macro which returns \verb|true| or \verb|false| depending on whether the symbol passed is a declared symbol. \\
+\verb|__varargs__| & \verb|5, 10| & Takes the place of unnamed variadic arguments in functional macros. \\
+\verb|__table__(symbol)| & \verb|{"a": 10}| & Returns the compile-time generated symbol table of any tabular object (class, object, namespace, table). \\
+\verb|__ref_count__(ref)| & \verb|3| & Returns the reference count of any pass-by-reference argument. \\
+\verb|__counter__| & \verb|3| & Starts from 0 and each time it is accessed, is incremented. \\
+\verb|__include_level__| & \verb|2| & Starts from 0 and represents the number of includes that the current code is accessed through. \\
+\hline
+\end{tabular}
+
+\begin{tabular}{| l l p{4cm} |}
+\hline
+\verb|__os__| & \verb|"Darwin"| & A string literal representing the name of the current operating system according to system-specific shell commands (will give empty string and compiler warning if not supported by current OS). \\
+\hline
+\end{tabular}
+
+\newpage
+
+
+
+
+
+\section{Source/Object Formats}
+\label{sec:SourceData}
+Source data for any Mitten compiler is text. This text may be encoded in any of the following standards:
+\begin{itemize}
+  \item ASCII
+  \item UTF-8
+  \item UTF-16
+  \item UTF-32
+\end{itemize}
+
+Object data is the output of any Mitten compiler. This data is binary and should be either executable or have the possibility to be made executable by a linker. 
+
+\newpage
+
+
+
+
+\section{Machine Assumptions and Turing Completeness}
+Mitten, as a programming language, represents data and computation. The data is represented as literals and symbols within the source code. Computation is the representation of any action performed on this data. 
+
+The machine must have the following properties:
+\begin{itemize}
+  \item Instruction set which is indexed.
+  \item Ability to store mutable state data in an indexed manner.
+  \item Mutable read head for executable data.
+  \item Ability to store mutable sequential executable data.
+\end{itemize}
+
+Essentially, it can store the data and perform computation on that data. An informal proof that Mitten is Turing complete is that it can be thought of as an extention to a procedural language that contains conditionals and loops. Note that this informal proof essentially piggybacks off of C's proof of Turing completeness.
+
+\newpage
+
+
+
+
+\section{Syntactic Notation}
+This specification uses EBNF to represent the syntactic elements used within the Mitten programming language. Provided here is a brief summary of EBNF metasyntax. For more detailed information, see \textit{Extended BNF} (ISO/EIC 14977). All syntactic notations represented within this specification are complient with the rules specified in \textit{Source Data} (see section \ref{sec:SourceData}).
+
+EBNF representations of syntax are written as a series of production rules:
+\begin{verbatim}
+zero = "0"
+\end{verbatim}
+
+They support alternations:
+\begin{verbatim}
+nonzero digits = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+\end{verbatim}
+
+Sequences:
+\begin{verbatim}
+twelve = "1", "2";
+\end{verbatim}
+
+Repetitions of 0 or more elements:
+\begin{verbatim}
+number = {"0" | nonzero digits};
+\end{verbatim}
+
+Optional elements:
+\begin{verbatim}
+maybe one = ["1"];
+\end{verbatim}
+
+Groupings:
+\begin{verbatim}
+float = ["-"], ({digits}, ["."], {digits});
+\end{verbatim}
+
+All characters used in this specification may be assumed to be contained within ASCII unless otherwise specified.
+
+Note that all production rules after this point are assumed to be continuous - rules declared are used as if they are all part of the same EBNF specification. This complete specification can be seen in appendix \textbf{BLAHBLAHBLAH}.
+\newpage
+
+
+
+
+\subsection{Predefined Production Rules}
+\begin{verbatim}
+lowercase = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h"
+    | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r"
+    | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z";
+
+uppercase = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H"
+    | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R"
+    | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z";
+
+letters = lowercase | uppercase;
+
+nonzero octal digits = "1" | "2" | "3" | "4" | "5" | "6"
+    | "7";
+
+octal digits = "0" | nonzero octal digits;
+
+nonzero decimal digits = "1" | "2" | "3" | "4" | "5" | "6"
+    | "7" | "8" | "9";
+
+decimal digits = "0" | nonzero decimal digits;
+
+nonzero hexadecimal digits = "1" | "2" | "4" | "5" | "6"
+    | "7" | "8" | "9" | ("a" | "A") | ("b" | "B")
+    | ("c" | "C") | ("d" | "D") | ("e" | "E") | ("f" | "F");
+
+hexadecimal digits = "0" | nonzero hexadecimal digits;
+
+whitespace = " " | "\t" | "\n";
+\end{verbatim}
+\newpage
+
+
+
+
+\section{Language Syntax}
+Each syntactic element has its own subsection (\textit{5.XX}). Each syntactic element subsection has a description of its use followed by five subsubsections (\textit{5.XX.YY}):
+\begin{description}
+  \item[Syntax] The EBNF syntactic representation of the element.
+  \item[Examples] Examples of the element in use.
+  \item[Generation] Rules for how to syntactic element results in generated code.
+  \item[Errors] Minimal set of errors that should be caused by improper use of the syntactic element.
+\end{description}
+
+Note that violation of the syntax must always cause errors, although these errors are not specified.
+
+\newpage
+
+
+
+
+\subsection{Symbols}
+\label{sec:Symbols}
+Symbols can be thought of as tags which represent declarations within other syntactic constructs.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+symbol = (letters | "_" | "$" | "@"), {letters | decimal digits | "$" | "@"};
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+hi
+__hi__
+@hi42
+_0_A
+\end{verbatim}
+
+\subsubsection{Generation}
+How the symbol is generated depends on how the symbol is used and on what type of declaration the symbol references (see sections \ref{sec:VaraibleDeclarations}, \ref{sec:FunctionDeclarations}).
+
+\subsubsection{Errors}
+Use of undeclared symbols, duplicate declarations unless sanctioned by other syntactic elements (see sections \ref{sec:Scopes}, \ref{sec:FunctionDeclarations}). 
+
+\newpage
+
+
+
+
+\subsection{Octal Integer Literals}
+\label{sec:OctalIntegerLiterals}
+Literals are a way of including constant memory values into the source code directly. This particular syntactic element is for representing octal integer values. For more details on how to use integers, see section \ref{sec:IntegerMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+octal integer literal = "0", nonzero octal digits, {octal digits};
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+027
+033
+00
+0777
+\end{verbatim}
+
+\subsubsection{Generation}
+Generates a 4-byte or 8-byte value, depending on the width required to store the value, to be stored in memory according to the octal representation. 
+
+\subsubsection{Errors}
+Literals over the 8-byte unsigned value range ($2^{64}-1$).
+
+\newpage
+
+
+
+
+\subsection{Decimal Integer Literals}
+\label{sec:DecimalIntegerLiterals}
+Literals are a way of including constant memory values into the source code directly. This particular syntactic element is for representing decimal integer values. For more details on how to use integers, see section \ref{sec:IntegerMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+decimal integer literal = "0" | (["-"], nonzero decimal digits, {decimal digits});
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+50
+2
+0
+-2400
+\end{verbatim}
+
+\subsubsection{Generation}
+Generates a 4-byte or 8-byte value, depending on the width required to store the value, to be stored in memory according to the decimal representation. 
+
+\subsubsection{Errors}
+Literals over the 8-byte unsigned value range ($2^{64}-1$) or the 8-bit signed value range ($-2^{16}$-$2^{16}-1$).
+
+\newpage
+
+
+
+
+\subsection{Hexadecimal Integer Literals}
+\label{sec:HexadecimalIntegerLiterals}
+Literals are a way of including constant memory values into the source code directly. This particular syntactic element is for representing hexadecimal integer values. For more details on how to use integers, see section \ref{sec:IntegerMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+hexadecimal integer literal = ("0x", hexadecimal digits, {hexadecimal digits})
+    | (hexadecimal digits, {hexadecimal digits}, "h");
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+0xDEADBEEF
+0x0
+50h
+00000ah
+eh
+\end{verbatim}
+
+\subsubsection{Generation}
+Generates a 4-byte or 8-byte value, depending on the width required to store the value, to be stored in memory according to the hexadecimal representation. 
+
+\subsubsection{Errors}
+Literals over the 8-byte unsigned value range ($2^{64}-1$).
+
+\newpage
+
+
+
+
+\subsection{Integer Literals}
+Literals are a way of including constant memory values into the source code directly. This particular syntactic element is for representing integer values of octal, decimal, or hexadecimal base. Read the previous sections (\ref{sec:OctalIntegerLiterals}, \ref{sec:DecimalIntegerLiterals}, \ref{sec:HexadecimalIntegerLiterals}) for details on the different bases of literals. For more details on how to use integers, see section \ref{sec:IntegerMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+integer literal = octal integer literal | decimal integer literal
+    | hexadecimal integer literal;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+033
+-20
+0x80
+\end{verbatim}
+
+\subsubsection{Generation}
+Generates a 4-byte or 8-byte value to be stored in memory according to the integer representation (see sections \ref{sec:OctalIntegerLiterals}, \ref{sec:DecimalIntegerLiterals}, \ref{sec:HexadecimalIntegerLiterals}).
+
+\subsubsection{Errors}
+Literals over the 8-byte unsigned value range ($2^{32}-1$) or the 8-bit signed value range ($-2^{16}$-$2^{16}-1$).
+
+\newpage
+
+
+
+
+\subsection{Floating Literals}
+Literals are a way of including constant memory values into the source code directly. This particular syntactic element is for representing floating decimal point values in base 10. For more details on how to use floats, see section \ref{sec:FloatingPointMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+floating literal = (["-"], {decimal digits}, ".", {decimal digits}), 
+    ["e", ["-"], nonzero decimal digits, {decimal digits}];
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5.2
+-5000.2
+-2.5e-50
+\end{verbatim}
+
+\subsubsection{Generation}
+Generates a 4-byte or 8-byte value, depending on the width required to store the value, to be stored in memory according to the floating decimal point representation.
+
+\subsubsection{Errors}
+Literals over the 8-byte floating precision range.
+
+\newpage
+
+
+
+
+\subsection{Printable Characters}
+Printable characters can be used in character and string literals (see sections \ref{sec:CharacterLiterals} and \ref{sec:CharacterStringLiterals}).
+
+\subsubsection{Syntax}
+\begin{verbatim}
+printable characters = letters | decimal digits | "`" | "~" | "!" | "@"
+    | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "-" | "_" | "="
+    | "+" | "[" | "{" | "]" | "}" | "\" | "|" | ";" | ":" | "," | "<"
+    | "." | ">" | "/" | "?" | " ";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+A
+%
+6
+\end{verbatim}
+
+\subsubsection{Generation}
+See sections \ref{sec:CharacterLiterals} and \ref{sec:CharacterStringLiterals} for detailed descriptions on how printable characters are used in generation.
+
+\subsubsection{Errors}
+None other than syntax.
+
+\newpage
+
+
+
+
+\subsection{Escape Codes}
+\label{sec:EscapeCodes}
+Escape codes can be used in character and string literals (see sections \ref{sec:CharacterLiterals} and \ref{sec:CharacterStringLiterals}). The following is a table of escape code representations: \newline
+\begin{center}
+\begin{tabular}{|l l|}
+\hline
+\textbf{Escape Code} & \textbf{Value} \\
+\verb|\a| & \verb|0x07| \\
+\verb|\b| & \verb|0x08| \\
+\verb|\f| & \verb|0x0C| \\
+\verb|\n| & \verb|0x0A| \\
+\verb|\r| & \verb|0x0D| \\
+\verb|\t| & \verb|0x09| \\
+\verb|\v| & \verb|0x0B| \\
+\verb|\\| & \verb|'\'| \\
+\verb|\'| & \verb|'''| \\
+\verb|\"| & \verb|'"'| \\
+\verb|\?| & \verb|?| \\
+\verb|\e| & \verb|0x1B| \\
+\verb|\o| & \verb|o|, where \verb|o| is an octal digit \\
+\verb|\oo| & \verb|oo|, where \verb|o| are octal digits \\
+\verb|\ooo| & \verb|ooo|, where \verb|o| are octal digits \\
+\verb|\xhh| & \verb|hh|, where \verb|h| are hex digits \\
+\verb|\uhh| & \verb|hh|, where \verb|h| are hex digits \\
+\verb|\uhhhh| & \verb|hhhh|, where \verb|h| are hex digits \\
+\verb|\uhhhhhhhh| & \verb|hhhhhhhh|, where \verb|h| are hex digits \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Syntax}
+\begin{verbatim}
+escape codes = "\", ("a" | "b" | "f" | "n" | "r" | "t" | "v" | "\" | "'"
+    | """ | "?" | "0" | "e"
+    | (octal digits, [octal digits, [octal digits]])
+    | ("x", hexadecimal digits, hexadecimal digits)
+    | ("u", 
+      (
+        (hexadecimal digits,
+        hexadecimal digits,
+        hexadecimal digits,
+        hexadecimal digits) |
+        (hexadecimal digits,
+        hexadecimal digits,
+        hexadecimal digits,
+        hexadecimal digits,
+        hexadecimal digits,
+        hexadecimal digits,
+        hexadecimal digits,
+        hexadecimal digits)
+      )
+    )
+);
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+\n
+\x00
+\033
+\end{verbatim}
+
+\subsubsection{Generation}
+See sections \ref{sec:CharacterLiterals} and \ref{sec:CharacterStringLiterals} for detailed descriptions on how printable characters are used in generation.
+
+\subsubsection{Errors}
+None other than syntax.
+
+\newpage
+
+
+
+
+\subsection{Character Literals}
+\label{sec:CharacterLiterals}
+Literals are a way of including constant memory values into the source code directly. This syntactic element is a way of representing ASCII printable characters, and characters of any encoding via escape code.
+
+Printable UTF-8, UTF-16, and UTF-32 characters may be used just as printable ASCII characters, although bear in mind that unless the proper character width is used, the character will be misencoded.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+character literal = "'", (printable characters
+    | escape codes | printable utf characters), "'" ["c" | "d" | "q"];
+\end{verbatim}
+
+Note that \verb|printable utf characters| is the set of printable UTF-8, UTF-16, and UTF-32 characters that are supported by the Mitten implementation. 
+
+\subsubsection{Examples}
+\begin{verbatim}
+'A'
+'\n'
+'\u0000'
+\end{verbatim}
+
+\subsubsection{Generation}
+The "c", "d", or "q" that can be suffixed to the literal are representative of the width of the character. They denote 1 byte, 2 byte, and 4 byte characters, respectively. Characters with no width specification suffix are assumed to be 1 byte. The result is an n-byte value to be stored in memory containing the encoded value of the character, according to encoding standards or the represented value of the escape code (see section \ref{sec:EscapeCodes}).
+
+\subsubsection{Errors}
+Use of unicode characters with widths larger than the specified character width.
+
+\newpage
+
+
+
+
+\subsection{Character String Literals}
+\label{sec:CharacterStringLiterals}
+Literals are a way of including constant memory values into the source code directly. This syntactic element is a way of representing strings.
+
+Printable UTF-8, UTF-16, and UTF-32 characters may be used just as printable ASCII characters, although bear in mind that unless the proper character width is used, the character will be misencoded.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+character string literal = """, {printable characters
+    | escape codes | printable utf characters}, """ ["c" | "d" | "q"];
+\end{verbatim}
+
+Note that \verb|printable utf characters| is the set of printable UTF-8, UTF-16, and UTF-32 characters that are supported by the Mitten implementation. 
+
+\subsubsection{Examples}
+\begin{verbatim}
+"hi"
+"hi"c
+"hello, world\n"q
+\end{verbatim}
+
+\subsubsection{Generation}
+The "c", "d", or "q" that can be suffixed to the literal are representative of the width of the character. They denote 1 byte, 2 byte, and 4 byte characters, respectively. Characters with no width specification suffix are assumed to be 1 byte. The result is an n-byte value to be stored in memory containing the encoded value of the character string, according to encoding standards or the represented value of the escape code (see section \ref{sec:EscapeCodes}). n is the character with w multiplied by the number of characters within the string +1. The extra character, suffixed to the end of the string, is a null byte with a value of \verb|0x00| in whichever character width is specified. The characters are stored sequentially in memory according to how they are represented within character literals (see section \ref{sec:CharacterLiterals}).
+
+\subsubsection{Errors}
+Use of unicode characters with widths larger than the specified character width.
+
+\newpage
+
+
+
+
+\subsection{Hex String Literals}
+\label{sec:HexStringLiterals}
+Literals are a way of including constant memory values into the source code directly. This syntactic element is a way of representing hex strings.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+hex string literal = """, [whitespace], 
+    [(hexadecimal digits, hexadecimal digits), 
+      {whitespace, hexadecimal digits, hexadecimal digits}, 
+    [whitespace], 
+    ""x";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+"ff ff"x
+"ff"x
+""x
+\end{verbatim}
+
+\subsubsection{Generation}
+The series of n whitespace-separated hex bytes are stored in memory as n bytes of data with the represented values stored sequentially. Note that no null byte is appended to the end of the string as in character string literals.
+
+\subsubsection{Errors}
+None other than syntax.
+
+\newpage
+
+
+
+
+\subsection{String Literals}
+\label{sec:StringLiterals}
+Literals are a way of including constant memory values into the source code directly. This syntactic element is a way of representing strings. Read the prior sections on string literals (\ref{sec:CharacterStringLiterals} and \ref{sec:HexStringLiterals}) for more detailed descriptions.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+string literal = character string literal | hex string literal;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+"hi"
+"hi"c
+"hello, world\n"q
+"ff ff"x
+\end{verbatim}
+
+\subsubsection{Generation}
+Read the prior sections on string literals (\ref{sec:CharacterStringLiterals} and \ref{sec:HexStringLiterals}) for detailed descriptions.
+
+\subsubsection{Errors}
+Read the prior sections on string literals (\ref{sec:CharacterStringLiterals} and \ref{sec:HexStringLiterals}) for detailed descriptions.
+
+\newpage
+
+
+
+
+\subsection{Literals}
+\label{sec:Literals}
+Literals are a way of including constant memory values into the source code directly. Read the prior sections on literals for more detailed descriptions.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+literal = integer literal | floating literal 
+    | character literal | string literal;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5
+5.0
+"5"
+\end{verbatim}
+
+\subsubsection{Generation}
+Read the prior sections on literals for detailed descriptions.
+
+\subsubsection{Errors}
+Read the prior sections on literals for detailed descriptions.
+
+\newpage
+
+
+
+
+\subsection{Addition}
+Binary perations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+addition = value, [whitespace], "+", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5+2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that adds the two operands.
+
+If the two operands are both integers, the result will be an integer. If the two operands are a combination of integers and floats or two floats, the result will be a float. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Subtraction}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+subtraction = value, [whitespace], "-", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5-2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that subtracts the right operand from the left.
+
+If the two operands are both integers, the result will be an integer. If the two operands are a combination of integers and floats or two floats, the result will be a float. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Multiplication}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+multiplication = value, [whitespace], "*", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5*2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that multiplies the two operands.
+
+If the two operands are both integers, the result will be an integer. If the two operands are a combination of integers and floats or two floats, the result will be a float. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Division}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+division = value, [whitespace], "/", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5/2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that divides the right operand into the left.
+
+If the two operands are both integers, the result will be an integer. If the two operands are a combination of integers and floats or two floats, the result will be a float. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Modulation}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+modulation = value, [whitespace], "%", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5%2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that divides the right operand into the left and takes the remainder of that operation.
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bitwise And}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bitwise and = value, [whitespace], "&", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5&2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that bitwise ANDs the two operands (see section \ref{sec:BooleanMath}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bitwise Or}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bitwise or = value, [whitespace], "|", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5|2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that bitwise ORs the two operands (see section \ref{sec:BooleanMath}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bitwise Exclusive Or}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bitwise exclusive or = value, [whitespace], "^", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5^2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that bitwise XORs the two operands (see section \ref{sec:BooleanMath}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bit Shift Left}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bit shift left = value, [whitespace], "<<", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5<<2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that left bit shifts the left operand by the number of bits represented by the right (see section \ref{sec:BooleanMath}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bit Shift Right}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bit shift right = value, [whitespace], ">>", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5>>2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that right bit shifts the left operand by the number of bits represented by the right (see section \ref{sec:BooleanMath}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bit Test}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bit test = value, [whitespace], "&.", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5&.2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests the n-th bit of the left operand where n is the index represented by the right (see section \ref{sec:BooleanMath}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bit Set}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bit set = value, [whitespace], "|.", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5|.2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that sets the n-th bit of the left operand where n is the index represented by the right (see section \ref{sec:BooleanMath}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bit Unset}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bit unset = value, [whitespace], "~.", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5~.2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that unsets the n-th bit of the left operand where n is the index represented by the right (see section \ref{sec:BooleanMath}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Less Than}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+less than = value, [whitespace], "<", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5<2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not the left operand is less than the right (see section \ref{sec:IfStatements}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Less Than Or Equal To}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+less than or equal to = value, [whitespace], "<=", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5<=2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not the left operand is less or equal to the right (see section \ref{sec:IfStatements}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Greater Than}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+greater than = value, [whitespace], ">", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5>2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not the left operand is greater than the right (see section \ref{sec:IfStatements}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Greater Than Or Equal To}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+greater than or equal to = value, [whitespace], ">=", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5>=2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not the left operand is greater than or equal to the right (see section \ref{sec:IfStatements}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Equal To}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+equal to = value, [whitespace], "==", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5==2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not the left operand is equal to the right (see section \ref{sec:IfStatements}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Not Equal To}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+not equal to = value, [whitespace], "!=", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5!=2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not the left operand is not equal to the right (see section \ref{sec:IfStatements}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Logical And}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+logical and = value, [whitespace], "&&", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5&&2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not both the left and right operands are true (see section \ref{sec:IfStatements}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Logical Or}
+Operations combine two values into a single value. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+logical or = value, [whitespace], "||", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5||2
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not either of the left and right operands is true (see section \ref{sec:IfStatements}).
+
+The two operands must be integers, objects, or some combination. If both operands are integers, the result will be an integer. If one or both of the operands are objects, the result will be dictated by the class declaration of the leftmost object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Bitwise Complement}
+Operations modify existing values. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+bitwise complement = "~", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+~5
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that takes the bitwise complement of the operand (see section \ref{sec:BooleanMath}).
+
+The operand must be an integer or an object. the operand is an integer, the result will be an integer. If the operand is an object, the result will be dictated by the class declaration of the object.
+
+\subsubsection{Errors}
+Errors may be caused by an object involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Logical Not}
+Operations modify existing values. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on conditions see section \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+logical not = "!", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+!5
+\end{verbatim}
+
+\subsubsection{Generation}
+A computation element that tests whether or not the operand is boolean false (see section \ref{sec:IfStatements}).
+
+The operand must be an integer or an object. the operand is an integer, the result will be an integer. If the operand is an object, the result will be dictated by the class declaration of the object.
+
+\subsubsection{Errors}
+Errors may be caused by the object involved in the operation according to class declaration. Errors may be caused by unsupported types.
+
+\newpage
+
+
+
+
+\subsection{Address Of}
+Operations modify existing values. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on addresses and memory management see sections \ref{sec:References} and \ref{sec:Memory}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+address of = "&", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+&x
+\end{verbatim}
+
+\subsubsection{Generation}
+The address of operator is a syntactic element which is used for retrieving the memory address in which a value is stored. Taking the address of a literal or constant value will allocate a new memory spage for the value and return the address of this memory. Using the operator on a reference returns the address referenced. 
+
+The operand must be an integer or an object. the operand is an integer, the result will be an integer. If the operand is an object, the result will be dictated by the class declaration of the object.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. 
+
+\newpage
+
+
+
+
+\subsection{Dereference}
+Operations modify existing values. For a detailed description of values, see section \ref{sec:Values}. For more details on how to use operations, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, \ref{sec:FloatingPointMath}, and \ref{sec:BooleanMath}. For more details on addresses and memory management see sections \ref{sec:References} and \ref{sec:Memory}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+dereference = "*", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+*x
+**y
+*0x00
+\end{verbatim}
+
+\subsubsection{Generation}
+If the value is an integer, it will be treated as the memory address of a single byte to be made available. If the value is a reference, the referenced memory will be copied and n bytes (where n is the width of the subtype) will be made available in the form of the subtype. If the value is a pointer, n bytes (where n is the width of the subtype) of the data is directly made accessable in the form of the subtype. If the value is an object, the result is defined by the class declaration of the object. See section \ref{sec:Assignment} for how dereferenced memory can be modified. It can be accessed just like any other value.
+
+\subsubsection{Errors}
+Errors may be caused by the objects involved in the operation according to class declaration. Unsupported types will cause errors.
+
+\newpage
+
+
+
+
+\subsection{Calls}
+Calls are the syntactic method of accesssing functions and builtins. They provide a way of specifying argument values to the called element (see section \ref{sec:Values}). For more details on how to use calls, see section \ref{sec:MakingYourOwnFunctions}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+call = symbol, [whitespace], "(", [whitespace],
+    [
+      value, [whitespace], {",", [whitespace], value, [whitespace]}
+    ],
+    ")";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+f(x)
+f(2, f(x))
+\end{verbatim}
+
+\subsubsection{Generation}
+Either the builtin dictates the code generation, or execution is jumped to the function implementation with the argument values carried over. The result is the return value of the function. At the end of the function, execution is jumped back to just after the function call so that execution may continue.
+
+\subsubsection{Errors}
+Argument value types or count not matching the builtin requirements or function declaration requirements.
+
+\newpage
+
+
+
+
+\subsection{Values}
+\label{sec:Values}
+Values are any construct within Mitten that have a typed piece of data stored in emmory which can be accesssed within a line of code in a function and syntactically are accessed within a line code in a function. (See sections \ref{sec:Types}, \ref{sec:Symbols}, \ref{sec:Literals}, prior sections on operations, and \ref{sec:Calls}.) For more details on how to use values and expressions, see sections \ref{sec:IntegerMath}, \ref{sec:ACleanerWayOfWritingThings}, and \ref{sec:FloatingPointMath}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+value = symbol | literal | addition | subtraction
+    | multiplication | division | modulation
+    | bitwise and | bitwise or | bitwise exclusive or
+    | bit shift left | bit shift right | bit test
+    | bit set | bit unset | less than
+    | less than or equal to | greater than
+    | greater than or equal to | equal to
+    | not equal to | logical and | logical or
+    | bitwise complement | logical not | address of
+    | calls;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+5
+"hi"
+2+x
+f(x)
+&50 + 10 - &x
+\end{verbatim}
+
+\subsubsection{Generation}
+See prior sections on values for detailed descriptions of generation. Keep in mind that each value has an implicit type paired with it. For details on how these types are utilized and assigned, see prior sections on values.
+
+\subsubsection{Errors}
+See prior sections on values for detailed descriptions of errors.
+
+\newpage
+
+
+
+
+\subsection{Assignments}
+\label{sec:Assignments}
+Assignments are the syntactic elements for moving memory. The memory space represented by the left side will be overwritten by the value of the right.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+assignment = value, [whitespace], "=", [whitespace], value;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+*x = 50
+y = 2
+str = f("hi")
+\end{verbatim}
+
+\subsubsection{Generation}
+If the left side is a variable symbol, the variable's memory space will be overwritten. If the left side is a reference, how the assignment is generated depends on the type of the right side. If the type of the right side of the assignment is convertable to the reference type, the pointer type, or the address type, the address of the reference is overwritten. If the type of the right side of the assignment is convertable to the value of the reference subtype, the referenced memroy space is overwritten. If the left side is an object, the generation is defined by the class declaration of the object.
+
+\subsubsection{Errors}
+If the left side is a function symbol. Use of unconvertable types.
+
+\newpage
+
+
+
+
+
+\subsection{Atomic Types}
+\label{sec:AtomicTypes}
+Atomic types are the most basic types. They are the closest thing to describing how binary values are proecessed by the machine directly.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+atomic type =
+    (
+      [("unsigned" | "signed"), whitespace],
+      (
+         "char" |
+         "short" |
+         ("short", whitespace, "int") |
+         "int" |
+         "long" |
+         ("long", whitespace, "int")
+      )
+    ) |
+    (
+      "bool" |
+      "float" |
+      "double" |
+      ("long", whitespace, "double")
+    );
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+long int
+float
+unsigned char
+\end{verbatim}
+
+\subsubsection{Generation}
+See sections \ref{sec:VariableDeclarations} and \ref{sec:FunctionDeclarations} for detailed descriptions of generation.
+
+\subsubsection{Error}
+None other than syntax.
+
+\newpage
+
+
+
+
+\subsection{Reference Types}
+\label{sec:AtomicTypes}
+Reference types can be used to make variables that do not have memory of their own, but reference other variables' memory spaces. They store addresses that can be either null or a valid address of a variable's memory space. See sections \ref{sec:Types} and \ref{sec:References}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+reference type = type, [whitespace], "&";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+int &
+float &&
+\end{verbatim}
+
+\subsubsection{Generation}
+See sections \ref{sec:VariableDeclarations} and \ref{sec:FunctionDeclarations} for detailed descriptions of generation.
+
+\subsubsection{Error}
+None other than syntax.
+
+\newpage
+
+
+
+
+
+\subsection{Pointer Types}
+\label{sec:AtomicTypes}
+Reference types can be used to make variables that do not have memory of their own, but reference other variables' memory spaces. They can store any memory address, valid or not. See sections \ref{sec:Types} and \ref{sec:Memory}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+reference type = type, [whitespace], "*";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+int *
+float **
+\end{verbatim}
+
+\subsubsection{Generation}
+See sections \ref{sec:VariableDeclarations} and \ref{sec:FunctionDeclarations} for detailed descriptions of generation.
+
+\subsubsection{Error}
+None other than syntax.
+
+\newpage
+
+
+
+\subsection{Variable Declarations}
+\label{sec:VariableDeclarations}
+For more detailed descriptions of how to use variables and scopes, see sections \ref{sec:IntegerMath} and \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+variable declaration = type, whitespace, symbol,
+    [
+      [whitespace], "=", [whitespace], value
+    ],
+    [whitespace], ";";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+int x;
+int y = 5+x;
+\end{verbatim}
+
+\subsubsection{Generation}
+A variable with the specified symbol is declared in the current scope, or the global scope if none exists.
+
+\subsubsection{Error}
+Unconvertable types of value and declaration. 
+
+\newpage
+
+
+
+
+\subsection{Argument Declarations}
+Arguments are used in function declarations (see section \ref{sec:FunctionDeclarations}) to represent an argument. The argument is represented by a type and a symbol. This declares a "variable" that may be used only in the function. The argument declaration contains either a value specified in a call or a default value. If a function's argument has a default value, it is not necesary to specify the value as an argument value in the call. For more details on how to use functions, see section \ref{sec:MakingYourOwnFunctions}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+argument declaration = type, whitespace, symbol,
+    [
+        [whitespace], "=", [whitespace], value
+    ];
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+int x
+int y = 0
+\end{verbatim}
+
+\subsubsection{Generation}
+See section \ref{sec:FunctionDeclarations} for detailed descriptions on generation.
+
+\subsubsection{Errors}
+See section \ref{sec:FunctionDeclarations} for detailed descriptions on errors.
+
+\newpage
+
+
+
+
+\subsection{Function Declarations}
+Function declarations are syntactic elements that represent the argument types and return type of functions. They can be used in either prototypes (see section \ref{sec:FunctionPrototypes}) or implementations (see section \ref{sec:FunctionImplementations}). For more details on how to use functions, see section \ref{sec:MakingYourOwnFunctions}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+function declaration = type, whitespace, symbol, [whitespace], "(",
+    [argument declaration
+      {
+        [whitespace], ",", [whitespace], argument declaration
+      }
+    ],
+    ")";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+int f(int x, int y = 0)
+\end{verbatim}
+
+\subsubsection{Generation}
+See sections \ref{sec:FunctionPrototypes} and \ref{sec:FunctionImplementations} for detailed descriptions of generation.
+
+\subsubsection{Errors}
+See sections \ref{sec:FunctionPrototypes} and \ref{sec:FunctionImplementations} for detailed descriptions of errors.
+
+\newpage
+
+
+
+
+\subsection{Function Prototypes}
+Function prototypes are accessable only by the compiler and now the linker. They can be used as placeholders for implementations that need to be accessable by the compiler only. For more details on how to use functions, see section \ref{sec:MakingYourOwnFunctions}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+function protoype = function declaration, [whitespace], ";";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+int f(int x);
+\end{verbatim}
+
+\subsubsection{Generation}
+The declaration is placed into the current scope within the compiler.
+
+\subsubsection{Errors}
+Identical prototypes will cause errors. Prototypes are only considered identical if the symbols are identical as well as the argument types and counts.
+
+\newpage
+
+
+
+
+\subsection{Function Implementations}
+Function implementations are visible by both the compiler and the linker. Two identical implementations (ignoring the return type) are not allowed within the same scope. Nesting of functions is allowed. For more details on how to use functions, see section \ref{sec:MakingYourOwnFunctions}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+function implementation = function declarations, [whitespace], "{",
+     [whitespace], scope;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+int f(int x)
+{
+    return (2*x);
+}
+\end{verbatim}
+
+\subsubsection{Generation}
+The executable data generated from the scope is placed in the output data such that it can be accessed through a call.
+
+\subsubsection{Errors}
+Duplicate implementations will cause errors. Implementations are only considered duplicate if the symbols are identical as well as the argument types and counts.
+
+\newpage
+
+
+
+\subsection{Scopes}
+\label{sec:Scopes}
+Scopes are constructs for organizing symbol declarations and for showing which declaration code "belongs to". For examples of scopes, see sections \ref{sec:Statements} and \ref{sec:Declarations}. See sections \ref{sec:IfStatements} and \ref{sec:ScopeShorthand} for more details on the syntax of scopes.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+scope =
+    (
+      "{",
+      {
+        [whitespace], (value | statement | scope | declaration),
+        [whitespace], ";", [whitespace]
+      },
+      "}"
+    )
+    |
+    (
+      (value | statement | scope | declaration),
+      [whitespace], ";";
+    )
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+{
+    int x = 5;
+    return (x+5);
+}
+\end{verbatim}
+
+\subsubsection{Generation}
+Each element of the scope is generated according to its own specifications in sequential order.
+
+\subsubsection{Errors}
+See prior sections on scope elements for more details.
+
+\newpage
+
+
+
+\subsection{If-Statements}
+\label{sec:IfStatements}
+If statements are the syntactic element used for writing code whose execution is conditional on the boolean truth of an expression. For examples and more details, see \ref{sec:IfStatements}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+if-statement = "if", [whitespace], "(", [whitespace], value, [whitespace], ")", [whitespace], (";" |
+    scope,
+        [
+          [whitespace],
+          "else", 
+          [whitespace],
+          (";" | scope)
+        ]
+    );
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+if (5 < 7)
+{
+    print("Guess what, 5 is less than 7. Mind blown.\n");
+}
+\end{verbatim}
+
+\subsubsection{Generation}
+The condition is generated, followed by a conditional jump to just past the end of the then-scope if the condition is not met. After this, any else-scope code is generated.
+
+\subsubsection{Errors}
+None other than syntax.
+
+\newpage
+
+
+
+
+
+\subsection{While Loops}
+\label{sec:WhileLoops}
+While loops are the syntactic element for repeating code as long as a condition is met. For more details about loops, see section \ref{sec:WhileLoops}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+while loop = "while", [whitespace], "(", [whitespace], value, [whitespace], ")", [whitespace], (";" | scope);
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+while (5 < 7)
+{
+    print("Guess what, 5 is less than 7. Mind blown.\n");
+}
+\end{verbatim}
+
+\subsubsection{Generation}
+The condition is generated, followed by a conditional jump to just after the end of the loop if the condition is not met. An instruction is inserted between the last instruction of the scope and the instructions after the loop which states that if the condition is met, the condition is re-evaluated and that execution is reset to the beginning of the loop.
+
+\subsubsection{Errors}
+None other than syntax.
+
+\newpage
+
+
+
+
+
+
+
+
+\subsection{Do-While Loops}
+\label{sec:DoWhileLoops}
+Do-while loops are the syntactic element for repeating code as long as a condition is met, but at least one time. For more details about loops, see section \ref{sec:WhileLoops}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+do-while loop = "do", [whitespace], scope, [whitespace], "while", [whitespace], "(", [whitespace], value, [whitespace], ")", [whitespace], ";";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+do
+{
+    print("Guess what, 5 is less than 7. Mind blown.\n");
+}
+while (5 < 7);
+\end{verbatim}
+
+\subsubsection{Generation}
+The condition is generated. An instruction is inserted between the last instruction of the scope and the instructions after the loop which states that if the condition is met, the condition is re-evaluated and that execution is reset to the beginning of the loop.
+
+\subsubsection{Errors}
+None other than syntax.
+
+\newpage
+
+
+
+
+
+\subsection{For Loops}
+\label{sec:ForLoops}
+For loops are the syntactic elements for iterative loops . For more details about for loops, see section \ref{sec:ForLoops}.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+for loop = "for", [whitespace], "("
+    [whitespace], variable declaration, [whitespace], ";",
+    [whitespace], value, [whitespace], ";",
+    [whitespace], value,
+    [whitespace], ")", [whitespace],
+    (";" | scope);
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+for (int i = 0; i < 10; i++)
+    print(i, "\n");
+\end{verbatim}
+
+\subsubsection{Generation}
+The first "field" of the for loop is generated. Then a while loop with the section "field" as the condition and the third "field" as the last instruction of the scope.
+
+\subsubsection{Errors}
+First "field" must declare a variable with a defined value.
+
+\newpage
+
+
+
+
+
+
+\subsection{Statements}
+\label{sec:Statements}
+Statements are the syntactic constructs used for conditionals and loops. See sections \ref{sec:IfStatements}, \ref{sec:WhileLoops}, \ref{sec:DoWhileLoops}, and \ref{sec:ForLoops} for more details on the different types of statements.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+statement = if-statement | while loop | do-while loop | for loop;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+for (int i = 0; i < 10; i++)
+    print(i, "\n");
+
+if (true)
+    print("true\n");
+\end{verbatim}
+
+\subsubsection{Generation}See sections \ref{sec:IfStatements}, \ref{sec:WhileLoops}, \ref{sec:DoWhileLoops}, and \ref{sec:ForLoops} for more details on generation.
+
+
+\subsubsection{Errors}
+See sections \ref{sec:IfStatements}, \ref{sec:WhileLoops}, \ref{sec:DoWhileLoops}, and \ref{sec:ForLoops} for more details on errors.
+
+\newpage
+
+
+
+
+
+\subsection{Declarations}
+\label{sec:Declarations}
+Declarations are any syntactic elements that declare code structure to the compiler.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+declaration = variable declaration | function prototype | function implementation | member declaration | method declaration | class declaration | template declaration;
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+int x = 5;
+
+int x();
+
+int x()
+{
+    return 5;
+}
+\end{verbatim}
+
+\subsubsection{Generation}
+See prior sections on declarations for details on generation.
+
+\subsubsection{Errors}
+See prior sections on declarations for details on errors.
+
+\newpage
+
+
+
+
+
+
+\subsection{Data Security Identifiers}
+\label{sec:DataSecurityIdentifiers}
+Class members and methods have different data security levels. \verb|public| means that the member and method can be accessed by code within the class as well as code outside the class through an object instance. \verb|protected| means that it can only be accessed by code within the class. \verb|private| means it can only be accessed through that exact class and not any subclasses.
+
+Any member or method declaration that does not have a data security identifier specified is public by default.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+data security identifier = "public" | "protected" | "private";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+public
+\end{verbatim}
+
+\subsubsection{Generation}
+See section \ref{sec:DataSecurityScopes} for details on generation.
+
+\subsubsection{Errors}
+See section \ref{sec:DataSecurityScopes} for details on errors.
+
+\newpage
+
+
+
+
+
+
+
+\subsection{Member Declarations}
+\label{sec:MemberDeclarations}
+Member declarations are any variable declarations that declare members specific to a certain class.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+member declaration = [data security identifier, whitespace], variable declaration, [whitespace], ";";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+public int x = 5;
+
+int y;
+\end{verbatim}
+
+\subsubsection{Generation}
+Declares the variable with the data security level specified within the current class.
+
+\subsubsection{Errors}
+None other than syntax.
+
+\newpage
+
+
+
+
+
+
+
+
+\subsection{Method Declarations}
+\label{sec:MethodDeclarations}
+Method declarations are any function declarations that declare methods specific to a certain class.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+method declaration = [data security identifier, whitespace], function declaration, [whitespace], ";";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+public int x = 5;
+
+int y;
+\end{verbatim}
+
+\subsubsection{Generation}
+Declares the prototype with the data security level specified within the current class.
+
+\subsubsection{Errors}
+None other than syntax.
+
+\newpage
+
+
+
+
+
+
+
+\subsection{Data Security Scopes}
+\label{sec:DataSecurityScopes}
+Data security scopes provide a default data security identifier for a scope of declarations.
+
+\subsubsection{Syntax}
+\begin{verbatim}
+data security scope = data security identifier, [whitespace],
+    "{", [whitespace],
+    {
+        (member declaration | method declaration),
+        [whitespace], ";", [whitespace],
+    },
+    "}";
+\end{verbatim}
+
+\subsubsection{Examples}
+\begin{verbatim}
+protected
+{
+    int x;
+    string y;
+}
+\end{verbatim}
+
+\subsubsection{Generation}
+See sections \ref{sec:MemberDeclarations} and \ref{sec:MethodDeclarations} for details on generation.
+
+\subsubsection{Errors}
+See sections \ref{sec:MemberDeclarations} and \ref{sec:MethodDeclarations} for details on errors.
+
+\newpage
+
+
+
+
+
+\subsection{Classes}
+\label{sec:}
+
+
+
+
+
+
+\section{References}
+\begin{description}
+  \item[ISO/IEC 14977] \textit{Information Technology - Syntactic metalanguage - Extended BNF}
+\end{description}
+\newpage
+
+
+
+
+\end{document}

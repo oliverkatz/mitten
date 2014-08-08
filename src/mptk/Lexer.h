@@ -110,6 +110,8 @@ namespace mitten
 			StringConstPattern(std::string v);
 		} StringConstPattern;
 
+		typedef int (*DeliminatorPatternCallback)(int from, std::string s);
+
 		/* Helper Type: Deliminator
 		 * ------------------------
 		 * Stores deliminator descriptions.
@@ -118,25 +120,28 @@ namespace mitten
 		{
 			StringConstPattern start, end; // start and end points
 			DeliminatorFlags flags; // description flags
+			DeliminatorPatternCallback patternCallback;
 
 			/* Constructor
 			 * -----------
 			 * Initiates empty deliminator.
 			 */
-			Deliminator() : flags(Defaults) {}
+			Deliminator() : flags(Defaults), patternCallback(NULL) {}
 
 			/* Constructor
 			 * -----------
 			 * Creates deliminator with start but no end point.
 			 */
-			Deliminator(StringConstPattern p) : start(p), flags(Defaults) {}
+			Deliminator(StringConstPattern p) : start(p), flags(Defaults), patternCallback(NULL) {}
+
+			Deliminator(StringConstPattern p, DeliminatorPatternCallback c) : start(p), flags(Defaults), patternCallback(c) {}
 
 			/* Constructor
 			 * -----------
 			 * Creates deliminator with start and end points.
 			 */
 			Deliminator(StringConstPattern s, StringConstPattern e) : 
-				start(s), end(e), flags(Defaults) {}
+				start(s), end(e), patternCallback(NULL), flags(Defaults) {}
 		} Deliminator;
 
 		/* Member: delims
@@ -177,6 +182,8 @@ namespace mitten
 		 *           set them as you please to configure the deliminator.
 		 */
 		DeliminatorFlags &deliminate(std::string s, std::string e = "");
+
+		DeliminatorFlags &deliminate(std::string s, DeliminatorPatternCallback c);
 
 		/* Method: lex
 		 * -----------

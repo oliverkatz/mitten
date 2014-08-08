@@ -65,7 +65,8 @@ namespace mitten
 		IntegerLiteralTag,
 		FloatingLiteralTag,
 		CharacterLiteralTag,
-		StringLiteralTag
+		StringLiteralTag,
+		SyntheticTag
 	} TokenTag;
 
 	/* Class: Token

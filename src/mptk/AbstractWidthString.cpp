@@ -34,23 +34,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPTK.h
+/* File:    AbstractWidthString.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * MPTK is a language parsing library. It is designed to be implemented in a
- * single header file. It provides the ability for a developer to write a
- * compiler with a handmade feel without the significant workload required to
- * implement even a simple lexer and parser. It maintains a competetive
- * efficiency of O(n) with lex and yacc.
- *
- * For a description of how the algorithms used by MPTK work or a detailed
- * efficiency analysis, see "MPTK Language Parsing Algorithms" (2014), a
- * pamplet which can be found on the MPTK website.
- *
- * For a tutorial on how to use MPTK, see the MPTK website or "MPTK
- * Beginner Tutorial" (2014), which can be found on the MPTK website.
+ * Abstract width string class to be used for all strings in MPTK.
  */
 
 /* Changelog:
@@ -59,21 +48,48 @@
  * Initial release.
  */
 
-#ifndef __MITTEN_MPTK_H
-#define __MITTEN_MPTK_H
+#include "AbstractWidthString.h"
 
-#define MPTK_VERSION_MAJOR 0
-#define MPTK_VERSION_MINOR 1
-#define MPTK_VERSION_STR "0.01-alpha"
-#define MPTK_VERSION 0x001
+using namespace std;
 
-#include "Utils.h"
-#include "Token.h"
-#include "Lexer.h"
-#include "AST.h"
-#include "ErrorHandler.h"
-#include "StructureParser.h"
-#include "ExpressionParser.h"
-#include "Reconstruction.h"
+namespace mitten
+{
+	AbstractWidthString AbstractWidthString::fromCString8(const char *s)
+	{
+		AbstractWidthString rtn;
+		rtn._size = 0;
+		while (s[rtn._size] != 0)
+			rtn._size++;
+		rtn._data = (void *)new char[rtn._size];
+		memcpy(rtn._data, s, rtn._size);
+		rtn._capacity = rtn._size;
+		rtn._width = 1;
+		return rtn;
+	}
 
-#endif
+	AbstractWidthString AbstractWidthString::fromCString16(const char16_t *s)
+	{
+		AbstractWidthString rtn;
+		rtn._size = 0;
+		while (s[rtn._size] != 0)
+			rtn._size++;
+		rtn._data = (void *)new char16_t[rtn._size];
+		memcpy(rtn._data, s, rtn._size*2);
+		rtn._capacity = rtn._size;
+		rtn._width = 2;
+		return rtn;
+	}
+
+	AbstractWidthString AbstractWidthString::fromCString32(const char32_t *s)
+	{
+		AbstractWidthString rtn;
+		rtn._size = 0;
+		while (s[rtn._size] != 0)
+			rtn._size++;
+		rtn._data = (void *)new char32_t[rtn._size];
+		memcpy(rtn._data, s, rtn._size*4);
+		rtn._capacity = rtn._size;
+		rtn._width = 4;
+		return rtn;
+	}
+}

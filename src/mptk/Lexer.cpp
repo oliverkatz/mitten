@@ -105,6 +105,18 @@ namespace mitten
 		return delims[s.size()][s].flags;
 	}
 
+	DeliminatorFlags &Lexer::deliminate(std::string s, Lexer::DeliminatorPatternCallback c)
+	{
+		if (s.empty())
+			throw std::runtime_error("cannot deliminate empty string");
+
+		delims[s.size()][s] = Deliminator(StringConstPattern(s), c);
+		if (s.size() > maxDelimLength)
+			maxDelimLength = s.size();
+
+		return delims[s.size()][s].flags;
+	}
+
 	std::vector<Token> Lexer::lex(std::string s)
 	{
 		std::vector<Token> rtn;
@@ -150,6 +162,10 @@ namespace mitten
 								dl++;
 							}
 						}
+						else if (d.patternCallback != NULL)
+						{
+							dl = d.patternCallback(i, s);
+						}
 
 						if (!(d.flags & Filtered))
 						{
@@ -191,7 +207,7 @@ namespace mitten
 			}
 		}
 
-		if (last < s.size()-1)
+		if (last < s.size())
 		{
 			rtn.push_back(Token(s.substr(last), lastline, lastcolumn));
 			rtn.back().tag = findTag(rtn.back());

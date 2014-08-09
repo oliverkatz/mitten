@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Utils.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Various utility functions used by MPTK.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_UTILS_H
 #define __MITTEN_UTILS_H
 
@@ -59,18 +45,36 @@
 
 namespace mitten
 {
-	/* Function: readFile
-	 * ------------------
-	 * Reads the whole contents of a text file and returns them in a string.
-	 * 'path'  - the path of the file to read
-	 * returns - the contents of the file
+	/** \brief Reads a file into a string.
+	 * Loads the entire contents of a file into a dynamically-expanding string object.
+	 * If readFile is unable to open the file, it will throw a runtime_error.
+	 * \param path The path of the file to be read.
+	 * \returns The contents of the file.
 	 */
 	std::string readFile(std::string path);
 
-	// TODO: Move these into MString
+	/** \brief Evaluates escape codes in a string.
+	 * Iterates through the input string and converts all C-style escape codes into their equivalent character codes.
+	 * \param s Input string to be iterated.
+	 * \returns The resultant string.
+	 * \todo Move this method to the AbstractWidthString class.
+	 */
 	std::string evaluateEscapeCodes(std::string s);
+
+	/** \brief Converts all non-printable characters in the string to escape codes.
+	 * Iterates through the input string and converts all non-printable characters to C-style escape codes.
+	 * \param s Input string to be iterated.
+	 * \returns The resultant string.
+	 * \todo Move this method to the AbstractWidthString class.
+	 */
 	std::string makePrintable(std::string s);
 
+	/** \brief Trims whitespace from both ends.
+	 * This should be in the C++ standard library, but it's not easily accessable.
+	 * \param s String to be stripped.
+	 * \returns The stripped string.
+	 * \todo Move this method to the AbstractWidthString class.
+	 */
 	std::string stripString(std::string s);
 }
 

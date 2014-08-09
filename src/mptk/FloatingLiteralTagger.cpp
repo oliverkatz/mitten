@@ -56,7 +56,7 @@ namespace mitten
 {
 	bool FloatingLiteralTagger::isFloatingLiteral(Token t)
 	{
-		return isFloatingLiteral(t.value);
+		return isFloatingLiteral(t.value());
 	}
 
 	bool FloatingLiteralTagger::isFloatingLiteral(string s)
@@ -101,7 +101,7 @@ namespace mitten
 
 	double FloatingLiteralTagger::parse(Token t)
 	{
-		return parse(t.value);
+		return parse(t.value());
 	}
 
 	double FloatingLiteralTagger::parse(string s)

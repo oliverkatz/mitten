@@ -56,7 +56,7 @@ namespace mitten
 {
 	bool CharacterLiteralTagger::isCharacterLiteral(Token t)
 	{
-		return isCharacterLiteral(t.value);
+		return isCharacterLiteral(t.value());
 	}
 
 	bool CharacterLiteralTagger::isCharacterLiteral(string s)
@@ -83,7 +83,7 @@ namespace mitten
 
 	char CharacterLiteralTagger::parse(Token t)
 	{
-		return parse(t.value);
+		return parse(t.value());
 	}
 
 	char CharacterLiteralTagger::parse(string s)

@@ -34,31 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPTK.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * MPTK is a language parsing library. It is designed to be implemented in a
- * single header file. It provides the ability for a developer to write a
- * compiler with a handmade feel without the significant workload required to
- * implement even a simple lexer and parser. It maintains a competetive
- * efficiency of O(n) with lex and yacc.
- *
- * For a description of how the algorithms used by MPTK work or a detailed
- * efficiency analysis, see "MPTK Language Parsing Algorithms" (2014), a
- * pamplet which can be found on the MPTK website.
- *
- * For a tutorial on how to use MPTK, see the MPTK website or "MPTK
- * Beginner Tutorial" (2014), which can be found on the MPTK website.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_MPTK_H
 #define __MITTEN_MPTK_H
 

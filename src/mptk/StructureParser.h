@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StructureParser.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Parses token sequences into ASTs using splits and bounds.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_STRUCTURE_PARSER_H
 #define __MITTEN_STRUCTURE_PARSER_H
 
@@ -65,30 +51,74 @@
 
 namespace mitten
 {
+	/*! \brief Parser which parses initial structure from a token vector to an AST.
+	 * Uses a combination of bounds and splits to parse the tokens into a tree structure. See the MPTK Algorithms pamphlet for more details.
+	 */
 	class StructureParser
 	{
 	protected:
+		/*! \brief Declaration for a bound/split pairing.
+		 * Contains the end point, the split point, and the names for both the bound and an element of the bound. The start point is not given because Bound declarations are organized by start point.
+		*/
 		typedef struct Bound
 		{
-			std::string end, split, boundName, elementName;
-			bool endIsParentSplit;
+			std::string end; //! End-point token value.
+			std::string split; //! Split-point token value.
+			std::string boundName; //! AST node name for the bound.
+			std::string elementName; //! AST node name for an element of the bound.
+			bool endIsParentSplit; //! Set to true to enable end-is-parent-split. See the MPTK Algorithms pamphlet for more details.
 
+			/*! \brief Constructor.
+			 * Initializes an empty bound.
+			 */
 			Bound() : endIsParentSplit(false) {}
+
+			/*! \brief Constructor.
+			 * Initializes a bound with no split.
+			 */
 			Bound(std::string n, std::string e) : boundName(n), end(e) {}
+
+			/*! \brief Constructor.
+			 * Initializes a full bound/split pairing.
+			 */
 			Bound(std::string n, std::string e, std::string en, std::string s) : boundName(n), end(e), elementName(en), split(s) {}
 
+			/*! \brief Configures the end-is-parent-split option.
+			 * Can be used easily, as references to bound declarations are returned by the bind method of the parent class.
+			 */
 			Bound &setEndIsParentSplit(bool v);
 		} Bound;
 
-		std::string globalBoundName, globalSplitName;
-		std::unordered_map<std::string, Bound> bounds;
-		std::unordered_set<std::string> boundEnds;
+		std::string globalBoundName; //! AST node name for the global bound (often 'global').
+		std::string globalSplitName; //! AST node name for the global bound element (i.e. a line of code).
+		std::unordered_map<std::string, Bound> bounds; //! List of bounds sorted by start-point.
+		std::unordered_set<std::string> boundEnds; //! Set of all bound end-points - used for error checking.
 
 	public:
+		/*! \brief Constructor.
+		 * Creates a new structure parser with no bounds.
+		 * \param en Global node name.
+		 * \param sp Global element node name.
+		 */
 		StructureParser(std::string en = "", std::string sp = "");
 
+		/*! \brief Declares a new bound.
+		 * Adds a bound with specified configuration to the bound declaration map.
+		 * \param n Node name.
+		 * \param st Start point.
+		 * \param e End point.
+		 * \param en Node name.
+		 * \param sp Node element name.
+		 * \returns A reference to the newly created bound declaration.
+		 */
 		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
 
+		/*! \brief Runs parser.
+		 * Requires the use of an input token vector and an error handler with which to store errors.
+		 * \param toks Input token vector.
+		 * \param e Error handler to use.
+		 * \returns Resultant AST.
+		 */
 		AST parse(std::vector<Token> toks, ErrorHandler &e);
 	};
 }

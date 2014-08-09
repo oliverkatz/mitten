@@ -22,6 +22,7 @@ docs :
 	$(MAKE) $(MAKEFLAGS) -C doc/MittenParsingToolkitAlgorithms all
 	$(MAKE) $(MAKEFLAGS) -C doc/TheMittenProgrammingLanguage all
 	$(MAKE) $(MAKEFLAGS) -C doc/MPTKTutorial html
+	$(MAKE) $(MAKEFLAGS) -C doc/MPTKReference all
 	$(MAKE) $(MAKEFLAGS) -C doc/MUnitTutorial html
 
 clean :
@@ -32,4 +33,5 @@ clean :
 	$(MAKE) $(MAKEFLAGS) -C doc/MittenParsingToolkitAlgorithms clean
 	$(MAKE) $(MAKEFLAGS) -C doc/TheMittenProgrammingLanguage clean
 	$(MAKE) $(MAKEFLAGS) -C doc/MPTKTutorial clean
+	$(MAKE) $(MAKEFLAGS) -C doc/MPTKReference clean
 	$(MAKE) $(MAKEFLAGS) -C doc/MUnitTutorial clean

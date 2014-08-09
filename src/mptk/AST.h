@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    AST.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Abstract Syntax Tree (AST) data is stored in this class.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_AST_H
 #define __MITTEN_AST_H
 
@@ -61,34 +47,79 @@
 
 namespace mitten
 {
+	/*! \brief Class for storing Abstract Syntax Tree (AST) node data.
+	 */
 	class AST
 	{
 	protected:
-		bool isBranched;
-		Token leafValue;
-		std::string nameValue;
-		std::vector<AST> branchValues;
+		bool isBranched; //! True only if the current node has branches.
+		Token leafValue; //! The token to use if the current node is a leaf.
+		std::string nameValue; //! The name of the node if it is a branch.
+		std::vector<AST> branchValues; //! The branches if the current node is not a leaf.
 
 	public:
+		/*! \brief Constructor.
+		 * Initializes an empty AST node.
+		 */
 		AST() : isBranched(false) {}
 	
+		/*! \brief Constructor.
+		 * Creates an AST leaf node from token \p t.
+		 */
 		static AST createLeaf(Token t);
+
+		/*! \brief Constructor.
+		 * Creates an AST branch node with name \p n.
+		 */
 		static AST createNode(std::string n);
 
+		/*! \brief Checks if the node is a leaf. 
+		 */
 		bool isLeaf();
+
+		/*! \brief Checks if the node is a branch. 
+		 */
 		bool isBranch();
+
+		/*! \brief Gets a reference to the name of the node.
+		 */
 		std::string &name();
+
+		/*! \brief Gets a reference to the leaf's token value.
+		 */
 		Token &leaf();
+
+		/*! \brief Returns the number of branches, 0 if none.
+		 */
 		size_t size();
+
+		/*! \brief Gets a reference to the nth branch.
+		 */
 		AST &operator [] (size_t n);
+
+		/*! \brief Creates a begin iterator.
+		 */
 		std::vector<AST>::iterator begin();
+
+		/*! \brief Creates an end iterator.
+		 */
 		std::vector<AST>::iterator end();
 
+		/*! \brief Retusn a reference to the rightmost node of the AST.
+		 */
 		AST &rightmost();
 
+		/*! \brief Appends a branch node as a branch.
+		 */
 		void append(AST a);
+
+		/*! \brief Appends a leaf node as a branch.
+		 */
 		void append(Token t);
 
+		/*! \brief Displays the AST.
+		 * \returns Formatted string representing the AST.
+		 */
 		std::string display();
 	};
 }

@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    CharacterLiteralTagger.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Detects character literals.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_CHARACTER_LITERAL_PARSER_H
 #define __MITTEN_CHARACTER_LITERAL_PARSER_H
 
@@ -61,18 +47,40 @@
 
 namespace mitten
 {
+	/*! \brief Identifies character literals from tokens.
+	 */
 	class CharacterLiteralTagger
 	{
 	public:
-		bool allowEscapes;
+		bool allowEscapes; //! Set to true to allow escape codes
 
-		std::string inQuote, unQuote;
+		std::string inQuote; //! The syntax for the opening quote.
+		std::string unQuote; //! The syntax for the closing quote.
 
+		/*! \brief Constructor
+		 * Initializes C-style characters. */
 		CharacterLiteralTagger() : allowEscapes(true), inQuote("'"), unQuote("'") {}
 
+		/*! \brief Checks if a token is a character according to the configuration.
+		 * \param t Token to be checked.
+		 * \returns True only if the token is a valid character.
+		 */
 		bool isCharacterLiteral(Token t);
+
+		/*! \brief Checks if a string is a character according to the configuration.
+		 * \param t String to be checked.
+		 * \returns True only if the string is a valid character.
+		 */
 		bool isCharacterLiteral(std::string s);
+
+		/*! \brief Parses the character literal's contents.
+		 * Removes the in-quote and un-quote syntax.
+		 */
 		char parse(Token t);
+
+		/*! \brief Parses the character literal's contents.
+		 * Removes the in-quote and un-quote syntax.
+		 */
 		char parse(std::string s);
 	};
 }

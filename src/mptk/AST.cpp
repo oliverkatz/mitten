@@ -153,7 +153,7 @@ namespace mitten
 		}
 		else
 		{
-			ss << "'" << leafValue.value << "'";
+			ss << "'" << leafValue.value() << "'";
 		}
 
 		return ss.str();

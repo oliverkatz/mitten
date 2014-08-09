@@ -13,7 +13,7 @@ include ../config.mk
 
 CXXFLAGS+=-I../munit -L../munit -L.
 
-OBJ=AbstractWidthString.o Utils.o BooleanLiteralTagger.o CharacterLiteralTagger.o FloatingLiteralTagger.o IntegerLiteralTagger.o StringLiteralTagger.o SymbolTagger.o Lexer.o AST.o ASTBuilder.o ErrorHandler.o StructureParser.o ExpressionParser.o Reconstruction.o
+OBJ=AbstractWidthString.o Utils.o BooleanLiteralTagger.o CharacterLiteralTagger.o FloatingLiteralTagger.o IntegerLiteralTagger.o StringLiteralTagger.o SymbolTagger.o Token.o Lexer.o AST.o ASTBuilder.o ErrorHandler.o StructureParser.o ExpressionParser.o Reconstruction.o
 TEST=AbstractWidthStringTest UtilsTest LiteralTaggerTest
 
 all : libMPTK.a

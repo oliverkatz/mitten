@@ -58,12 +58,15 @@ using namespace mitten;
 
 int main()
 {
-	Test test = Test("UtilsTest");
+	Test test = Test("AbstractWidthStringTest");
 
 	AbstractWidthString tmp8 = AbstractWidthString::fromCString8("hello, world");
 	AbstractWidthString tmp16 = AbstractWidthString::fromCString16(u"hello, world");
 	AbstractWidthString tmp32 = AbstractWidthString::fromCString32(U"hello, world");
 	AbstractWidthString slice = AbstractWidthString(tmp8);
+
+	test.assert(tmp32.toString8().compare("hello, world") == 0);
+	test.assert(tmp32[0] == 'h');
 
 	return (int)(test.write());
 }

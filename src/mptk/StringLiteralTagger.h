@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    StringLiteralTagger.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Detects string literals.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_STRING_LITERAL_TAGGER_H
 #define __MITTEN_STRING_LITERAL_TAGGER_H
 
@@ -61,18 +47,42 @@
 
 namespace mitten
 {
+	/*! \brief Identifies string literals from tokens.
+	 */
 	class StringLiteralTagger
 	{
 	public:
-		bool allowEscapes;
+		bool allowEscapes; //! Set to true to allow the use of C-style escape codes.
 
-		std::string inQuote, unQuote;
+		std::string inQuote; //! The opening quote syntax.
+		std::string unQuote; //! The closing quote syntax.
 
+		/*! \brief Constructor
+		 * Initializes C-style strings. */
 		StringLiteralTagger() : allowEscapes(true), inQuote("\""), unQuote("\"") {}
 
+		/*! \brief Checks if a token is a string according to the configuration.
+		 * \todo Optimize for O(1), not O(n^2).
+		 * \param t Token to be checked.
+		 * \returns True only if the token is a valid string.
+		 */
 		bool isStringLiteral(Token t);
+
+		/*! \brief Checks if a string is a string according to the configuration.
+		 * \todo Optimize for O(1), not O(n^2).
+		 * \param t String to be checked.
+		 * \returns True only if the string is a valid string.
+		 */
 		bool isStringLiteral(std::string s);
+
+		/*! \brief Parses the string literal's contents.
+		 * Removes in-quote and un-quote syntax. 
+		 */
 		std::string parse(Token t);
+
+		/*! \brief Parses the string literal's contents.
+		 * Removes in-quote and un-quote syntax. 
+		 */
 		std::string parse(std::string s);
 	};
 }

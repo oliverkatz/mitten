@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Error.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Errors are stored in this class.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_ERROR_HANDLER_H
 #define __MITTEN_ERROR_HANDLER_H
 
@@ -61,44 +47,126 @@
 
 namespace mitten
 {
+	/*! \brief Stores error messages and prints them out at the end.
+	 * This is just an abstract base class. If you want to actually use errors in MPTK, you will have to either implement a subclass of the ErrorHandler base class or use MPTK's InternalErrorHandler.
+	 */
 	class ErrorHandler
 	{
 	public:
+		/*! \brief Error for mismatched structure bounds.
+		 * \param start Start bound used.
+		 * \param end End bound used.
+		 */
 		virtual void mismatchedStructureBounds(Token source, std::string start, std::string end) =0;
+
+		/*! \brief Error for incomplete structure bounds.
+		 * \param start Start bound used.
+		 * \param end End bound used.
+		 */
 		virtual void incompleteStructureBound(Token source, std::string start, std::string end) =0;
+
+		/*! \brief Error for unexpected argument list while parsing ASTs.
+		 */
 		virtual void unexpectedArgumentList(Token source) =0;
+
+		/*! \brief Error for unexpected expression while parsing ASTs.
+		 */
 		virtual void expectedExpression(Token source) =0;
+
+		/*! \brief Error for required left operands for operators.
+		 */
 		virtual void operationRequiredLeftOperand(Token source) =0;
+
+		/*! \brief Error for unexpected tokens in expressions while parsing ASTs.
+		 */
 		virtual void unexpectedTokenInExpression(Token source) =0;
+
+		/*! \brief Error for the inability to operate on operators.
+		 */
 		virtual void cannotOperateOnAnOperator(Token source) =0;
 	};
 
+	/*! \brief Implementation of the ErrorHandler base class.
+	 */
 	class InternalErrorHandler : public ErrorHandler
 	{
 	protected:
-		std::string filename;
-		std::vector<std::string> filebody;
-		std::string page;
-		int count;
+		std::string filename; //! The filename of the file that was parsed.
+		std::vector<std::string> filebody; //! The body of the file that was parsed, split by lines.
+		std::string page; //! The string containing all the error messages.
+		int count; //! The number of errors produced.
 
+		/* \brief Helper method.
+		 * Appends an error message.
+		 * \param source Source token.
+		 * \param message Error message.
+		 */
 		virtual void append(Token source, std::string message);
 
 	public:
+		/*! \brief Constructor.
+		 * Initializes an empty internal error handler. 
+		 */
 		InternalErrorHandler() : count(0) {}
 
+		/*! \brief Sets the file name.
+		 * Required for file name printing.
+		 */
 		void setFileName(std::string f);
+
+		/*! \brief Sets the file body.
+		 * Also splits it up by lines.
+		 */
 		void setFileBody(std::string b);
 
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
 		virtual void mismatchedStructureBounds(Token source, std::string start, std::string end);
+
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
 		virtual void incompleteStructureBound(Token source, std::string start, std::string end);
+
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
 		virtual void unexpectedArgumentList(Token source);
+
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
 		virtual void expectedExpression(Token source);
+
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
 		virtual void operationRequiredLeftOperand(Token source);
+
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
 		virtual void unexpectedTokenInExpression(Token source);
+
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
 		virtual void cannotOperateOnAnOperator(Token source);
 
+		/*! \brief Checks if there are no errors.
+		 * \returns True only if there are no errors.
+		 */
 		bool empty();
+
+		/* \brief Displays all the errors to the console.
+		 * Uses stderr to print them.
+		 * \returns True only if errors were printed, false otherwise.
+		 */
 		bool dump();
+
+		/*! \brief Clears all errors.
+		 */
 		void clear();
 	};
 }

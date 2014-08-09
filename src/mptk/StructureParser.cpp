@@ -80,15 +80,15 @@ namespace mitten
 
 		for (auto i : toks)
 		{
-			if (bounds.find(i.value) != bounds.end())
+			if (bounds.find(i.value()) != bounds.end())
 			{
-				builder.append(AST::createNode(bounds[i.value].boundName));
+				builder.append(AST::createNode(bounds[i.value()].boundName));
 				builder.descend();
-				builder.append(AST::createNode(bounds[i.value].elementName));
+				builder.append(AST::createNode(bounds[i.value()].elementName));
 				builder.descend();
-				boundStack.push(i.value);
+				boundStack.push(i.value());
 			}
-			else if (!boundStack.empty() && bounds[boundStack.top()].end.compare(i.value) == 0)
+			else if (!boundStack.empty() && bounds[boundStack.top()].end.compare(i.value()) == 0)
 			{
 				AST *head = &(builder.head());
 				builder.ascend();
@@ -100,20 +100,20 @@ namespace mitten
 					builder.descend();
 				}
 			}
-			else if (!boundStack.empty() && bounds[boundStack.top()].split.compare(i.value) == 0)
+			else if (!boundStack.empty() && bounds[boundStack.top()].split.compare(i.value()) == 0)
 			{
 				builder.ascend();
 				builder.append(AST::createNode(bounds[boundStack.top()].elementName));
 				builder.descend();
 			}
-			else if (boundEnds.find(i.value) != boundEnds.end())
+			else if (boundEnds.find(i.value()) != boundEnds.end())
 			{
 				bool found = false;
 				for (auto j : bounds)
 				{
-					if (j.second.end.compare(i.value) == 0)
+					if (j.second.end.compare(i.value()) == 0)
 					{
-						e.mismatchedStructureBounds(i, j.first, i.value);
+						e.mismatchedStructureBounds(i, j.first, i.value());
 						found = true;
 						break;
 					}

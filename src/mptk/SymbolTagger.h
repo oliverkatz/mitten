@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    SymbolTagger.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Detects symbols.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_SYMBOL_TAGGER_H
 #define __MITTEN_SYMBOL_TAGGER_H
 
@@ -60,17 +46,33 @@
 
 namespace mitten
 {
+	/*! \brief Identifies symbols from tokens.
+	 * \todo Optimize for O(n), not O(n^2).
+	 */
 	class SymbolTagger
 	{
 	public:
-		std::string allowedChars;
-		std::string allowedFirstChars;
+		std::string allowedChars; //! Allowed characters to be used in the symbol.
+		std::string allowedFirstChars; //! Allowed character to be used only in the first character of the symbol.
 
+		/*! \brief Constructor.
+		 * Initializes C-style symbols. */
 		SymbolTagger() :
 			allowedChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"),
 			allowedFirstChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_") {}
 
+		/*! \brief Checks if a token is a symbol according to the configuration.
+		 * \todo Optimize for O(1), not O(n^2).
+		 * \param t Token to be checked.
+		 * \returns True only if the token is a valid symbol.
+		 */
 		bool isSymbol(Token t);
+
+		/*! \brief Checks if a string is a symbol according to the configuration.
+		 * \todo Optimize for O(1), not O(n^2).
+		 * \param s String to be checked.
+		 * \returns True only if the string is a valid symbol.
+		 */
 		bool isSymbol(std::string s);
 	};
 }

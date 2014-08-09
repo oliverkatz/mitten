@@ -59,13 +59,13 @@ namespace mitten
 		if (!filename.empty())
 			page += filename+":";
 
-		page += to_string(source.line)+":"+to_string(source.column)+" - "+message+"\n";
-		page += "    from '"+source.value+"'\n";
+		page += to_string(source.line())+":"+to_string(source.column())+" - "+message+"\n";
+		page += "    from '"+source.value()+"'\n";
 
 		if (!filebody.empty())
 		{
-			page += filebody[source.line-1]+"\n";
-			page += string(source.column, ' ')+"^\n";
+			page += filebody[source.line()-1]+"\n";
+			page += string(source.column(), ' ')+"^\n";
 		}
 
 		page += "\n";
@@ -118,12 +118,12 @@ namespace mitten
 
 	void InternalErrorHandler::operationRequiredLeftOperand(Token source)
 	{
-		append(source, "operator '"+source.value+"' requires left operand");
+		append(source, "operator '"+source.value()+"' requires left operand");
 	}
 
 	void InternalErrorHandler::unexpectedTokenInExpression(Token source)
 	{
-		append(source, "unexpected token '"+source.value+"' in expression");
+		append(source, "unexpected token '"+source.value()+"' in expression");
 	}
 
 	void InternalErrorHandler::cannotOperateOnAnOperator(Token source)
@@ -146,9 +146,9 @@ namespace mitten
 		{
 			cerr << page;
 			if (count == 1)
-				cerr << "1 error.\n";
+				cerr << "1 error in " << filename << ".\n";
 			else
-				cerr << count << " errors.\n";
+				cerr << count << " errors in " << filename << ".\n";
 			return true;
 		}
 	}

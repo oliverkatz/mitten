@@ -75,7 +75,7 @@ namespace mitten
 			rtn._size++;
 		rtn._data = (void *)new char16_t[rtn._size];
 		memcpy(rtn._data, s, rtn._size*2);
-		rtn._capacity = rtn._size;
+		rtn._capacity = rtn._size*2;
 		rtn._width = 2;
 		return rtn;
 	}
@@ -88,8 +88,204 @@ namespace mitten
 			rtn._size++;
 		rtn._data = (void *)new char32_t[rtn._size];
 		memcpy(rtn._data, s, rtn._size*4);
-		rtn._capacity = rtn._size;
+		rtn._capacity = rtn._size*4;
 		rtn._width = 4;
 		return rtn;
+	}
+
+	AbstractWidthString AbstractWidthString::fromString8(string s)
+	{
+		AbstractWidthString rtn;
+		rtn._size = s.size();
+		rtn._data = (void *)new char[rtn._size];
+		memcpy(rtn._data, s.data(), rtn._size);
+		rtn._capacity = rtn._size;
+		rtn._width = 1;
+		return rtn;
+	}
+
+	AbstractWidthString AbstractWidthString::fromString16(u16string s)
+	{
+		AbstractWidthString rtn;
+		rtn._size = s.size();
+		rtn._data = (void *)new char16_t[rtn._size];
+		memcpy(rtn._data, s.data(), rtn._size*2);
+		rtn._capacity = rtn._size*2;
+		rtn._width = 2;
+		return rtn;
+	}
+
+	AbstractWidthString AbstractWidthString::fromString32(u32string s)
+	{
+		AbstractWidthString rtn;
+		rtn._size = s.size();
+		rtn._data = (void *)new char32_t[rtn._size];
+		memcpy(rtn._data, s.data(), rtn._size*4);
+		rtn._capacity = rtn._size*4;
+		rtn._width = 4;
+		return rtn;
+	}
+
+	bool AbstractWidthString::isResource()
+	{
+		return (_capacity > 0);
+	}
+
+	bool AbstractWidthString::isSlice()
+	{
+		return (_capacity == 0);
+	}
+
+	AbstractWidthString AbstractWidthString::copy()
+	{
+		AbstractWidthString rtn;
+		rtn._size = _size;
+		rtn._data = (void *)new char[rtn._size*_width];
+		memcpy(rtn._data, _data, rtn._size*_width);
+		rtn._capacity = rtn._size*_width;
+		rtn._width = _width;
+		return rtn;
+	}
+
+	AbstractWidthString AbstractWidthString::castToWidth(unsigned char w)
+	{
+		AbstractWidthString rtn;
+		rtn._size = _size;
+		rtn._data = (void *)new char[rtn._size*w];
+		
+		if (_width == 1)
+		{
+			char *src = (char *)_data;
+			if (w == 1)
+			{
+				char *dst = (char *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char)src[i];
+			}
+			else if (w == 2)
+			{
+				char16_t *dst = (char16_t *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char16_t)src[i];
+			}
+			else if (w == 4)
+			{
+				char32_t *dst = (char32_t *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char32_t)src[i];
+			}
+		}
+		else if (_width == 2)
+		{
+			char16_t *src = (char16_t *)_data;
+			if (w == 1)
+			{
+				char *dst = (char *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char)src[i];
+			}
+			else if (w == 2)
+			{
+				char16_t *dst = (char16_t *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char16_t)src[i];
+			}
+			else if (w == 4)
+			{
+				char32_t *dst = (char32_t *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char32_t)src[i];
+			}
+		}
+		else if (_width == 4)
+		{
+			char32_t *src = (char32_t *)_data;
+			if (w == 1)
+			{
+				char *dst = (char *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char)src[i];
+			}
+			else if (w == 2)
+			{
+				char16_t *dst = (char16_t *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char16_t)src[i];
+			}
+			else if (w == 4)
+			{
+				char32_t *dst = (char32_t *)rtn._data;
+				for (int i = 0; i < _size; i++)
+					dst[i] = (char32_t)src[i];
+			}
+		}
+
+		rtn._capacity = rtn._size*w;
+		rtn._width = w;
+		return rtn;
+	}
+
+	const char *AbstractWidthString::toCString8()
+	{
+		char *dst = new char[_size];
+		for (int i = 0; i < _size; i++)
+			dst[i] = (char)this->operator [] (i);
+		return dst;
+	}
+
+	const char16_t *AbstractWidthString::toCString16()
+	{
+		char16_t *dst = new char16_t[_size];
+		for (int i = 0; i < _size; i++)
+			dst[i] = (char16_t)this->operator [] (i);
+		return dst;
+	}
+
+	const char32_t *AbstractWidthString::toCString32()
+	{
+		char32_t *dst = new char32_t[_size];
+		for (int i = 0; i < _size; i++)
+			dst[i] = (char32_t)this->operator [] (i);
+		return dst;
+	}
+
+	std::string AbstractWidthString::toString8()
+	{
+		std::string dst;
+		for (int i = 0; i < _size; i++)
+			dst.push_back((char)this->operator [] (i));
+		return dst;
+	}
+
+	std::u16string AbstractWidthString::toString16()
+	{
+		std::u16string dst;
+		for (int i = 0; i < _size; i++)
+			dst.push_back((char16_t)this->operator [] (i));
+		return dst;
+	}
+
+	std::u32string AbstractWidthString::toString32()
+	{
+		std::u32string dst;
+		for (int i = 0; i < _size; i++)
+			dst.push_back((char32_t)this->operator [] (i));
+		return dst;
+	}
+
+	char32_t AbstractWidthString::operator [] (int n)
+	{
+		if (_width == 1)
+		{
+			return ((char *)_data)[n];
+		}
+		else if (_width == 2)
+		{
+			return ((char16_t *)_data)[n];
+		}
+		else if (_width == 4)
+		{
+			return ((char32_t *)_data)[n];
+		}
 	}
 }

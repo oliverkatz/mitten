@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Lexer.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * The lexical analyzer within MPTK is implemented here.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_LEXER_H
 #define __MITTEN_LEXER_H
 
@@ -66,132 +52,139 @@
 
 namespace mitten
 {
-	/* Enumerator: DeliminatorFlags
-	 * ----------------------------
-	 * Bit flags for deliminators.
+	/*! \brief Bitwise flags for deliminator declarations.
+	 * The lexer uses these flags to configure how the tokens are added to the resultant token vector.
 	 */
 	typedef enum
 	{
-		Defaults = 0x00, 	// no special flags
-		Filtered = 0x01, 	// removes the token from the token vector resultant
-							// from lexing
+		Defaults = 0x00, //! No special flags.
+		Filtered = 0x01, //! Removes the token from the token vector resultant from lexing.
 	} DeliminatorFlags;
 
-	/* Class: Lexer
-	 * ------------
-	 * Performs lexing. Configure this class only to configure the lexical
-	 * grammar for the source language.
+	/*! \brief Performs lexing. 
+	 * Configure this class only to configure the lexical grammar for the source language.
 	 */
 	class Lexer
 	{
 	protected:
-		/* Helper Type: StringConstPattern
-		 * -------------------------------
+		/*! \brief Helper type.
 		 * Used to store deliminator start/end-points. It contains not only the
 		 * string pattern itself, but the line/column difference across the
 		 * string.
 		 */
 		typedef struct StringConstPattern
 		{
-			std::string value; // string value
-			int linediff, coldiff; // line/column difference across the string
+			std::string value; //! String value.
+			int linediff, coldiff; //! Line/column difference across the string.
 
-			/* Constructor
-			 * -----------
+			/*! \brief Constructor.
 			 * Initializes empty pattern.
 			 */
 			StringConstPattern() : linediff(0), coldiff(0) {}
 
-			/* Constructor
-			 * -----------
+			/*! \brief Constructor.
 			 * Initializes pattern with string value.
-			 * 'v' - string value
+			 * \param v String value.
 			 */
 			StringConstPattern(std::string v);
 		} StringConstPattern;
 
+		/*! \brief Callback to be used for deliminator end-points.
+		 * \param from The current position in the string.
+		 * \param s The string to look for the end-point in.
+		 * \returns Length of the resultant deliminator.
+		 */
 		typedef int (*DeliminatorPatternCallback)(int from, std::string s);
 
-		/* Helper Type: Deliminator
-		 * ------------------------
+		/*! \brief Helper type.
 		 * Stores deliminator descriptions.
 		 */
 		typedef struct Deliminator
 		{
-			StringConstPattern start, end; // start and end points
-			DeliminatorFlags flags; // description flags
-			DeliminatorPatternCallback patternCallback;
+			StringConstPattern start; //! Start point.
+			StringConstPattern end; //! End point.
+			DeliminatorFlags flags; //! Description flags.
+			DeliminatorPatternCallback patternCallback; //! A callback that can be used in leiu of the end point.
 
-			/* Constructor
-			 * -----------
+			/*! \brief Constructor.
 			 * Initiates empty deliminator.
 			 */
 			Deliminator() : flags(Defaults), patternCallback(NULL) {}
 
-			/* Constructor
-			 * -----------
+			/*! \brief Constructor.
 			 * Creates deliminator with start but no end point.
+			 * \param p Start point.
 			 */
 			Deliminator(StringConstPattern p) : start(p), flags(Defaults), patternCallback(NULL) {}
 
+			/*! \brief Constructor.
+			 * Creates deliminator with start and an end point specified by a callback.
+			 * \param p Start point.
+			 * \param c Pattern callback.
+			 */
 			Deliminator(StringConstPattern p, DeliminatorPatternCallback c) : start(p), flags(Defaults), patternCallback(c) {}
 
-			/* Constructor
-			 * -----------
+			/*! \brief Constructor.
 			 * Creates deliminator with start and end points.
+			 * \param p Start point.
+			 * \param e End point.
 			 */
 			Deliminator(StringConstPattern s, StringConstPattern e) : 
 				start(s), end(e), patternCallback(NULL), flags(Defaults) {}
 		} Deliminator;
 
-		/* Member: delims
-		 * --------------
-		 * The set of deliminators, sorted by size and then start-point.
+		/*! \brief The set of deliminators, sorted by size and then start-point.
 		 */
 		std::unordered_map<size_t, 
 			std::unordered_map<std::string, Deliminator> > delims;
 
-		/* Member: maxDelimLength
-		 * ----------------------
-		 * The length of the longest deliminator added to the deliminator set.
+		/*! \brief The length of the longest deliminator added to the deliminator set.
 		 */
 		size_t maxDelimLength;
 
+		/*! \brief Dictionary of macros used within the lexer.
+		 */
+		std::unordered_map<std::string, std::vector<Token> > macros;
+
+		/*! \brief Helper method to identify the tag of any given token.
+		 * \todo Optimize for better efficiency.
+		 * \param t Input token.
+		 * \return Token tag.
+		 */
 		TokenTag findTag(Token t);
 
 	public:
-		BooleanLiteralTagger boolTag;
-		IntegerLiteralTagger intTag;
-		FloatingLiteralTagger floatTag;
-		CharacterLiteralTagger charTag;
-		StringLiteralTagger stringTag;
-		SymbolTagger symbolTag;
+		BooleanLiteralTagger boolTag; //! The boolean tag parser.
+		IntegerLiteralTagger intTag; //! The int tag parser.
+		FloatingLiteralTagger floatTag; //! The float tag parser.
+		CharacterLiteralTagger charTag; //! The character tag parser.
+		StringLiteralTagger stringTag; //! The string tag parser.
+		SymbolTagger symbolTag; //! The symbol tag parser.
 
-		/* Constructor
-		 * -----------
+		/*! \brief Constructor.
 		 * Initializes a lexer with an empty lexical grammar.
 		 */
 		Lexer() : maxDelimLength(0) {}
 
-		/* Method: deliminate
-		 * ------------------
-		 * Adds a new deliminator to the lexical grammar.
-		 * 's'     - the start point of the deliminator
-		 * 'e'     - an optional end point for the deliminator
-		 * returns - a reference to the deliminator flags for the deliminator;
-		 *           set them as you please to configure the deliminator.
+		/*! \brief Adds a new deliminator to the lexical grammar.
+		 * \param s The start point of the deliminator.
+		 * \param e An optional end point for the deliminator.
+		 * \returns A reference to the deliminator flags for the deliminator; set them as you please to configure the deliminator.
 		 */
 		DeliminatorFlags &deliminate(std::string s, std::string e = "");
 
+		/*! \brief Adds a new deliminator to the lexical grammar.
+		 * \param s The start point of the deliminator.
+		 * \param c The callback to be used to detect the end point for the deliminator.
+		 * \returns A reference to the deliminator flags for the deliminator; set them as you please to configure the deliminator.
+		 */
 		DeliminatorFlags &deliminate(std::string s, DeliminatorPatternCallback c);
 
-		/* Method: lex
-		 * -----------
-		 * Performs the actual lexical analysis.
-		 * 's'     - the input string
-		 * returns - the resultant token vector
+		/*! \brief Performs the actual lexical analysis.
+		 * \param s The input string.
+		 * \returns The resultant token vector.
 		 */
-		std::vector<Token> lex(std::string s);
+		std::vector<Token> lex(std::string s, std::string f);
 	};
 }
 

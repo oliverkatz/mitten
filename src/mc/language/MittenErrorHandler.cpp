@@ -169,9 +169,9 @@ namespace mitten
 		{
 			cerr << errorPage;
 			if (errorCount == 1)
-				cerr << "1 error.\n";
+				cerr << "1 error in " << filePath << ".\n";
 			else
-				cerr << errorCount << " errors.\n";
+				cerr << errorCount << " errors in " << filePath << ".\n";
 			return true;
 		}
 	}

@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    BooleanLiteralTagger.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Detects boolean literals.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_BOOLEAN_LITERAL_TAGGER_H
 #define __MITTEN_BOOLEAN_LITERAL_TAGGER_H
 
@@ -60,16 +46,38 @@
 
 namespace mitten
 {
+	/*! \brief Identifies boolean literals from tokens.
+	 */
 	class BooleanLiteralTagger
 	{
 	public:
-		std::string trueToken, falseToken;
+		std::string trueToken; //! Syntax for the true token.
+		std::string falseToken; //! Syntax for the false token.
 
+		/*! \brief Constructor
+		 * Initializes C++-style bools. */
 		BooleanLiteralTagger() : trueToken("true"), falseToken("false") {}
 
+		/*! \brief Checks if a token is a boolean according to the configuration.
+		 * \param t Token to be checked.
+		 * \returns True only if the token is a valid boolean.
+		 */
 		bool isBooleanLiteral(Token t);
+
+		/*! \brief Checks if a string is a boolean according to the configuration.
+		 * \param t String to be checked.
+		 * \returns True only if the string is a valid boolean.
+		 */
 		bool isBooleanLiteral(std::string s);
+
+		/*! \brief Parses the boolean literal's contents.
+		 * String-to-bool conversion function.
+		 */
 		bool parse(Token t);
+
+		/*! \brief Parses the boolean literal's contents.
+		 * String-to-bool conversion function.
+		 */
 		bool parse(std::string s);
 	};
 }

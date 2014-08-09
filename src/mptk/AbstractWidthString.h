@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    AbstractWidthString.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Abstract width string class to be used for all strings in MPTK.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_ABSTRACT_WIDTH_STRING_H
 #define __MITTEN_ABSTRACT_WIDTH_STRING_H
 
@@ -59,37 +45,110 @@
 
 namespace mitten
 {
+	/*! \brief String that can have any character width.
+	 * Abstracts character width. Supports 8, 16, and 32 bit character encodings.
+	 */
 	class AbstractWidthString
 	{
 	protected:
-		void *_data;
-		size_t _size;
-		size_t _capacity;
-		unsigned char _width;
+		void *_data; //! Data content.
+		size_t _size; //! Size of string.
+		size_t _capacity; //! Memory usage capacity.
+		unsigned char _width; //! Width of character in bytes.
 
 	public:
+		/*! \brief Constructor.
+		 * Constructs uninitialized string. 
+		 */
 		AbstractWidthString() : _data(NULL), _size(0), _capacity(0), _width(1) {}
+
+		/*! \brief Constructor.
+		 * Copy constructor to preserve memory management.
+		 */
 		AbstractWidthString(const AbstractWidthString &s) : _data(s._data), _size(s._size), _capacity(0), _width(s._width) {}
 
+		/*! \brief Constructor.
+		 * Creates an abstract width string from an 8-bit C string.
+		 */
 		static AbstractWidthString fromCString8(const char *s);
+
+		/*! \brief Constructor.
+		 * Creates an abstract width string from a 16-bit C string.
+		 */
 		static AbstractWidthString fromCString16(const char16_t *s);
+
+		/*! \brief Constructor.
+		 * Creates an abstract width string from a 32-bit C string.
+		 */
 		static AbstractWidthString fromCString32(const char32_t *s);
+
+		/*! \brief Constructor.
+		 * Creates an abstract width string from an 8-bit C++ string.
+		 */
 		static AbstractWidthString fromString8(std::string s);
+
+		/*! \brief Constructor.
+		 * Creates an abstract width string from a 16-bit C++ string.
+		 */
 		static AbstractWidthString fromString16(std::u16string s);
+
+		/*! \brief Constructor.
+		 * Creates an abstract width string from a 32-bit C++ string.
+		 */
 		static AbstractWidthString fromString32(std::u32string s);
 
+		/*! \brief Checks if the string is an original resource.
+		 */
 		bool isResource();
+
+		/*! \brief Checks if the string is a slice of an original resource.
+		 */
 		bool isSlice();
 
+		/*! \brief Creates a duplicate of the current string's memory.
+		 */
 		AbstractWidthString copy();
+
+		/*! \brief Creates a duplicate of the current string's memory cast to a certain character width.
+		 * \param w Target character width in bytes.
+		 */
 		AbstractWidthString castToWidth(unsigned char w);
 
+		/*! \brief Converts the string to a standardized format.
+		 * Generates an 8-bit C string.
+		 */
 		const char *toCString8();
+
+		/*! \brief Converts the string to a standardized format.
+		 * Generates a 16-bit C string.
+		 */
 		const char16_t *toCString16();
+
+		/*! \brief Converts the string to a standardized format.
+		 * Generates a 32-bit C string.
+		 */
 		const char32_t *toCString32();
+
+		/*! \brief Converts the string to a standardized format.
+		 * Generates an 8-bit C++ string.
+		 */
 		std::string toString8();
+
+		/*! \brief Converts the string to a standardized format.
+		 * Generates a 16-bit C++ string.
+		 */
 		std::u16string toString16();
+
+		/*! \brief Converts the string to a standardized format.
+		 * Generates a 32-bit C++ string.
+		 */
 		std::u32string toString32();
+
+		/*! \brief Random accessor.
+		 * \param n Index of character.
+		 * \returns A copy of the character at index n cast to a 32-bit integer.
+		 */
+		char32_t operator [] (int n);
 	};
 }
 

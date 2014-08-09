@@ -63,11 +63,11 @@ namespace mitten
 
 		for (auto i : toks)
 		{
-			if (i.line > line && i.tag != SyntheticTag)
+			if (i.line() > line && i.tag() != SyntheticTag)
 			{
 				firstOnLine = true;
 
-				while (i.line > line)
+				while (i.line() > line)
 				{
 					page += "\n";
 					line++;
@@ -78,9 +78,9 @@ namespace mitten
 				firstOnLine = false;
 			}
 
-			if (i.tag != SyntheticTag)
+			if (i.tag() != SyntheticTag)
 			{
-				while (i.column > column)
+				while (i.column() > column)
 				{
 					if (firstOnLine && autoTabs)
 					{
@@ -100,8 +100,8 @@ namespace mitten
 				column++;
 			}
 
-			page += i.value;
-			for (auto j : i.value)
+			page += i.value();
+			for (auto j : i.value())
 			{
 				if (j == '\n')
 				{

@@ -56,7 +56,7 @@ namespace mitten
 {
 	bool BooleanLiteralTagger::isBooleanLiteral(Token t)
 	{
-		return isBooleanLiteral(t.value);
+		return isBooleanLiteral(t.value());
 	}
 
 	bool BooleanLiteralTagger::isBooleanLiteral(string s)
@@ -72,7 +72,7 @@ namespace mitten
 
 	bool BooleanLiteralTagger::parse(Token t)
 	{
-		return parse(t.value);
+		return parse(t.value());
 	}
 
 	bool BooleanLiteralTagger::parse(string s)

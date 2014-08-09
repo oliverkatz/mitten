@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Reconstruction.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Reconstructs files from token vectors or ASTs.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_RECONSTRUCTION_H
 #define __MITTEN_RECONSTRUCTION_H
 
@@ -58,7 +44,20 @@
 
 namespace mitten
 {
+	/*! \brief Reconstruct source file.
+	 * Reconstructs the original source file as closely as possible from a list of tokens. Line numbers, especially, are preserved.
+	 * \param toks Input token vector.
+	 * \param autoTabs Assumes that whitespace characters in the beginning of the lines are tabs, not single spaces.
+	 * \returns Original source file contents, as closely as can be reconstructed from given data.
+	 */
 	std::string reconstructFromTokenVector(std::vector<Token> toks, bool autoTabs = true);
+
+	/*! \brief Reconstruct source file.
+	 * Reconstructs the original source file as closely as possible from an AST. Line numbers, especially, are preserved.
+	 * \param toks Input AST.
+	 * \param autoTabs Assumes that whitespace characters in the beginning of the lines are tabs, not single spaces.
+	 * \returns Original source file contents, as closely as can be reconstructed from given data.
+	 */
 	std::string reconstructFromAST(AST ast, bool autoTabs = true);
 }
 

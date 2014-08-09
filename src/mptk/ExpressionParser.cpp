@@ -182,7 +182,7 @@ namespace mitten
 			AST a = ast[i];
 			AST value;
 
-			if ((a.isBranch() && a.name().compare(expressionBound) == 0) || (a.isLeaf() && (isLiteral(a.leaf().value) || isSymbol(a.leaf().value))))
+			if ((a.isBranch() && a.name().compare(expressionBound) == 0) || (a.isLeaf() && (isLiteral(a.leaf().value()) || isSymbol(a.leaf().value()))))
 			{
 				if (a.isBranch() && a.name().compare(expressionBound) == 0)
 				{
@@ -199,11 +199,11 @@ namespace mitten
 						e.expectedExpression(a.rightmost().leaf());
 					}
 				}
-				else if (a.isLeaf() && isLiteral(a.leaf().value))
+				else if (a.isLeaf() && isLiteral(a.leaf().value()))
 				{
 					value = a;
 				}
-				else if (a.isLeaf() && isSymbol(a.leaf().value))
+				else if (a.isLeaf() && isSymbol(a.leaf().value()))
 				{
 					if (i != ast.size()-1 && (ast[i+1].isBranch() && ast[i+1].name().compare(expressionBound) == 0))
 					{
@@ -227,9 +227,9 @@ namespace mitten
 					value = a;
 				}
 
-				if (!expressionStack.empty() && (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value) != operators.end()))
+				if (!expressionStack.empty() && (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value()) != operators.end()))
 				{
-					string o = expressionStack.top().leaf().value;
+					string o = expressionStack.top().leaf().value();
 					AST oast = expressionStack.top();
 
 					if (operators[o].unary == false)
@@ -254,15 +254,15 @@ namespace mitten
 							{
 								if (lvalue.name().compare(operationUnaryLeftNode) == 0)
 								{
-									ptmp = operators[lvalue[1].leaf().value].precedence;
+									ptmp = operators[lvalue[1].leaf().value()].precedence;
 								}
 								else if (lvalue.name().compare(operationUnaryRightNode) == 0)
 								{
-									ptmp = operators[lvalue[0].leaf().value].precedence;
+									ptmp = operators[lvalue[0].leaf().value()].precedence;
 								}
 								else if (lvalue.name().compare(operationBinaryNode) == 0)
 								{
-									ptmp = operators[lvalue[1].leaf().value].precedence;
+									ptmp = operators[lvalue[1].leaf().value()].precedence;
 								}
 								else
 								{
@@ -303,15 +303,15 @@ namespace mitten
 					expressionStack.push(value);
 				}
 			}
-			else if (a.isLeaf() && operators.find(a.leaf().value) != operators.end())
+			else if (a.isLeaf() && operators.find(a.leaf().value()) != operators.end())
 			{
-				if (!operators[a.leaf().value].unary)
+				if (!operators[a.leaf().value()].unary)
 				{
 					expressionStack.push(a);
 				}
 				else
 				{
-					if (operators[a.leaf().value].leftAssociative && operators[a.leaf().value].rightAssociative)
+					if (operators[a.leaf().value()].leftAssociative && operators[a.leaf().value()].rightAssociative)
 					{
 						if (expressionStack.empty() || (!expressionStack.empty() && (expressionStack.top().isBranch() && expressionStack.top().name().compare(expressionBound) == 0)))
 						{
@@ -323,15 +323,15 @@ namespace mitten
 							{
 								if (value.name().compare(operationUnaryLeftNode) == 0)
 								{
-									ptmp = operators[value[1].leaf().value].precedence;
+									ptmp = operators[value[1].leaf().value()].precedence;
 								}
 								else if (value.name().compare(operationUnaryRightNode) == 0)
 								{
-									ptmp = operators[value[0].leaf().value].precedence;
+									ptmp = operators[value[0].leaf().value()].precedence;
 								}
 								else if (value.name().compare(operationBinaryNode) == 0)
 								{
-									ptmp = operators[value[1].leaf().value].precedence;
+									ptmp = operators[value[1].leaf().value()].precedence;
 								}
 								else
 								{
@@ -339,7 +339,7 @@ namespace mitten
 								}
 							}
 
-							if (operators[a.leaf().value].precedence > ptmp)
+							if (operators[a.leaf().value()].precedence > ptmp)
 							{
 								AST tmp = AST::createNode(operationUnaryLeftNode);
 								tmp.append(value.rightmost());
@@ -356,9 +356,9 @@ namespace mitten
 							}
 						}
 					}
-					else if (operators[a.leaf().value].leftAssociative && !operators[a.leaf().value].rightAssociative)
+					else if (operators[a.leaf().value()].leftAssociative && !operators[a.leaf().value()].rightAssociative)
 					{
-						if (!expressionStack.empty() && (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value) != operators.end()))
+						if (!expressionStack.empty() && (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value()) != operators.end()))
 						{
 							value = expressionStack.top();
 							expressionStack.pop();
@@ -368,15 +368,15 @@ namespace mitten
 							{
 								if (value.name().compare(operationUnaryLeftNode) == 0)
 								{
-									ptmp = operators[value[1].leaf().value].precedence;
+									ptmp = operators[value[1].leaf().value()].precedence;
 								}
 								else if (value.name().compare(operationUnaryRightNode) == 0)
 								{
-									ptmp = operators[value[0].leaf().value].precedence;
+									ptmp = operators[value[0].leaf().value()].precedence;
 								}
 								else if (value.name().compare(operationBinaryNode) == 0)
 								{
-									ptmp = operators[value[1].leaf().value].precedence;
+									ptmp = operators[value[1].leaf().value()].precedence;
 								}
 								else
 								{
@@ -384,7 +384,7 @@ namespace mitten
 								}
 							}
 
-							if (operators[a.leaf().value].precedence > ptmp)
+							if (operators[a.leaf().value()].precedence > ptmp)
 							{
 								AST tmp = AST::createNode(operationUnaryLeftNode);
 								tmp.append(value.rightmost());
@@ -401,7 +401,7 @@ namespace mitten
 							}
 						}
 					}
-					else if (operators[a.leaf().value].rightAssociative)
+					else if (operators[a.leaf().value()].rightAssociative)
 					{
 						expressionStack.push(a);
 					}
@@ -419,7 +419,7 @@ namespace mitten
 		}
 		else if (expressionStack.size() == 1)
 		{
-			if (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value) != operators.end())
+			if (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value()) != operators.end())
 			{
 				e.cannotOperateOnAnOperator(expressionStack.top().leaf());
 			}

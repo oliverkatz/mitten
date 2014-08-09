@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    FloatingLiteralTagger.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Detects floating-point literals.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_FLOATING_LITERAL_TAGGER_H
 #define __MITTEN_FLOATING_LITERAL_TAGGER_H
 
@@ -62,16 +48,37 @@
 
 namespace mitten
 {
+	/*! \brief Identifies floating-point literals from tokens.
+	 */
 	class FloatingLiteralTagger
 	{
 	public:
-		bool allowScientific;
+		bool allowScientific; //! Set to true to allow scientific notation.
 
+		/*! \brief Constructor
+		 * Initializes C-style floats. */
 		FloatingLiteralTagger() : allowScientific(true) {}
 
+		/*! \brief Checks if a token is a float according to the configuration.
+		 * \param t Token to be checked.
+		 * \returns True only if the token is a valid float.
+		 */
 		bool isFloatingLiteral(Token t);
+
+		/*! \brief Checks if a string is a float according to the configuration.
+		 * \param t String to be checked.
+		 * \returns True only if the string is a valid float.
+		 */
 		bool isFloatingLiteral(std::string s);
+
+		/*! \brief Parses the floating-point literal's contents.
+		 * String-to-float conversion function.
+		 */
 		double parse(Token t);
+
+		/*! \brief Parses the floating-point literal's contents.
+		 * String-to-float conversion function.
+		 */
 		double parse(std::string s);
 	};
 }

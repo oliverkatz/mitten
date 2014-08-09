@@ -34,12 +34,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    IntegerLiteralTagger.cpp
+/* File:    Token.cpp
  * Author:  Oliver Katz
  * Version: 0.01-alpha
  * License: BSD 2-Clause
  * ========================================================================== *
- * Detects integer literals.
+ * Tokens are basic units of syntax, stored by the 'Token' class, declared 
+ * here.
  */
 
 /* Changelog:
@@ -48,49 +49,38 @@
  * Initial release.
  */
 
-#include "IntegerLiteralTagger.h"
-
-using namespace std;
+#include "Token.h"
 
 namespace mitten
 {
-	bool IntegerLiteralTagger::isIntegerLiteral(Token t)
+	int Token::line()
 	{
-		return isIntegerLiteral(t.value());
+		return _line;
 	}
 
-	bool IntegerLiteralTagger::isIntegerLiteral(string s)
+	int Token::column()
 	{
-		if (s.compare("0x") == 0)
-			return false;
-
-		if (s.back() == 'h' && (isdigit(s[0]) || (s[0] >= 'a' && s[0] <= 'f') || (s[0] >= 'A' && s[0] <= 'F')))
-			s = "0x" + s.substr(0, s.size()-1);
-
-		try
-		{
-			stoi(s, NULL, 0);
-			return true;
-		}
-		catch(invalid_argument &e)
-		{
-			return false;
-		}
+		return _column;
 	}
 
-	int IntegerLiteralTagger::parse(Token t)
+	std::string Token::value()
 	{
-		return parse(t.value());
+		return _value;
 	}
 
-	int IntegerLiteralTagger::parse(string s)
+	TokenTag Token::tag()
 	{
-		if (s.compare("0x") == 0)
-			throw runtime_error("invalid integer format");
+		return _tag;
+	}
 
-		if (s.back() == 'h' && (isdigit(s[0]) || (s[0] >= 'a' && s[0] <= 'f') || (s[0] >= 'A' && s[0] <= 'F')))
-			s = "0x" + s.substr(0, s.size()-1);
+	TokenTag &Token::setTag(TokenTag t)
+	{
+		_tag = t;
+		return _tag;
+	}
 
-		return stoi(s, NULL, 0);
+	std::string Token::file()
+	{
+		return _file;
 	}
 }

@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    ASTBuilder.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Abstract Syntax Tree (AST) iterative building is done by this class.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_AST_BUILDER_H
 #define __MITTEN_AST_BUILDER_H
 
@@ -59,21 +45,45 @@
 
 namespace mitten
 {
+	/*! \brief Helper class for StructureParser.
+	 * Builds ASTs in a linear fashion.
+	 */
 	class ASTBuilder
 	{
 	protected:
-		AST rootNode;
-		std::stack<AST *> headStack;
+		AST rootNode; //! The root node.
+		std::stack<AST *> headStack; //! The writing head in stack form.
 
 	public:
+		/*! \brief Constructor.
+		 * Initializes empty ASTBuilder.
+		 */
 		ASTBuilder();
 
+		/*! \brief Gets reference to root node.
+		 */
 		AST &root();
+
+		/*! \brief Gets reference to writing head node.
+		 */
 		AST &head();
 
+		/*! \brief Descends head into the rightmost branch of the current node.
+		 * Throws an exception if none exists.
+		 */
 		void descend();
+
+		/*! \brief Ascends head to the parent node of the current node.
+		 * Throws an exception if none exists.
+		 */
 		void ascend();
+
+		/*! \brief Appends the token \p t to the current writing head node as a leaf branch.
+		 */
 		void append(Token t);
+
+		/*! \brief Appends the token \p a to the current writing head node as a node branch.
+		 */
 		void append(AST a);
 	};
 }

@@ -56,7 +56,7 @@ namespace mitten
 {
 	bool StringLiteralTagger::isStringLiteral(Token t)
 	{
-		return isStringLiteral(t.value);
+		return isStringLiteral(t.value());
 	}
 
 	bool StringLiteralTagger::isStringLiteral(string s)
@@ -66,7 +66,7 @@ namespace mitten
 
 	string StringLiteralTagger::parse(Token t)
 	{
-		return parse(t.value);
+		return parse(t.value());
 	}
 
 	string StringLiteralTagger::parse(string s)

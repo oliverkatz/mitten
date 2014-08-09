@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    IntegerLiteralTagger.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Detects integer literals.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_INTEGER_LITERAL_TAGGER_H
 #define __MITTEN_INTEGER_LITERAL_TAGGER_H
 
@@ -60,22 +46,43 @@
 
 namespace mitten
 {
+	/*! \brief Identifies integer literals from tokens.
+	 */
 	class IntegerLiteralTagger
 	{
 	public:
-		bool allowDecimal;
-		bool allowOctal;
-		bool allowHexadecimalLowercase;
-		bool allowHexadecimalUppercase;
-		bool allowNegative;
+		bool allowDecimal; //! Set to true to allow decimal integers.
+		bool allowOctal; //! Set to true to allow octal integers.
+		bool allowHexadecimalLowercase; //! Set to true to allow hex integers with lowercase letters.
+		bool allowHexadecimalUppercase; //! Set to true to allow hex integers with uppercase letters.
+		bool allowNegative; //! Set to true to allow negative integers.
 
+		/*! \brief Constructor
+		 * Initializes C-style integers. */
 		IntegerLiteralTagger() : allowDecimal(true), allowOctal(true), 
 			allowHexadecimalLowercase(true), allowHexadecimalUppercase(true),
 			allowNegative(true) {}
 
+		/*! \brief Checks if a token is an integer according to the configuration.
+		 * \param t Token to be checked.
+		 * \returns True only if the token is a valid integer.
+		 */
 		bool isIntegerLiteral(Token t);
+
+		/*! \brief Checks if a string is an integer according to the configuration.
+		 * \param t String to be checked.
+		 * \returns True only if the string is a valid integer.
+		 */
 		bool isIntegerLiteral(std::string s);
+
+		/*! \brief Parses the integer literal's contents.
+		 * String-to-int conversion function.
+		 */
 		int parse(Token t);
+
+		/*! \brief Parses the integer literal's contents.
+		 * String-to-int conversion function.
+		 */
 		int parse(std::string s);
 	};
 }

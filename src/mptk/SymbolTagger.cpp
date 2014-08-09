@@ -56,7 +56,7 @@ namespace mitten
 {
 	bool SymbolTagger::isSymbol(Token t)
 	{
-		return isSymbol(t.value);
+		return isSymbol(t.value());
 	}
 
 	bool SymbolTagger::isSymbol(string s)

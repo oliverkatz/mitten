@@ -9,14 +9,11 @@
 # Version: 0.01-alpha
 # License: Unlicensed
 
-TEX=pdflatex
-TEXFLAGS=
+include ../config.mk
 
-DOXYGEN=doxygen
-DOXYFLAGS=
+all : 
+	$(DOXYGEN) $(DOXYFLAGS) Doxyfile
+	@#make -C latex
 
-RM=rm
-RMFLAGS=-f
-
-%.pdf : %.tex
-	$(TEX) $(TEXFLAGS) $<
+clean :
+	$(RM) $(RMFLAGS) -r html latex

@@ -142,16 +142,16 @@ namespace mitten
 		 */
 		size_t maxDelimLength;
 
-		/*! \brief Dictionary of macros used within the lexer.
-		 */
-		std::unordered_map<std::string, std::vector<Token> > macros;
-
 		/*! \brief Helper method to identify the tag of any given token.
 		 * \todo Optimize for better efficiency.
 		 * \param t Input token.
 		 * \return Token tag.
 		 */
 		TokenTag findTag(Token t);
+
+		/*! \brief Appends token \p t to token vector \p v, but it can be overloaded to do much more.
+		 */
+		virtual void onToken(Token t, std::vector<Token> &v);
 
 	public:
 		BooleanLiteralTagger boolTag; //! The boolean tag parser.

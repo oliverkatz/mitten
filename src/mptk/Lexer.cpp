@@ -89,6 +89,11 @@ namespace mitten
 			return DeliminatorTag;
 	}
 
+	void Lexer::onToken(Token t, vector<Token> &v)
+	{
+		v.push_back(t);
+	}
+
 	DeliminatorFlags &Lexer::deliminate(std::string s, std::string e)
 	{
 		if (s.empty())
@@ -141,9 +146,9 @@ namespace mitten
 						Deliminator d = delims[j][s.substr(i, j)];
 						if (last < i)
 						{
-							rtn.push_back(Token(s.substr(last, i-last), f,
-								lastline, lastcolumn));
-							rtn.back().setTag(findTag(rtn.back()));
+							Token tmp = Token(s.substr(last, i-last), f, lastline, lastcolumn);
+							tmp.setTag(findTag(tmp));
+							onToken(tmp, rtn);
 						}
 
 						size_t dl = j;
@@ -169,7 +174,8 @@ namespace mitten
 
 						if (!(d.flags & Filtered))
 						{
-							rtn.push_back(Token(s.substr(i, dl), f, line, column, DeliminatorTag));
+							Token tmp = Token(s.substr(i, dl), f, line, column, DeliminatorTag);
+							onToken(tmp, rtn);
 						}
 						for (auto c : s.substr(i, dl))
 						{
@@ -209,8 +215,9 @@ namespace mitten
 
 		if (last < s.size())
 		{
-			rtn.push_back(Token(s.substr(last), f, lastline, lastcolumn));
-			rtn.back().setTag(findTag(rtn.back()));
+			Token tmp = Token(s.substr(last), f, lastline, lastcolumn);
+			tmp.setTag(findTag(tmp));
+			onToken(tmp, rtn);
 		}
 
 		return rtn;

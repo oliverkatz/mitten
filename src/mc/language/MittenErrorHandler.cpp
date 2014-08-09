@@ -59,13 +59,13 @@ namespace mitten
 		if (!filePath.empty())
 			errorPage += filePath+":";
 
-		errorPage += to_string(source.line)+":"+to_string(source.column)+" - "+message+"\n";
-		errorPage += "    from '"+source.value+"'\n";
+		errorPage += to_string(source.line())+":"+to_string(source.column())+" - "+message+"\n";
+		errorPage += "    from '"+source.value()+"'\n";
 
 		if (!fileBody.empty())
 		{
-			errorPage += fileBody[source.line-1]+"\n";
-			errorPage += string(source.column, ' ')+"^\n";
+			errorPage += fileBody[source.line()-1]+"\n";
+			errorPage += string(source.column(), ' ')+"^\n";
 		}
 
 		errorPage += "\n";
@@ -111,12 +111,12 @@ namespace mitten
 
 	void MittenErrorHandler::operationRequiredLeftOperand(Token source)
 	{
-		append(source, "operator '"+source.value+"' requires left operand");
+		append(source, "operator '"+source.value()+"' requires left operand");
 	}
 
 	void MittenErrorHandler::unexpectedTokenInExpression(Token source)
 	{
-		append(source, "unexpected token '"+source.value+"' in expression");
+		append(source, "unexpected token '"+source.value()+"' in expression");
 	}
 
 	void MittenErrorHandler::cannotOperateOnAnOperator(Token source)

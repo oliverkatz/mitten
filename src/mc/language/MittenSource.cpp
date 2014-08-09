@@ -124,7 +124,7 @@ namespace mitten
 		if (page.empty())
 			return true;
 
-		toks = lexer.lex(page);
+		toks = lexer.lex(page, path);
 
 		if (verbose)
 		{
@@ -134,13 +134,13 @@ namespace mitten
 			int line = 1;
 			for (auto i : toks)
 			{
-				if (i.line != line)
+				if (i.line() != line)
 				{
 					cout << "\n";
-					line = i.line;
+					line = i.line();
 				}
 
-				cout << "'" << i.value << "' ";
+				cout << "'" << i.value() << "' ";
 			}
 
 			cout << "\n\n";
@@ -161,12 +161,12 @@ namespace mitten
 
 		for (int i = 0; i < toks.size(); i++)
 		{
-			if (toks[i].tag == DeliminatorTag && toks[i].value[0] == '#')
+			if (toks[i].tag() == DeliminatorTag && toks[i].value()[0] == '#')
 			{
-				string d = toks[i].value.substr(1, toks[i].value.size()-2);
-				vector<Token> dt = directiveLexer.lex(d);
+				string d = toks[i].value().substr(1, toks[i].value().size()-2);
+				vector<Token> dt = directiveLexer.lex(d, path);
 				
-				if (dt[0].value.compare("define") == 0)
+				if (dt[0].value().compare("define") == 0)
 				{
 					if (dt.size() < 2)
 					{
@@ -174,26 +174,26 @@ namespace mitten
 					}
 					else
 					{
-						if (lexicalMacros.find(dt[1].value) != lexicalMacros.end())
+						if (lexicalMacros.find(dt[1].value()) != lexicalMacros.end())
 						{
 							meh.macroAlreadyDefined(toks[i]);
 						}
 						else
 						{
-							lexicalMacros[dt[1].value].insert(lexicalMacros[dt[1].value].end(), dt.begin()+2, dt.end());
-							for (auto j : lexicalMacros[dt[1].value])
-								j.tag = SyntheticTag;
+							lexicalMacros[dt[1].value()].insert(lexicalMacros[dt[1].value()].end(), dt.begin()+2, dt.end());
+							for (auto j : lexicalMacros[dt[1].value()])
+								j.setTag(SyntheticTag);
 							if (verbose)
 							{
-								cout << dt[1].value << " <=";
+								cout << dt[1].value() << " <=";
 								for (int j = 2; j < dt.size(); j++)
-									cout << " '" << dt[j].value << "'";
+									cout << " '" << dt[j].value() << "'";
 								cout << "\n";
 							}
 						}
 					}
 				}
-				else if (dt[0].value.compare("undef") == 0)
+				else if (dt[0].value().compare("undef") == 0)
 				{
 					if (dt.size() != 2)
 					{
@@ -201,21 +201,21 @@ namespace mitten
 					}
 					else
 					{
-						if (lexicalMacros.find(dt[1].value) == lexicalMacros.end())
+						if (lexicalMacros.find(dt[1].value()) == lexicalMacros.end())
 						{
 							meh.useOfUndefinedMacro(toks[i]);
 						}
 						else
 						{
-							lexicalMacros.erase(dt[1].value);
+							lexicalMacros.erase(dt[1].value());
 							if (verbose)
 							{
-								cout << dt[1].value << " <= <null>\n";
+								cout << dt[1].value() << " <= <null>\n";
 							}
 						}
 					}
 				}
-				else if (dt[0].value.compare("redef") == 0)
+				else if (dt[0].value().compare("redef") == 0)
 				{
 					if (dt.size() < 2)
 					{
@@ -223,27 +223,27 @@ namespace mitten
 					}
 					else
 					{
-						if (lexicalMacros.find(dt[1].value) == lexicalMacros.end())
+						if (lexicalMacros.find(dt[1].value()) == lexicalMacros.end())
 						{
 							meh.useOfUndefinedMacro(toks[i]);
 						}
 						else
 						{
-							lexicalMacros[dt[1].value].clear();
-							lexicalMacros[dt[1].value].insert(lexicalMacros[dt[1].value].end(), dt.begin()+2, dt.end());
-							for (auto j : lexicalMacros[dt[1].value])
-								j.tag = SyntheticTag;
+							lexicalMacros[dt[1].value()].clear();
+							lexicalMacros[dt[1].value()].insert(lexicalMacros[dt[1].value()].end(), dt.begin()+2, dt.end());
+							for (auto j : lexicalMacros[dt[1].value()])
+								j.setTag(SyntheticTag);
 							if (verbose)
 							{
-								cout << dt[1].value << " <=";
+								cout << dt[1].value() << " <=";
 								for (int j = 2; j < dt.size(); j++)
-									cout << " '" << dt[j].value << "'";
+									cout << " '" << dt[j].value() << "'";
 								cout << "\n";
 							}
 						}
 					}
 				}
-				else if (dt[0].value.compare("include") == 0)
+				else if (dt[0].value().compare("include") == 0)
 				{
 					
 				}
@@ -252,9 +252,9 @@ namespace mitten
 					meh.unknownDirective(toks[i]);
 				}
 			}
-			else if (lexicalMacros.find(toks[i].value) != lexicalMacros.end())
+			else if (lexicalMacros.find(toks[i].value()) != lexicalMacros.end())
 			{
-				res.insert(res.end(), lexicalMacros[toks[i].value].begin(), lexicalMacros[toks[i].value].end());
+				res.insert(res.end(), lexicalMacros[toks[i].value()].begin(), lexicalMacros[toks[i].value()].end());
 			}
 			else
 			{
@@ -271,13 +271,13 @@ namespace mitten
 			int line = 1;
 			for (auto i : toks)
 			{
-				if (i.line != line)
+				if (i.line() != line)
 				{
 					cout << "\n";
-					line = i.line;
+					line = i.line();
 				}
 
-				cout << "'" << i.value << "' ";
+				cout << "'" << i.value() << "' ";
 			}
 
 			cout << "\n\n";

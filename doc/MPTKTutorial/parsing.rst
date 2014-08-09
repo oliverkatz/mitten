@@ -32,7 +32,7 @@ The AST type in MPTK has a few different attributes. Each node has a node name, 
 	for (auto i : branch)
 	{
 		// i.leaf() gets a reference to the AST leaf's token.
-		cout << "\t" << i.leaf().value << "\n";
+		cout << "\t" << i.leaf().value() << "\n";
 	}
 
 The result of the above program is::

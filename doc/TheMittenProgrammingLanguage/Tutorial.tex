@@ -1,0 +1,69 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage{ifpdf}
+\ifpdf 
+    \usepackage[pdftex]{graphicx}   % to include graphics
+    \pdfcompresslevel=9 
+    \usepackage[pdftex,     % sets up hyperref to use pdftex driver
+            plainpages=false,   % allows page i and 1 to exist in the same document
+            breaklinks=true,    % link texts can be broken at the end of line
+            colorlinks=true,
+            pdftitle=The Mitten Programming Language
+            pdfauthor=Oliver Katz
+           ]{hyperref} 
+    \usepackage{thumbpdf}
+\else 
+    \usepackage{graphicx}       % to include graphics
+    \usepackage{hyperref}       % to simplify the use of \href
+\fi
+
+\usepackage[margin=1.0in]{geometry}
+
+\title{The Mitten Programming Language}
+\author{Oliver Katz}
+\date{\today}
+
+\setcounter{tocdepth}{2}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Mitten is intended to be a high-level programming language for large projects. It is multi-paradigm, encompassing object-oriented, procedural, and functional programming. It is designed to be run natively, although this is left to the implementation's discretion. If you already know the C programming language, or especially C++, the syntax and functionality of Mitten should be familiar. This document is a description of Mitten for those who want to write code in it and for those who want to write a compiler for it.
+
+This document is a beginner-level tutorial of Mitten. Before reading it, you should have a basic knowledge of your operating system's shell and of how to use the Mitten compiler. It does not, however, assume any knowledge of programming.
+
+The best introduction for the programming language is a simple example. The following code prints out the message ``hello, world." to the console:
+\begin{verbatim}
+include(std);
+
+void main()
+{
+    print("hello, world\n");
+}
+\end{verbatim}
+
+This is one of the simplest programs that can be written in Mitten. It will be explained in detail in the next section of this document (\ref{sec:HelloWorldExplained}).
+
+\textit{NOTE: This document uses the Mitten 0.01 alpha specification.}
+
+\subsection{Comparison to Other Languages}
+Mitten takes much inspiration from other existing programming languages. Its syntax is notably C-like, categorizing Mitten as a C-based programming language. Its object orientation system is based heavily off C++, although there are distinct differences. It's dynamicy is very similar to that of Python, although limited by the fact that Mitten was designed to run natively. The functional programming features implemented with Mitten are inspired by Haskell's ability to utilize functions efficiently, although this system is much simpler in Mitten.
+
+Although Mitten can be thought of as an extension to C, it is not legacy compatible with the legendary programming language. The main difference, besides the extension, is the preprocessor. Mitten's preprocessor is based partially off C's, but the syntax is different; it does not use the \verb|#define x 5| directive syntax, but instead uses the same syntax as the rest of the language: \verb|define(x, 5);|. This is to allow a single pass of the text for compilation, instead of two: one for preprocessing, one for compiling.
+
+C++'s object-orientation system is incredibly comprehensive, but there are some things that are different between C++ and Mitten that make Mitten's syntax simpler. The most profound difference is in how polymorphism works. In Mitten, assume you have two classes \verb|Superclass| and \verb|Subclass| (\verb|Subclass| obviously inherits from \verb|Superclass|) and create an object \verb|o| of \verb|Subclass|. If you pass \verb|o| to a function that takes an argument of type \verb|Superclass| and call a method overloaded by \verb|Subclass|, \verb|Subclass|'s method will be called, not \verb|Superclass|'s. This profound difference allows for casting and polymorphism workarounds to be less heavily used in Mitten. The other significant difference is templates. C++'s template syntax is bulky and sometimes difficult to read, while in Mitten it is kept simple. Additionally, Mitten provides an \verb|auto| type for quick generic methods. Every time you call a method with an \verb|auto| argument, a new ``version" of that function is generated with the correct type. The \verb|auto| type is truly automatic.
+
+Python provides the \verb|dir| function, invaluable for dynamic programs. It returns a dictionary of all the members and methods of any class, module, method, or object within the programming language. Mitten provides a similar functionality with the \verb|table| function. Every time the \verb|table| function is called on any symbol, a tabular dictionary with all the members and methods of that symbol is created and returned. For native implementations, this will require extra memory used, but since it can be lazily generated for only the symbols that it is required for the overhead can be quite small. The disadvantage of Mitten's \verb|table| to Python's \verb|dir| is that modification of the dictionary returned by Python's \verb|dir| results in modification of the runtime object that it represents. Mitten does not have this functionality with \verb|table|, thus the name difference.
+
+Haskell is remarkable in its syntax effiency. Every function is written on a single line and there are no loops, these restrictions are easily counteracted by the extraordinarily powerful function system within the language. Currying, higher-order functions, and a functional type system are the basis of this system. Mitten provides the ability for function calls to curry functions when explicitly specified, allowing for optimizations. Functions, curried or not, may be passed as variables, allowing for higher-order functions and have a strict type system allowing for safety within the runtime. Mitten extends this system by providing method callbacks, pairing the function itself with the object it belongs to.
+
+Although these languages cannot be matched for their specific advantages, Mitten does take heavy inspiration from them. C, C++, Python, and Haskell are all extraordinary languages to learn, as they should be.
+
+\section{Hello World Explained}
+\ref{sec:HelloWorldExplained}
+
+
+\end{document}

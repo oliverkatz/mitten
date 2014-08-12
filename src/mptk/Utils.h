@@ -43,39 +43,18 @@
 #include <fstream>
 #include <stdexcept>
 
+#include "AbstractWidthString.h"
+
 namespace mitten
 {
 	/** \brief Reads a file into a string.
 	 * Loads the entire contents of a file into a dynamically-expanding string object.
 	 * If readFile is unable to open the file, it will throw a runtime_error.
 	 * \param path The path of the file to be read.
+	 * \param width The character width of the file's encoding.
 	 * \returns The contents of the file.
 	 */
-	std::string readFile(std::string path);
-
-	/** \brief Evaluates escape codes in a string.
-	 * Iterates through the input string and converts all C-style escape codes into their equivalent character codes.
-	 * \param s Input string to be iterated.
-	 * \returns The resultant string.
-	 * \todo Move this method to the AbstractWidthString class.
-	 */
-	std::string evaluateEscapeCodes(std::string s);
-
-	/** \brief Converts all non-printable characters in the string to escape codes.
-	 * Iterates through the input string and converts all non-printable characters to C-style escape codes.
-	 * \param s Input string to be iterated.
-	 * \returns The resultant string.
-	 * \todo Move this method to the AbstractWidthString class.
-	 */
-	std::string makePrintable(std::string s);
-
-	/** \brief Trims whitespace from both ends.
-	 * This should be in the C++ standard library, but it's not easily accessable.
-	 * \param s String to be stripped.
-	 * \returns The stripped string.
-	 * \todo Move this method to the AbstractWidthString class.
-	 */
-	std::string stripString(std::string s);
+	AbstractWidthString readFile(std::string path, size_t width = 8);
 }
 
 #endif

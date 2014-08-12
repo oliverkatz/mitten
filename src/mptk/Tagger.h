@@ -34,28 +34,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Utils.h"
+#ifndef __MITTEN_CHARACTER_LITERAL_PARSER_H
+#define __MITTEN_CHARACTER_LITERAL_PARSER_H
 
-using namespace std;
+#include <iostream>
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+#include "Utils.h"
+#include "Token.h"
 
 namespace mitten
 {
-	AbstractWidthString readFile(string path, size_t width)
+	/*! \brief Identifies particular patterns in text iteratively.
+	 */
+	class Tagger
 	{
-		FILE *f = fopen(path.c_str(), "r");
-		if (f == NULL)
-			throw runtime_error("cannot open file for reading: "+path);
+	protected:
+		
 
-		fseek(f, 0, SEEK_END);
-		long l = ftell(f);
-		fseek(f, 0, SEEK_SET);
-
-		AbstractWidthString rtn = AbstractWidthString();
-		rtn.reallocate(l);
-		fread((void *)rtn.data(), width, l/width, f);
-		rtn.resize(l/width);
-
-		fclose(f);
-		return rtn;
-	}
+	public:
+		bool next(AbstractWidthString::Char c);
+		bool matches();
+	};
 }
+
+#endif

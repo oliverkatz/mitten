@@ -339,6 +339,11 @@ namespace mitten
 		return dst;
 	}
 
+	const void *AbstractWidthString::data()
+	{
+		return _data;
+	}
+
 	size_t AbstractWidthString::size()
 	{
 		return _size;
@@ -439,7 +444,19 @@ namespace mitten
 		{
 			if (s > _capacity)
 				throw runtime_error("cannot resize resource outside of memory space");
-			_size = s;
+			else if (s > _size)
+			{
+				while (s > _size)
+				{
+					if (this->operator [] (_size) == 0)
+						break;
+					_size++;
+				}
+			}
+			else
+			{
+				_size = s;
+			}
 		}
 	}
 
@@ -645,5 +662,115 @@ namespace mitten
 		}
 
 		return npos;
+	}
+
+	AbstractWidthString AbstractWidthString::evaluateEscapeCodes()
+	{
+		AbstractWidthString rtn;
+
+		for (int i = 0; i < size(); i++)
+		{
+			if (this->operator [] (i) == '\\')
+			{
+				if (i == size()-1)
+				{
+					throw runtime_error("escape code ended prematurely");
+				}
+				else
+				{
+					if (this->operator [] (i+1) == 'a')
+					{
+						rtn += '\a';
+						i++;
+					}
+					else if (this->operator [] (i+1) == 'b')
+					{
+						rtn += '\b';
+						i++;
+					}
+					else if (this->operator [] (i+1) == 'f')
+					{
+						rtn += '\f';
+						i++;
+					}
+					else if (this->operator [] (i+1) == 'n')
+					{
+						rtn += '\n';
+						i++;
+					}
+					else if (this->operator [] (i+1) == 'r')
+					{
+						rtn += '\r';
+						i++;
+					}
+					else if (this->operator [] (i+1) == 't')
+					{
+						rtn += '\t';
+						i++;
+					}
+					else if (this->operator [] (i+1) == 'v')
+					{
+						rtn += '\v';
+						i++;
+					}
+					else if (this->operator [] (i+1) == '\\')
+					{
+						rtn += '\\';
+						i++;
+					}
+					else if (this->operator [] (i+1) == '\'')
+					{
+						rtn += '\'';
+						i++;
+					}
+					else if (this->operator [] (i+1) == '\"')
+					{
+						rtn += '\"';
+						i++;
+					}
+					else if (this->operator [] (i+1) == '?')
+					{
+						rtn += '\?';
+						i++;
+					}
+					else if (this->operator [] (i+1) >= '0' && this->operator [] (i+1) <= '7')
+					{
+						if (i+3 < size())
+						{
+							char tmp = stoi(substr(i+1, 3).toString8(), NULL, 8);
+							rtn += tmp;
+							i += 3;
+						}
+						else
+						{
+							throw runtime_error("escape code ended prematurely");
+						}
+					}
+					else if (this->operator [] (i+1) == 'x')
+					{
+						if (i+3 < size())
+						{
+							char tmp = stoi(substr(i+2, 2).toString8(), NULL, 16);
+							rtn += tmp;
+							i += 3;
+						}
+						else
+						{
+							throw runtime_error("escape code ended prematurely");
+						}
+					}
+					else
+					{
+						throw runtime_error("unexpected character");
+					}
+				}
+			}
+			else
+			{
+				rtn += this->operator [] (i);
+			}
+		}
+
+		return rtn;
 	}
 }

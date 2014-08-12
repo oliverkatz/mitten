@@ -63,6 +63,10 @@ namespace mitten
 		static const int defaultOff; //! The default offset for dynamic re-allocation.
 		static const size_t npos; //! The returned value of find and rfind if not instance is found.
 
+		/*! \brief Character type.
+		 */
+		typedef char32_t Char;
+
 		/*! \brief Constructor.
 		 * Constructs uninitialized string. 
 		 */
@@ -155,6 +159,10 @@ namespace mitten
 		 */
 		std::u32string toString32();
 
+		/*! \brief Gets the raw data pointer of the string.
+		 */
+		const void *data();
+
 		/*! \brief Gets the number of characters in the string.
 		 */
 		size_t size();
@@ -192,7 +200,7 @@ namespace mitten
 		 * \param n Index of character.
 		 * \returns A copy of the character at index n cast to a 32-bit integer.
 		 */
-		char32_t operator [] (int n);
+		Char operator [] (int n);
 
 		/*! \brief Comparison operation.
 		 * \param s String to compare to.
@@ -256,13 +264,13 @@ namespace mitten
 		 * \param off The offset to be applied to the string size for dynamic re-allocation after the factor.
 		 * \returns Reference to current string after append.
 		 */
-		AbstractWidthString &append(char32_t c, float fac = defaultFac, int off = defaultOff);
+		AbstractWidthString &append(Char c, float fac = defaultFac, int off = defaultOff);
 
 		/*! \brief Append character to current string.
 		 * \param c Character to append.
 		 * \returns Reference to current string after append.
 		 */
-		AbstractWidthString &operator += (char32_t c);
+		AbstractWidthString &operator += (Char c);
 
 		/*! \brief Returns a new string which is a slice of the current string.
 		 * Starts from \p from and goes for \p len characters.
@@ -301,6 +309,24 @@ namespace mitten
 		 * \returns The index of the last instance of \p s, AbstractWidthString::npos if not in string.
 		 */
 		size_t rfind(AbstractWidthString s, size_t after = 0);
+
+		/*! \brief Evaluates escape codes in a string.
+	 	 * Iterates through the input string and converts all C-style escape codes into their equivalent character codes.
+	 	 * \returns Evaluated string.
+	 	 */
+		AbstractWidthString evaluateEscapeCodes();
+
+		/*! \brief Converts all non-printable characters in the string to escape codes.
+	 	 * Iterates through the input string and converts all non-printable characters to C-style escape codes.
+	 	 * \returns Printable string.
+	 	 */
+		AbstractWidthString makePrintable();
+
+		/*! \brief Trims whitespace from both ends.
+	 	 * This should be in the C++ standard library, but it's not easily accessable.
+	 	 * \returns Stripped string.
+	 	 */
+		AbstractWidthString strip();
 	};
 }
 

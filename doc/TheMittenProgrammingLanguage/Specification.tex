@@ -123,12 +123,107 @@ Parenthesis work much as they do in algebraic expressions:
 binary string = ("1", "0"), {"1" | "0"};
 \end{verbatim}
 
-This is a basic summary of EBNF syntax to refresh the reader before reading the specification. For a more detailed description, see \textit{XXX}.
+This is a basic summary of EBNF syntax to refresh the reader before reading the specification. For a more detailed description, see \textit{XXX}. Note that all EBNF syntax in this document uses ASCII unless otherwise specified.
 
 \section{The Lexical Grammar}
-The lexical grammar of Mitten is used by both the preprocessor and the language itself. It will be described as a set of deliminators. Deliminators may be set sequences of characters or character sequence patterns which will be detailed below.
+The lexical grammar of Mitten is used by both the preprocessor and the language itself. It will be described as a set of deliminators. Deliminators may be set sequences of characters or character sequence patterns which will be detailed below. All nonterminal symbols listed in the subsections below are considered deliminators with the given names.
 
+\subsection{Whitespace Characters}
+\begin{verbatim}
+space = " ";
+horizontal tab = "\t";
+newline = "\n";
+whitespace = space | horizontal tab | newline;
+\end{verbatim}
 
+\subsection{Punctuation Tokens}
+\begin{verbatim}
+open expression = "(";
+close expression = ")";
+separate expression = ",";
+
+open scope = "{";
+close scope = "}";
+separate scope = ";";
+
+open subscript = "[";
+close supscript = "]";
+
+quote = "\", ?any printable characters and escape codes?, "\";
+character quote = "'", ?any single printable character or escape code?, "'";
+block quote = "\"\"\"", ?any characters?, "\"\"\"";
+
+line comment = "//", ?any characters?, newline;
+block comment = "/*", ?any characters?, "*/";
+\end{verbatim}
+
+\subsection{Operators}
+\begin{verbatim}
+add = "+";
+subtract = "-";
+multiply = "*";
+divide = "/";
+modulate = "\%";
+bit and = "&";
+bit or = "|";
+bit xor = "^";
+bit shift left = "<<";
+bit shift right = ">>";
+bit negate = "~";
+logical and = "&&";
+logical or = "||";
+logical xor = "^^";
+logical negate = "!";
+assign = "=";
+add assign = "+=";
+subtract assign = "-=";
+multiply assign = "*=";
+divide assign = "/=";
+modulate assign = "\%=";
+bit and assign = "&=";
+bit or assign = "|=";
+bit xor assign = "^=";
+bit shift left assign = "<<=";
+bit shift right assign = ">>=";
+bit negate assign = "~=";
+equal to = "==";
+not equal to = "!=";
+less than = "<";
+less than or equal to = "<=";
+greater than = ">";
+greater than or equal to = ">=";
+range = ":";
+\end{verbatim}
+
+\section{Semantic Grammar}
+There are certain syntactic elements which are repeated heavily throughout Mitten. They are listed below. All nonterminal symbols listed in the subsections below are considered semantic gramatical elements.
+
+\subsection{Expressions}
+\begin{verbatim}
+expression = open expression, [whitespace], [expression element, [whitespace], {expression separator, [whitespace], expression element}], [whitespace], close expression;
+
+expression element = expression | ...;
+\end{verbatim}
+
+\subsection{Scopes}
+\begin{verbatim}
+scope = (open scope, [whitespace], [scope element, [whitespace], {scope separator, [whitespace], scope element}], [whitespace], close scope) | scope element;
+
+scope element = expression | scope | ...;
+\end{verbatim}
+
+\subsection{Statements}
+\begin{verbatim}
+if keyword = "if";
+else keyword = "else";
+else if keyword = else, whitespace, if;
+while keyword = "while";
+for keyword = "for";
+do keyword = "do";
+
+if statement = if keyword, [whitespace], expression, [whitespace], 
+
+statement = 
 
 \section{The Preprocessor}
 

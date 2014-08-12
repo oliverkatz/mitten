@@ -128,6 +128,41 @@ This is a basic summary of EBNF syntax to refresh the reader before reading the 
 \section{The Lexical Grammar}
 The lexical grammar of Mitten is used by both the preprocessor and the language itself. It will be described as a set of deliminators. Deliminators may be set sequences of characters or character sequence patterns which will be detailed below. All nonterminal symbols listed in the subsections below are considered deliminators with the given names.
 
+\subsection{Input Data Format}
+The lexical grammar provides certain requirements on the input data. Mitten source text can be of any of the following encodings:
+\begin{itemize}
+\item 7-bit ASCII
+\item UTF-8
+\item UTF-16BE
+\item UTF-16LE
+\item UTF-32BE
+\item UTF-32LE
+\end{itemize}
+
+The encoding of a given text file may be identified by a UTF BOM (Byte Order Marking) at the beginning of the file:
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Encoding} & \textbf{BOM} \\
+\hline
+UTF-8 & EF BB BF \\
+\hline
+UTF-16BE & FE FF \\
+\hline
+UTF-16LE & FF FE \\
+\hline
+UTF-32BE & 00 00 FE FF \\
+\hline
+UTF-32LE & FF FE 00 00 \\
+\hline
+7-bit ASCII & (no BOM) \\
+\hline
+\end{tabular}
+
+If a text file does not have a BOM, the first character must be less than or equal to 7F, meaning that it is 7-bit ASCII. Since UTF encodings are supersets of 7-bit ASCII, 7-bit ASCII codes may work as codes for all other encodings listed here.
+
+\subsubsection{Note on Internationalization}
+Other encodings may be used for internationalization as long as they conform to the internationalization requirements listed in section \ref{sec:Internationalization} below.
+
 \subsection{Whitespace Characters}
 \begin{verbatim}
 space = " ";
@@ -211,6 +246,25 @@ scope = (open scope, [whitespace], [scope element, [whitespace], {scope separato
 
 scope element = expression | scope | ...;
 \end{verbatim}
+
+\subsection{Internationalization}
+Mitten, as a programming language, supports a multitude of other languages through their character encodings. Mitten compilers must comply with the following requirements in order to support internationalization:
+\begin{itemize}
+\item Mitten compilers can support 1, 2, and 4 byte character encodings using input file's BOMs for encoding detection as well as a runtime option to specify a source file's encoding.
+\item Mitten compilers can read and fully utilize internationalization packages in the format given by this specification on runtime for a given source file.
+\end{itemize}
+
+The internationalization package mentioned in these requirements is a list of all built-in symbols in the language's syntax mapped to the default symbol set. The file is designed so that it does not rely on any intersection with 7-bit ASCII in its syntax. Internationalization packages for Mitten compilers will have the following extension: \verb|*.mip|. 
+
+The first byte of the file is an unsigned integer which represents the character width of the encoding used in by the language's required character encoding. For example, a language using 7-bit ASCII would specify 1, while a language using a 4-byte character encoding would specify 4.
+
+The second byte is of the file is an unsigned integer which represents the length of the BOM in bytes to look for. If the text file is not expected to use a BOM, this byte should be 0. The next n bytes of the file will contain the expected BOM where n is the length of the BOM specified by the second byte of the file.
+
+For example, for UTF-32BE, The first 6 byte of the internationalization package would be: 04 04 00 00 FE FF.
+
+The next n bytes of the file, where n is the character width given by the first byte of the file, represents the separator character of the file which will be used in the remainder of the file. This completes the header of the package.
+
+For a 7-bit ASCII language with a newline separator character, the file header would be: 01 00 0A.
 
 \section{The Preprocessor}
 

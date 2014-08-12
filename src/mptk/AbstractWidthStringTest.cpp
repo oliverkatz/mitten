@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    AbstractWidthStringTest.cpp
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Unit test using MUnit.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #include <iostream>
 #include <MUnit.h>
 
@@ -67,6 +53,34 @@ int main()
 
 	test.assert(tmp32.toString8().compare("hello, world") == 0);
 	test.assert(tmp32[0] == 'h');
+	test.assert(slice.isSlice());
+	test.assert(tmp32.isResource());
+	test.assert(tmp32.size() == string("hello, world").size());
+	test.assert(tmp32.width() == 4);
+	test.assert(tmp32.memsize() == string("hello, world").size()*4);
+	tmp32.reallocate(1024);
+	tmp32.resize(1024);
+	test.assert(tmp32.size() == 1024);
+	test.assert(tmp32.toString8().compare("hello, world") == 0);
+	tmp32.resize(1);
+	test.assert(tmp32.toString8().compare("h") == 0);
+	test.assert(tmp8.compare(tmp16) == 0);
+	test.assert(tmp8 == tmp16);
+
+	tmp8.append(AbstractWidthString::fromString8("hi"));
+	test.assert(tmp8.toString8().compare("hello, worldhi") == 0);
+	test.assert(tmp8.substr(1).toString8().compare("ello, worldhi") == 0);
+	test.assert(tmp8.substr(1, 2).toString8().compare("el") == 0);
+
+	AbstractWidthString tmp8b = AbstractWidthString::fromString8("hi");
+	tmp8b.insert(1, AbstractWidthString::fromString8("_"));
+	test.assert(tmp8b.toString8().compare("h_i") == 0);
+	tmp8b.erase(1, 1);
+	test.assert(tmp8b.toString8().compare("hi") == 0);
+
+	test.assert(tmp16.find(AbstractWidthString::fromString8("e")) == 1);
+	test.assert(tmp16.find(AbstractWidthString::fromString8("_")) == AbstractWidthString::npos);
+	test.assert(tmp16.rfind(AbstractWidthString::fromString8("e")) == 1);
 
 	return (int)(test.write());
 }

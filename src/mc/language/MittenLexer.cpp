@@ -34,40 +34,90 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "BooleanLiteralTagger.h"
+#include "MittenLexer.h"
 
 using namespace std;
 
 namespace mitten
 {
-	bool BooleanLiteralTagger::isBooleanLiteral(Token t)
+	int MittenLexer::directivePattern(int from, string s)
 	{
-		return isBooleanLiteral(t.value());
+		bool multi = false;
+
+		for (int i = from; i < s.size(); i++)
+		{
+			if (s[i] == '\n')
+			{
+				if (!multi)
+				{
+					return i-from+1;
+				}
+			}
+			else if (s[i] == '#' && (i < s.size()-1 && s[i+1] == '{'))
+			{
+				multi = true;
+			}
+			else if (s[i] == '#' && (i < s.size()-1 && s[i+1] == '}'))
+			{
+				if (multi)
+				{
+					return i-from+2;
+				}
+			}
+		}
+
+		return s.size()-from;
 	}
 
-	bool BooleanLiteralTagger::isBooleanLiteral(string s)
+	void MittenLexer::onToken(Token t, vector<Token> &v)
 	{
-		if (s.compare(trueToken) == 0)
-			return true;
+		if (t.tag() == DeliminatorTag && t.value()[0] == '#')
+		{
+			cout << "DELIMINATOR '" << t.value() << "'\n";
 
-		if (s.compare(falseToken) == 0)
-			return true;
-
-		return false;
-	}
-
-	bool BooleanLiteralTagger::parse(Token t)
-	{
-		return parse(t.value());
-	}
-
-	bool BooleanLiteralTagger::parse(string s)
-	{
-		if (s.compare(trueToken) == 0)
-			return true;
-		else if (s.compare(falseToken) == 0)
-			return false;
+			if (t.value().find("#{") != string::npos)
+			{
+				vector<Token> d = directiveLexer.lex(t.value().substr(0, t.value().find("#{\n")), t.file(), t.line(), t.column());
+				cout << "\tcommand";
+				for (auto i : d)
+					cout << " '" << i.value() << "'";
+				
+				vector<Token> da = directiveLexer.lex(t.value().substr(t.value().find("#{\n")+3), t.file(), t.line()+1, 0);
+				da.pop_back();
+				cout << "\n\tbody";
+				for (auto i : da)
+					cout << " '" << i.value() << "'";
+				cout << "\n";
+			}
+			else
+			{
+				vector<Token> d = directiveLexer.lex(t.value(), t.file(), t.line(), t.column());
+				cout << "\tcommand";
+				for (auto i : d)
+					cout << " '" << i.value() << "'";
+				cout << "\n";
+			}
+		}
+		else if (lexicalMacros.find(t.value()) != lexicalMacros.end())
+		{
+			v.insert(v.end(), lexicalMacros[t.value()].begin(), lexicalMacros[t.value()].end());
+		}
 		else
-			throw runtime_error("invald boolean literal");
+		{
+			v.push_back(t);
+		}
+	}
+
+	MittenLexer::MittenLexer()
+	{
+		deliminate("//", "\n") = Filtered;
+		deliminate("/*", "*/") = Filtered;
+		deliminate("#", directivePattern);
+		deliminate("\n") = Filtered;
+		deliminate("\t") = Filtered;
+		deliminate(" ") = Filtered;
+
+		directiveLexer = Lexer(*this);
+		directiveLexer.undeliminate("#");
 	}
 }

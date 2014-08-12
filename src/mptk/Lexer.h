@@ -166,6 +166,11 @@ namespace mitten
 		 */
 		Lexer() : maxDelimLength(0) {}
 
+		/*! \brief Copy constructor.
+		 * Copies the lexer given completely.
+		 */
+		Lexer(const Lexer &l) : boolTag(l.boolTag), intTag(l.intTag), floatTag(l.floatTag), charTag(l.charTag), stringTag(l.stringTag), symbolTag(l.symbolTag), delims(l.delims), maxDelimLength(l.maxDelimLength) {}
+
 		/*! \brief Adds a new deliminator to the lexical grammar.
 		 * \param s The start point of the deliminator.
 		 * \param e An optional end point for the deliminator.
@@ -180,11 +185,19 @@ namespace mitten
 		 */
 		DeliminatorFlags &deliminate(std::string s, DeliminatorPatternCallback c);
 
+		/*! \brief Removes a deliminator from the lexical grammar.
+		 * \param s The start point of the deliminator to remove.
+		 */
+		void undeliminate(std::string s);
+
 		/*! \brief Performs the actual lexical analysis.
 		 * \param s The input string.
+		 * \param f The input file name.
+		 * \param lineoff The starting line number (from 1), -1 if none.
+		 * \aaram coloff The starting column number (from 0), -1 if none.
 		 * \returns The resultant token vector.
 		 */
-		std::vector<Token> lex(std::string s, std::string f);
+		std::vector<Token> lex(std::string s, std::string f, int lineoff = -1, int columnoff = -1);
 	};
 }
 

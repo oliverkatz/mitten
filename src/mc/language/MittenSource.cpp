@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MittenSource.cpp
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Source code object for Mitten. Interface to the compiler's frontend.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #include "MittenSource.h"
 
 using namespace std;
@@ -85,15 +71,6 @@ namespace mitten
 
 	MittenSource::MittenSource()
 	{
-		lexer.deliminate("//", "\n") = Filtered;
-		lexer.deliminate("/*", "*/") = Filtered;
-		lexer.deliminate("#", multiLineMacroPattern);
-		lexer.deliminate("\n") = Filtered;
-		lexer.deliminate("\t") = Filtered;
-		lexer.deliminate(" ") = Filtered;
-
-		directiveLexer.deliminate("\t") = Filtered;
-		directiveLexer.deliminate(" ") = Filtered;
 	}
 
 	bool MittenSource::readSourceFile(string p)
@@ -149,143 +126,6 @@ namespace mitten
 		return false;
 	}
 
-	bool MittenSource::preProcessLexical(bool verbose)
-	{
-		if (verbose)
-		{
-			cout << "preprocess lexical " << path << ":\n";
-			cout << string(50, '=') << "\n";
-		}
-
-		vector<Token> res;
-
-		for (int i = 0; i < toks.size(); i++)
-		{
-			if (toks[i].tag() == DeliminatorTag && toks[i].value()[0] == '#')
-			{
-				string d = toks[i].value().substr(1, toks[i].value().size()-2);
-				vector<Token> dt = directiveLexer.lex(d, path);
-				
-				if (dt[0].value().compare("define") == 0)
-				{
-					if (dt.size() < 2)
-					{
-						meh.insufficientDirectiveArguments(toks[i]);
-					}
-					else
-					{
-						if (lexicalMacros.find(dt[1].value()) != lexicalMacros.end())
-						{
-							meh.macroAlreadyDefined(toks[i]);
-						}
-						else
-						{
-							lexicalMacros[dt[1].value()].insert(lexicalMacros[dt[1].value()].end(), dt.begin()+2, dt.end());
-							for (auto j : lexicalMacros[dt[1].value()])
-								j.setTag(SyntheticTag);
-							if (verbose)
-							{
-								cout << dt[1].value() << " <=";
-								for (int j = 2; j < dt.size(); j++)
-									cout << " '" << dt[j].value() << "'";
-								cout << "\n";
-							}
-						}
-					}
-				}
-				else if (dt[0].value().compare("undef") == 0)
-				{
-					if (dt.size() != 2)
-					{
-						meh.insufficientDirectiveArguments(toks[i]);
-					}
-					else
-					{
-						if (lexicalMacros.find(dt[1].value()) == lexicalMacros.end())
-						{
-							meh.useOfUndefinedMacro(toks[i]);
-						}
-						else
-						{
-							lexicalMacros.erase(dt[1].value());
-							if (verbose)
-							{
-								cout << dt[1].value() << " <= <null>\n";
-							}
-						}
-					}
-				}
-				else if (dt[0].value().compare("redef") == 0)
-				{
-					if (dt.size() < 2)
-					{
-						meh.insufficientDirectiveArguments(toks[i]);
-					}
-					else
-					{
-						if (lexicalMacros.find(dt[1].value()) == lexicalMacros.end())
-						{
-							meh.useOfUndefinedMacro(toks[i]);
-						}
-						else
-						{
-							lexicalMacros[dt[1].value()].clear();
-							lexicalMacros[dt[1].value()].insert(lexicalMacros[dt[1].value()].end(), dt.begin()+2, dt.end());
-							for (auto j : lexicalMacros[dt[1].value()])
-								j.setTag(SyntheticTag);
-							if (verbose)
-							{
-								cout << dt[1].value() << " <=";
-								for (int j = 2; j < dt.size(); j++)
-									cout << " '" << dt[j].value() << "'";
-								cout << "\n";
-							}
-						}
-					}
-				}
-				else if (dt[0].value().compare("include") == 0)
-				{
-					
-				}
-				else
-				{
-					meh.unknownDirective(toks[i]);
-				}
-			}
-			else if (lexicalMacros.find(toks[i].value()) != lexicalMacros.end())
-			{
-				res.insert(res.end(), lexicalMacros[toks[i].value()].begin(), lexicalMacros[toks[i].value()].end());
-			}
-			else
-			{
-				res.push_back(toks[i]);
-			}
-		}
-
-		toks = res;
-
-		if (verbose)
-		{
-			cout << string(50, '-') << "\n";
-
-			int line = 1;
-			for (auto i : toks)
-			{
-				if (i.line() != line)
-				{
-					cout << "\n";
-					line = i.line();
-				}
-
-				cout << "'" << i.value() << "' ";
-			}
-
-			cout << "\n\n";
-		}
-
-		return false;
-	}
-
 	string MittenSource::reconstruct()
 	{
 		if (!toks.empty())
@@ -302,7 +142,6 @@ namespace mitten
 	{
 		page.clear();
 		toks.clear();
-		lexicalMacros.clear();
 		meh.clear();
 	}
 

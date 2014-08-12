@@ -34,40 +34,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "BooleanLiteralTagger.h"
+#ifndef __MITTEN_LANGUAGE_MITTEN_LEXER_H
+#define __MITTEN_LANGUAGE_MITTEN_LEXER_H
 
-using namespace std;
+#include <iostream>
+#include <MPTK.h>
 
 namespace mitten
 {
-	bool BooleanLiteralTagger::isBooleanLiteral(Token t)
+	class MittenLexer : public Lexer
 	{
-		return isBooleanLiteral(t.value());
-	}
+	protected:
+		Lexer directiveLexer;
+		std::unordered_map<std::string, std::vector<Token> > lexicalMacros;
 
-	bool BooleanLiteralTagger::isBooleanLiteral(string s)
-	{
-		if (s.compare(trueToken) == 0)
-			return true;
+		static int directivePattern(int from, std::string s);
+		void onToken(Token t, std::vector<Token> &v);
 
-		if (s.compare(falseToken) == 0)
-			return true;
-
-		return false;
-	}
-
-	bool BooleanLiteralTagger::parse(Token t)
-	{
-		return parse(t.value());
-	}
-
-	bool BooleanLiteralTagger::parse(string s)
-	{
-		if (s.compare(trueToken) == 0)
-			return true;
-		else if (s.compare(falseToken) == 0)
-			return false;
-		else
-			throw runtime_error("invald boolean literal");
-	}
+	public:
+		MittenLexer();
+	};
 }
+
+#endif

@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MC.cpp
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Entry point for the Mitten Compiler (MC).
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #include <iostream>
 #include <MPTK.h>
 
@@ -88,11 +74,6 @@ int main(int argc, char *argv[])
 		if (source.lex(true))
 		{
 			return 3;
-		}
-
-		if (source.preProcessLexical(true))
-		{
-			return 4;
 		}
 
 		if (source.dumpErrors())

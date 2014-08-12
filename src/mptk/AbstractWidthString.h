@@ -52,11 +52,17 @@ namespace mitten
 	{
 	protected:
 		void *_data; //! Data content.
-		size_t _size; //! Size of string.
-		size_t _capacity; //! Memory usage capacity.
+		size_t _size; //! Size of string in characters.
+		size_t _capacity; //! Memory usage capacity in characters.
 		unsigned char _width; //! Width of character in bytes.
 
+		void release();
+
 	public:
+		static const float defaultFac; //! The default factor for dynamic re-allocation.
+		static const int defaultOff; //! The default offset for dynamic re-allocation.
+		static const size_t npos; //! The returned value of find and rfind if not instance is found.
+
 		/*! \brief Constructor.
 		 * Constructs uninitialized string. 
 		 */
@@ -66,6 +72,11 @@ namespace mitten
 		 * Copy constructor to preserve memory management.
 		 */
 		AbstractWidthString(const AbstractWidthString &s) : _data(s._data), _size(s._size), _capacity(0), _width(s._width) {}
+
+		/*! \brief Destructor.
+		 * Releases and nullifies the current string.
+		 */
+		~AbstractWidthString();
 
 		/*! \brief Constructor.
 		 * Creates an abstract width string from an 8-bit C string.
@@ -144,11 +155,152 @@ namespace mitten
 		 */
 		std::u32string toString32();
 
+		/*! \brief Gets the number of characters in the string.
+		 */
+		size_t size();
+
+		/*! \brief Gets character width of the string in bytes
+		 */
+		size_t width();
+
+		/*! \brief Gets the memory size of the string in bytes.
+		 * Essentially, size()*width()
+		 */
+		size_t memsize();
+
+		/*! \brief Gets the capacity of the string in characters.
+		 * Although this capacity is governed by memory capacity, it is still given in
+		 * characters for consistency.
+		 */
+		size_t capacity();
+
+		/*! \brief Gets the memory capacity of the string in bytes.
+		 * Essentially, capacity()*width()
+		 */
+		size_t memcapacity();
+
+		/*! \brief Reallocates the memory space with the specified size in characters.
+		 * Must be given in characters for abstraction purposes.
+		 */
+		void reallocate(size_t s);
+
+		/*! \brief Resizes the string length to the specified size in characters.
+		 */
+		void resize(size_t s);
+
 		/*! \brief Random accessor.
 		 * \param n Index of character.
 		 * \returns A copy of the character at index n cast to a 32-bit integer.
 		 */
 		char32_t operator [] (int n);
+
+		/*! \brief Comparison operation.
+		 * \param s String to compare to.
+		 * \returns Lexiographical difference between strings (either -1, 0, or 1).
+		 */
+		int compare(AbstractWidthString s);
+
+		/*! \brief Equal-to operation.
+		 * \param s String to compare to.
+		 * \returns Result of operation.
+		 */
+		bool operator == (AbstractWidthString s);
+
+		/*! \brief Equal-to operation.
+		 * \param s String to compare to.
+		 * \returns Result of operation.
+		 */
+		bool operator != (AbstractWidthString s);
+
+		/*! \brief Equal-to operation.
+		 * \param s String to compare to.
+		 * \returns Result of operation.
+		 */
+		bool operator < (AbstractWidthString s);
+
+		/*! \brief Equal-to operation.
+		 * \param s String to compare to.
+		 * \returns Result of operation.
+		 */
+		bool operator <= (AbstractWidthString s);
+
+		/*! \brief Equal-to operation.
+		 * \param s String to compare to.
+		 * \returns Result of operation.
+		 */
+		bool operator > (AbstractWidthString s);
+
+		/*! \brief Equal-to operation.
+		 * \param s String to compare to.
+		 * \returns Result of operation.
+		 */
+		bool operator >= (AbstractWidthString s);
+
+		/*! \brief Append string to current string.
+		 * \param s String to append.
+		 * \param fac Factor that the string size will be multiplied by for dynamic re-allocation.
+		 * \param off The offset to be applied to the string size for dynamic re-allocation after the factor.
+		 * \returns Reference to current string after append.
+		 */
+		AbstractWidthString &append(AbstractWidthString s, float fac = defaultFac, int off = defaultOff);
+
+		/*! \brief Append string to current string.
+		 * \param s String to append.
+		 * \returns Reference to current string after append.
+		 */
+		AbstractWidthString &operator += (AbstractWidthString s);
+
+		/*! \brief Append character to current string.
+		 * \param c Character to append.
+		 * \param fac Factor that the string size will be multiplied by for dynamic re-allocation.
+		 * \param off The offset to be applied to the string size for dynamic re-allocation after the factor.
+		 * \returns Reference to current string after append.
+		 */
+		AbstractWidthString &append(char32_t c, float fac = defaultFac, int off = defaultOff);
+
+		/*! \brief Append character to current string.
+		 * \param c Character to append.
+		 * \returns Reference to current string after append.
+		 */
+		AbstractWidthString &operator += (char32_t c);
+
+		/*! \brief Returns a new string which is a slice of the current string.
+		 * Starts from \p from and goes for \p len characters.
+		 * \param from The start point of the substring in characters.
+		 * \param len The length of the substring in characters.
+		 * \returns The created substring.
+		 */
+		AbstractWidthString substr(size_t from, size_t len = (size_t)-1);
+
+		/*! \brief Inserts the contents of \p s into the string at position \p pos.
+		 * \param pos The position at which to insert the string in characters.
+		 * \param s The string to be inserted.
+		 * \param fac Factor that the string size will be multiplied by for dynamic re-allocation.
+		 * \param off The offset to be applied to the string size for dynamic re-allocation after the factor.
+		 * \returns Reference to current string after insert.
+		 */
+		AbstractWidthString &insert(size_t pos, AbstractWidthString s, float fac = defaultFac, int off = defaultOff);
+
+		/*! \brief Erases \p len characters of the contents of the string from position \p from.
+		 * \param from The start point of the erasure in characters.
+		 * \param len The length of the erasure in characters.
+		 * \returns Reference to the current string after erasure.
+		 */
+		AbstractWidthString &erase(size_t from, size_t len);
+
+		/*! \brief Finds the first instance of \p s starting from \p from.
+		 * \param s The string pattern to look for.
+		 * \param from The start point for the find.
+		 * \returns The index of the first instance of \p s, AbstractWidthString::npos if not in string.
+		 */
+		size_t find(AbstractWidthString s, size_t from = 0);
+
+		/*! \brief Finds the last instance of \p s after \p after.
+		 * \param s The string pattern to look for.
+		 * \param after The first index allowed.
+		 * \returns The index of the last instance of \p s, AbstractWidthString::npos if not in string.
+		 */
+		size_t rfind(AbstractWidthString s, size_t after = 0);
 	};
 }
 

@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MittenSource.h
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Source code object for Mitten. Interface to the compiler's frontend.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #ifndef __MITTEN_LANGUAGE_MITTEN_SOURCE_H
 #define __MITTEN_LANGUAGE_MITTEN_SOURCE_H
 
@@ -57,20 +43,18 @@
 #include <MPTK.h>
 
 #include "MittenErrorHandler.h"
+#include "MittenLexer.h"
 
 namespace mitten
 {
 	class MittenSource
 	{
 	protected:
-		Lexer lexer;
-		Lexer directiveLexer;
+		MittenLexer lexer;
 
 		std::string path;
 		std::string page;
 		std::vector<Token> toks;
-
-		std::unordered_map<std::string, std::vector<Token> > lexicalMacros;
 
 		MittenErrorHandler meh;
 
@@ -81,7 +65,6 @@ namespace mitten
 		bool setSourceString(std::string s);
 
 		bool lex(bool verbose = false);
-		bool preProcessLexical(bool verbose = false);
 
 		std::string reconstruct();
 

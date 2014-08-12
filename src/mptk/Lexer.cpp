@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    Lexer.cpp
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * The lexical analyzer within MPTK is implemented here.
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #include "Lexer.h"
 
 using namespace std;
@@ -122,12 +108,37 @@ namespace mitten
 		return delims[s.size()][s].flags;
 	}
 
-	std::vector<Token> Lexer::lex(std::string s, string f)
+	void Lexer::undeliminate(string s)
+	{
+		if (s.empty())
+			throw runtime_error("cannot undeliminate empty string");
+
+		if (delims.find(s.size()) == delims.end())
+			throw runtime_error("no such deliminator");
+
+		if (delims[s.size()].find(s) == delims[s.size()].end())
+			throw runtime_error("no such deliminator");
+
+		delims[s.size()].erase(s);
+		if (delims[s.size()].empty() && s.size() == maxDelimLength)
+		{
+			while (delims[maxDelimLength].empty() && maxDelimLength >= 0)
+			{
+				maxDelimLength--;
+			}
+		}
+	}
+
+	std::vector<Token> Lexer::lex(std::string s, string f, int lineoff, int columnoff)
 	{
 		std::vector<Token> rtn;
 
 		int line = 1;
+		if (lineoff > 1)
+			line = lineoff;
 		int column = 0;
+		if (column > 0)
+			column = columnoff;
 		int lastline = 1;
 		int lastcolumn = 0;
 		bool found = false;
@@ -177,6 +188,7 @@ namespace mitten
 							Token tmp = Token(s.substr(i, dl), f, line, column, DeliminatorTag);
 							onToken(tmp, rtn);
 						}
+
 						for (auto c : s.substr(i, dl))
 						{
 							if (c == '\n')

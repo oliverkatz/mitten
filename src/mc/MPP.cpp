@@ -34,20 +34,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* File:    MPP.cpp
- * Author:  Oliver Katz
- * Version: 0.01-alpha
- * License: BSD 2-Clause
- * ========================================================================== *
- * Entry point for the Mitten Compiler's preprocessor (MPP).
- */
-
-/* Changelog:
- * ========================================================================= *
- * 0.01-alpha ------------------------------------------------ July 20, 2014 *
- * Initial release.
- */
-
 #include <iostream>
 #include <MPTK.h>
 
@@ -90,11 +76,6 @@ int main(int argc, char *argv[])
 	if (source.lex())
 	{
 		return 4;
-	}
-
-	if (source.preProcessLexical())
-	{
-		return 5;
 	}
 
 	if (source.dumpErrors())

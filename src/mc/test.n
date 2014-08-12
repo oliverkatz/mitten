@@ -1,1 +1,8 @@
-#include "test2.h"
+#define A 5
+A
+
+#define L #{
+	hello, world
+#}
+
+L

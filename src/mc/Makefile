@@ -13,7 +13,7 @@ include ../config.mk
 
 CXXFLAGS+=-I../mptk -L../mptk
 
-OBJ=util/CommandLineParser.o language/MittenErrorHandler.o language/MittenSource.o
+OBJ=util/CommandLineParser.o language/MittenErrorHandler.o language/MittenLexer.o language/MittenSource.o
 
 all : mc mpp
 

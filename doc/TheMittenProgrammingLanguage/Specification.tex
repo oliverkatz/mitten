@@ -31,6 +31,8 @@
 \newpage
 
 \section{Introduction}
+This is the standard of the Mitten language. This standard has different versions, the naming of which is described in section \ref{sec:Versioning}. The semantic syntax is described in EBNF, a summary of which is given in section \ref{sec:EBNFSummary}. For a formal definition, see \textit{XXX}.
+
 Mitten is intended to be a high-level programming language for large projects. It is multi-paradigm, encompassing object-oriented, procedural, and functional programming. It is designed to be run natively, although this is left to the implementation's discretion. If you already know the C programming language, or especially C++, the syntax and functionality of Mitten should be familiar. This document is a description of Mitten for those who want to write code in it and for those who want to write a compiler for it.
 
 This document is a technical specification of the Mitten language. It provides standardization for compilers so that any Mitten code should work the same with any compiler implementation. It contains a description of the lexical grammar, the syntax, the preprocessor, the expected execution of a given syntax, and the most basic standard library necessary for Mitten.
@@ -60,9 +62,6 @@ Haskell is remarkable in its syntax effiency. Every function is written on a sin
 
 Although these languages cannot be matched for their specific advantages, Mitten does take heavy inspiration from them. C, C++, Python, and Haskell are all extraordinary languages to learn, as they should be.
 
-\section{Language Specification}
-This is the standard of the Mitten language. This standard has different versions, the naming of which is described in section \ref{sec:Versioning}. The semantic syntax is described in EBNF, a summary of which is given in section \ref{sec:EBNFSummary}. For a formal definition, see \textit{XXX}.
-
 \subsection{Versioning}
 \label{sec:Versioning}
 Since Mitten has an official compiler (the Mitten Compiler MC), the standard is given the same version number as the current compiler version. For example, the current compiler version for this standard is 0.01-alpha, which means that this standard will also be numbered 0.01-alpha for its correlation with this compiler version. It is expected that the compiler will update more often than the standard, which is why it is the basis for the versioning system.
@@ -76,7 +75,61 @@ The following table lists the history of the Mitten language standard and Mitten
 \hline
 \end{tabular}
 
+\subsection{Terminology}
+The following terms are used in the specification:
+\begin{description}
+\item[Token] A sequence of characters making up the smallest unit of lexical syntax.
+\item[Deliminator] A pattern or sequence of characters used to separate non-deliminator tokens in lexical analysis.
+\item[Symbol] A named element of the syntax for the given language. 
+\item[Terminal Symbol] An elementary syntactic symbol which is atomic in the syntax of the given language.
+\item[Nonterminal Symbol] A symbol which is comprised of other terminal and nonterminal symbols in the syntax of the given language. Their specification often takes the form of a production rule.
+\end{description}
+
 \subsection{EBNF Summary}
 \label{sec:EBNFSummary}
+Extended Backus-Naur Form (EBNF) is a formal syntax for specifying programming language syntax. Its syntax consists of terminal symbols and production rules. The simplest production rule states that a nonterminal symbol consists of a terminal symbol:
+\begin{verbatim}
+zero = "0";
+\end{verbatim}
+
+A nonterminal symbol can be any of a set of possible terminal symbols:
+\begin{verbatim}
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+\end{verbatim}
+
+It can also be a combination of terminal and nonterminal symbols:
+\begin{verbatim}
+hex digit = digit | "a" | "A" | "b" | "B" | "c" | "C" | "d" | "D" | "e" | "E" | "f" | "F";
+\end{verbatim}
+
+You can specify symbols that go in sequence:
+\begin{verbatim}
+hi = "hi"; (*this is the same as...*)
+hi = "h", "i"; (*this.*)
+\end{verbatim}
+
+It is also easy to specify an element which can be zero or more instances of a symbol in sequence:
+\begin{verbatim}
+hex number = "0x", hex digit, {hex digit};
+\end{verbatim}
+
+Or an element which is optional:
+\begin{verbatim}
+might be a question = "dinner", ["?"];
+\end{verbatim}
+
+Parenthesis work much as they do in algebraic expressions:
+\begin{verbatim}
+binary string = ("1", "0"), {"1" | "0"};
+\end{verbatim}
+
+This is a basic summary of EBNF syntax to refresh the reader before reading the specification. For a more detailed description, see \textit{XXX}.
+
+\section{The Lexical Grammar}
+The lexical grammar of Mitten is used by both the preprocessor and the language itself. It will be described as a set of deliminators. Deliminators may be set sequences of characters or character sequence patterns which will be detailed below.
+
+
+
+\section{The Preprocessor}
 
 \end{document}

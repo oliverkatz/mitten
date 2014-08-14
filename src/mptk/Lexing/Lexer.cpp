@@ -188,6 +188,11 @@ namespace mitten
 							Token tmp = Token(s.substr(i, dl), f, line, column, DeliminatorTag);
 							onToken(tmp, rtn);
 						}
+						else
+						{
+							Token tmp = Token(s.substr(i, dl), f, line, column, DeliminatorTag, true);
+							onToken(tmp, rtn);
+						}
 
 						for (auto c : s.substr(i, dl))
 						{

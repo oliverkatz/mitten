@@ -47,18 +47,16 @@ namespace mitten
 	/*! \brief Reconstruct source file.
 	 * Reconstructs the original source file as closely as possible from a list of tokens. Line numbers, especially, are preserved.
 	 * \param toks Input token vector.
-	 * \param autoTabs Assumes that whitespace characters in the beginning of the lines are tabs, not single spaces.
 	 * \returns Original source file contents, as closely as can be reconstructed from given data.
 	 */
-	std::string reconstructFromTokenVector(std::vector<Token> toks, bool autoTabs = true);
+	std::string reconstructFromTokenVector(std::vector<Token> toks);
 
 	/*! \brief Reconstruct source file.
 	 * Reconstructs the original source file as closely as possible from an AST. Line numbers, especially, are preserved.
 	 * \param toks Input AST.
-	 * \param autoTabs Assumes that whitespace characters in the beginning of the lines are tabs, not single spaces.
 	 * \returns Original source file contents, as closely as can be reconstructed from given data.
 	 */
-	std::string reconstructFromAST(AST ast, bool autoTabs = true);
+	std::string reconstructFromAST(AST ast);
 }
 
 #endif

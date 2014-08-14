@@ -66,6 +66,9 @@ namespace mitten
 
 		for (auto i : toks)
 		{
+			if (i.filtered())
+				continue;
+
 			if (bounds.find(i.value()) != bounds.end())
 			{
 				builder.append(AST::createNode(bounds[i.value()].boundName));

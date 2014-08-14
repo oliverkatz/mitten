@@ -44,61 +44,9 @@ namespace mitten
 	{
 		string page;
 
-		int line = 1, column = 0;
-		bool firstOnLine = true;
-
 		for (auto i : toks)
 		{
-			if (i.line() > line && i.tag() != SyntheticTag)
-			{
-				firstOnLine = true;
-
-				while (i.line() > line)
-				{
-					page += "\n";
-					line++;
-				}
-			}
-			else
-			{
-				firstOnLine = false;
-			}
-
-			if (i.tag() != SyntheticTag)
-			{
-				while (i.column() > column)
-				{
-					if (firstOnLine && autoTabs)
-					{
-						page += "\t";
-					}
-					else
-					{
-						page += " ";
-					}
-
-					column++;
-				}
-			}
-			else
-			{
-				page += " ";
-				column++;
-			}
-
 			page += i.value();
-			for (auto j : i.value())
-			{
-				if (j == '\n')
-				{
-					line++;
-					column = 0;
-				}
-				else
-				{
-					column++;
-				}
-			}
 		}
 
 		return page;

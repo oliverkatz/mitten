@@ -71,6 +71,7 @@ namespace mitten
 		std::string _value; //! The token's value.
 		TokenTag _tag; //! The token's tag.
 		std::string _file; //! The file path of the origin file.
+		bool _filtered; //! Whether or not the token was filtered by the lexer.
 
 	public:
 		/*! \brief Constructor.
@@ -86,7 +87,7 @@ namespace mitten
 		 * \param c The column number.
 		 * \param t Optional token tag.
 		 */
-		Token(std::string v, std::string f, int l, int c, TokenTag t = DeliminatorTag) : _line(l), _column(c), _value(v), _tag(t), _file(f) {}
+		Token(std::string v, std::string f, int l, int c, TokenTag t = DeliminatorTag, bool fil = false) : _line(l), _column(c), _value(v), _tag(t), _file(f), _filtered(fil) {}
 
 		/*! \brief Gets the line number of the first character of the token. 
 		 * Starts from 1.
@@ -111,6 +112,9 @@ namespace mitten
 
 		/*! \brief Gets the file path of the origin file. */
 		std::string file();
+
+		/*! \brief Gets whether or not the token is filtered. */
+		bool filtered();
 	};
 }
 

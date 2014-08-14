@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<title>MPTK</title>
+
+		<link rel="stylesheet" type="text/css" href="main.css" />
+
+		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open%20Sans" />
+
+		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato" />
+	</head>
+
+	<body>
+		<div id="TitleBar">
+			<a href="index.html">Mitten Parsing ToolKit (MPTK)</a> <span class="Divider">|</span>
+			<a href="download.html">Download</a> <span class="Divider">|</span>
+			<a href="javascript:void(0);">Tutorial</a> <span class="Divider">|</span>
+			<a href="javascript:void(0);">Reference</a> <span class="Divider">|</span>
+			<a href="javascript:void(0);">About</a>
+		</div>
+		<div id="Background">
+		</div>
+		<div id="Wrapper">
+			<div class="Title">Complex Syntaxes</div>
+			<div class="Section">
+				<div class="Code">
+					include(std);<br>
+					<br>
+					void main()<br>
+					{<br>
+					<span class="CodeIndent"></span>print("hello, world");<br>
+					}<br>
+				</div>
+
+				Even the most complex syntaxes with recursive elements and influences from C-like languages can be easily parsed with MPTK.
+			</div>
+
+			<div class="Title">Done Easily</div>
+			<div class="Section">
+				<div class="Code">
+					Lexer lexer;<br>
+					lexer.deliminate("\n") = Filtered;<br>
+					lexer.deliminate(" ") = Filtered;<br>
+					lexer.deliminate("\t") = Filtered;<br>
+					lexer.deliminate("(");<br>
+					lexer.deliminate(")");<br>
+					lexer.deliminate("{");<br>
+					lexer.deliminate("}");<br>
+					lexer.deliminate(";");<br>
+					lexer.deliminate("\"", "\"");<br>
+				</div>
+
+				The API between you and the parsing engine is easy to use an intuitive. Heavy-duty syntaxes can be parsed with less than a hundred lines of code.
+			</div>
+
+			<div class="Title">Flexible</div>
+			<div class="Section">
+				<div class="Code">
+					MPTK is capable of handling unusual syntaxes like reStructured Text::<br>
+<br>
+						<span class="CodeIndent"></span>In all shapes and forms.<br>
+				</div>
+
+				The parsing engine's flexibility and extendability are what let MPTK handle such a wide variety of input languages.
+			</div>
+
+			<div class="Title">Efficient</div>
+			<div class="Section">
+				MPTK's parsing engine only needs to run through the source code once to perform all the tasks it needs to generate easy-to-use ASTs. 
+			</div>
+
+			<div id="Copyright">Copyright 2014 Oliver Katz</div>
+		</div>
+	</body>
+</html>

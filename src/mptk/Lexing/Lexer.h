@@ -153,6 +153,8 @@ namespace mitten
 		 */
 		virtual void onToken(Token t, std::vector<Token> &v);
 
+		std::unordered_map<std::string, std::vector<Token> > lexicalMacros;
+
 	public:
 		BooleanLiteralTagger boolTag; //! The boolean tag parser.
 		IntegerLiteralTagger intTag; //! The int tag parser.
@@ -189,6 +191,8 @@ namespace mitten
 		 * \param s The start point of the deliminator to remove.
 		 */
 		void undeliminate(std::string s);
+
+		void defineMacro(std::string s, std::vector<Token> v);
 
 		/*! \brief Performs the actual lexical analysis.
 		 * \param s The input string.

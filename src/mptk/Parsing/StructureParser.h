@@ -97,9 +97,11 @@ namespace mitten
 		std::unordered_map<std::string, AST> semanticMacros; //! The dictionary of all semantic macros.
 
 	public:
+		/*! \brief Callback which is run for each AST node parsed.
+		 * The first argument is the parsed node. The second argument is a reference to the current 
+		 * AST builder object. The last argument is a reference to the current error handler object.
+		 */
 		std::function<void (AST, ASTBuilder &, ErrorHandler &)> onNode;
-		
-		std::function<void (AST, AST, ASTBuilder &, ErrorHandler &)> onUseMacro;
 	
 		/*! \brief Constructor.
 		 * Creates a new structure parser with no bounds.

@@ -93,8 +93,14 @@ namespace mitten
 		std::string globalSplitName; //! AST node name for the global bound element (i.e. a line of code).
 		std::unordered_map<std::string, Bound> bounds; //! List of bounds sorted by start-point.
 		std::unordered_set<std::string> boundEnds; //! Set of all bound end-points - used for error checking.
+		
+		std::unordered_map<std::string, AST> semanticMacros; //! The dictionary of all semantic macros.
 
 	public:
+		std::function<void (AST, ASTBuilder &, ErrorHandler &)> onNode;
+		
+		std::function<void (AST, AST, ASTBuilder &, ErrorHandler &)> onUseMacro;
+	
 		/*! \brief Constructor.
 		 * Creates a new structure parser with no bounds.
 		 * \param en Global node name.
@@ -112,6 +118,22 @@ namespace mitten
 		 * \returns A reference to the newly created bound declaration.
 		 */
 		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
+		
+		/*! \brief Defines a new macro.
+		 * \param s The name of the macro.
+		 * \param v The value of the macro.
+		 */
+		void defineMacro(std::string s, AST v);
+		
+		/*! \brief Undefines an existing macro.
+		 * \param s The name of the macro.
+		 */
+		void undefineMacro(std::string s);
+		
+		/*! \brief Checks whether or not a macro is defined.
+		 * \param s The name of the macro.
+		 */
+		bool isMacroDefined(std::string s);
 
 		/*! \brief Runs parser.
 		 * Requires the use of an input token vector and an error handler with which to store errors.

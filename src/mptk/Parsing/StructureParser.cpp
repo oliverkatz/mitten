@@ -98,6 +98,7 @@ namespace mitten
 				builder.ascend();
 				builder.ascend();
 				boundStack.pop();
+				onNode(builder.head(), builder, eh);
 				if (!boundStack.empty() && (head->size() > 0 && bounds[boundStack.top()].endIsParentSplit))
 				{
 					builder.append(AST::createNode(bounds[boundStack.top()].elementName));
@@ -107,6 +108,7 @@ namespace mitten
 			else if (!boundStack.empty() && bounds[boundStack.top()].split.compare(i.value()) == 0)
 			{
 				builder.ascend();
+				onNode(builder.head(), builder, eh);
 				builder.append(AST::createNode(bounds[boundStack.top()].elementName));
 				builder.descend();
 			}
@@ -129,6 +131,7 @@ namespace mitten
 			else
 			{
 				builder.append(i);
+				onNode(builder.head(), builder, eh);
 			}
 		}
 
@@ -137,6 +140,7 @@ namespace mitten
 			e.incompleteStructureBound(toks[0], boundStack.top(), bounds[boundStack.top()].end);
 		}
 
+		onNode(builder.root(), builder, eh);
 		return builder.root();
 	}
 }

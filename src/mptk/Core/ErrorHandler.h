@@ -84,6 +84,14 @@ namespace mitten
 		/*! \brief Error for the inability to operate on operators.
 		 */
 		virtual void cannotOperateOnAnOperator(Token source) =0;
+		
+		/*! \brief Error for the re-definition of an existing macro.
+		 */
+		virtual void macroShadowsExistingDefinition(Token source) =0;
+		
+		/*! \brief Error for the use of an undefined macro.
+		 */
+		virtual void useOfUndefinedMacro(Token source) =0;
 	};
 
 	/*! \brief Implementation of the ErrorHandler base class.
@@ -153,6 +161,16 @@ namespace mitten
 		 * See the ErrorHandler base class.
 		 */
 		virtual void cannotOperateOnAnOperator(Token source);
+		
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
+		virtual void macroShadowsExistingDefinition(Token source);
+		
+		/*! \brief Implemented method.
+		 * See the ErrorHandler base class.
+		 */
+		virtual void useOfUndefinedMacro(Token source);
 
 		/*! \brief Checks if there are no errors.
 		 * \returns True only if there are no errors.

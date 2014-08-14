@@ -169,10 +169,23 @@ namespace mitten
 						{
 							Token tmp = Token(s.substr(last, i-last), f, lastline, lastcolumn);
 							tmp.setTag(findTag(tmp));
-							if (onToken)
-								onToken(tmp, rtn, eh);
+							if (lexicalMacros.find(tmp.value()) != lexicalMacros.end())
+							{
+								for (auto k : lexicalMacros[tmp.value()])
+								{
+									if (onToken)
+										onToken(k, rtn, eh);
+									else
+										rtn.push_back(k);
+								}
+							}
 							else
-								rtn.push_back(tmp);
+							{
+								if (onToken)
+									onToken(tmp, rtn, eh);
+								else
+									rtn.push_back(tmp);
+							}
 						}
 
 						size_t dl = j;
@@ -199,18 +212,44 @@ namespace mitten
 						if (!(d.flags & Filtered))
 						{
 							Token tmp = Token(s.substr(i, dl), f, line, column, DeliminatorTag);
-							if (onToken)
-								onToken(tmp, rtn, eh);
+							if (lexicalMacros.find(tmp.value()) != lexicalMacros.end())
+							{
+								for (auto k : lexicalMacros[tmp.value()])
+								{
+									if (onToken)
+										onToken(k, rtn, eh);
+									else
+										rtn.push_back(k);
+								}
+							}
 							else
-								rtn.push_back(tmp);
+							{
+								if (onToken)
+									onToken(tmp, rtn, eh);
+								else
+									rtn.push_back(tmp);
+							}
 						}
 						else
 						{
 							Token tmp = Token(s.substr(i, dl), f, line, column, DeliminatorTag, true);
-							if (onToken)
-								onToken(tmp, rtn, eh);
+							if (lexicalMacros.find(tmp.value()) != lexicalMacros.end())
+							{
+								for (auto k : lexicalMacros[tmp.value()])
+								{
+									if (onToken)
+										onToken(k, rtn, eh);
+									else
+										rtn.push_back(k);
+								}
+							}
 							else
-								rtn.push_back(tmp);
+							{
+								if (onToken)
+									onToken(tmp, rtn, eh);
+								else
+									rtn.push_back(tmp);
+							}
 						}
 
 						for (auto c : s.substr(i, dl))
@@ -253,10 +292,23 @@ namespace mitten
 		{
 			Token tmp = Token(s.substr(last), f, lastline, lastcolumn);
 			tmp.setTag(findTag(tmp));
-			if (onToken)
-				onToken(tmp, rtn, eh);
+			if (lexicalMacros.find(tmp.value()) != lexicalMacros.end())
+			{
+				for (auto k : lexicalMacros[tmp.value()])
+				{
+					if (onToken)
+						onToken(k, rtn, eh);
+					else
+						rtn.push_back(k);
+				}
+			}
 			else
-				rtn.push_back(tmp);
+			{
+				if (onToken)
+					onToken(tmp, rtn, eh);
+				else
+					rtn.push_back(tmp);
+			}
 		}
 
 		return rtn;

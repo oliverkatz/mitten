@@ -58,6 +58,21 @@ namespace mitten
 		boundEnds.insert(e);
 		return bounds[st];
 	}
+	
+	void StructureParser::defineMacro(string s, AST v)
+	{
+		semanticMacros[s] = v;
+	}
+	
+	void StructureParser::undefineMacro(string s)
+	{
+		semanticMacros.erase(s);
+	}
+	
+	bool StructureParser::isMacroDefined(string s)
+	{
+		return (semanticMacros.find(s) != semanticMacros.end());
+	}
 
 	AST StructureParser::parse(vector<Token> toks, ErrorHandler &e)
 	{

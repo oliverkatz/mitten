@@ -149,10 +149,6 @@ namespace mitten
 		 */
 		TokenTag findTag(Token t);
 
-		/*! \brief Appends token \p t to token vector \p v, but it can be overloaded to do much more.
-		 */
-		virtual void onToken(Token t, std::vector<Token> &v);
-
 		std::unordered_map<std::string, std::vector<Token> > lexicalMacros;
 
 	public:
@@ -162,6 +158,29 @@ namespace mitten
 		CharacterLiteralTagger charTag; //! The character tag parser.
 		StringLiteralTagger stringTag; //! The string tag parser.
 		SymbolTagger symbolTag; //! The symbol tag parser.
+		
+		/*! \brief Callback which is run upon recieving token.
+		 * The first argument is the token which was lexed. The second is the current vector
+		 * of tokens. To replicate default behavior (tokens lexed are added to the results vector)
+		 * simply append the token lexed to the back of the vector.
+		 */
+		std::function<void (Token, std::vector<Token> &)> onToken;
+		
+		/*! \brief Callback which is run upon definition of a new macro.
+		 * The first argument is the token which is the symbol of the macro. The second is the
+		 * value of the token stored as a token vector. To replicate default behavior simply
+		 * add the symbol represented by the first token to lexicalMacros with the value
+		 * given.
+		 */
+		std::function<void (Token, std::vector<Token>)> onMacroDefinition;
+		
+		/*! \brief Callback which is run upon the use of a defined macro.
+		 * The first argument is the token which called the macro. The second is the value of the macro
+		 * given by the lexicalMacros dictionary. The last argument is the current vector of tokens. To
+		 * replicate default behavior (calling token is replaced by value tokens), simply append the macro
+		 * value to the resultant token vector.
+		 */
+		std::function<void (Token, std::vector<Token>, std::vector<Token> &)> onMacroUse;
 
 		/*! \brief Constructor.
 		 * Initializes a lexer with an empty lexical grammar.
@@ -192,6 +211,10 @@ namespace mitten
 		 */
 		void undeliminate(std::string s);
 
+		/*! \brief Defines a new macro for use in the rest of the code.
+		 * \param s The name of the macro.
+		 * \param v The value of the macro.
+		 */
 		void defineMacro(std::string s, std::vector<Token> v);
 
 		/*! \brief Performs the actual lexical analysis.

@@ -74,10 +74,23 @@ namespace mitten
 		else
 			return DeliminatorTag;
 	}
-
-	void Lexer::onToken(Token t, vector<Token> &v)
+	
+	void __mptk_onToken_default(Token t, vector<Token> &r, ErrorHandler &eh)
 	{
-		v.push_back(t);
+		r.push_back(t);
+	}
+	
+	void __mptk_onMacroDefinition_default(Token t, vector<Token> v, ErrorHandler &eh)
+	{
+		if (lexicalMacros.find(t.value()) != lexicalMacros.end())
+			eh.macroShadowsExistingDefinition(t);
+		else
+			lexicalMacros[t.value()] = v;
+	}
+	
+	void __mptk_onMacroUse_default(Token t, vector<Token> v, vector<Token> &r, ErrorHandler &eh)
+	{
+		r.insert(r.end(), v.begin(), v.end());
 	}
 
 	DeliminatorFlags &Lexer::deliminate(std::string s, std::string e)

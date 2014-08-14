@@ -124,12 +124,22 @@ namespace mitten
 		}
 	}
 	
-	void Lexer::defineMacro(Token t, vector<Token> v)
+	void Lexer::defineMacro(string s, vector<Token> v)
 	{
-		lexicalMacros[t.value()]
+		lexicalMacros[s] = v;
+	}
+	
+	void Lexer::undefineMacro(string s)
+	{
+		lexicalMacros.erase(s);
+	}
+	
+	bool Lexer::isMacroDefined(string s)
+	{
+		return (lexicalMacros.find(s) != lexicalMacros.end());
 	}
 
-	std::vector<Token> Lexer::lex(std::string s, string f, int lineoff, int columnoff)
+	std::vector<Token> Lexer::lex(std::string s, string f, ErrorHandler &eh, int lineoff, int columnoff)
 	{
 		std::vector<Token> rtn;
 
@@ -159,7 +169,10 @@ namespace mitten
 						{
 							Token tmp = Token(s.substr(last, i-last), f, lastline, lastcolumn);
 							tmp.setTag(findTag(tmp));
-							onToken(tmp, rtn);
+							if (onToken)
+								onToken(tmp, rtn, eh);
+							else
+								rtn.push_back(tmp);
 						}
 
 						size_t dl = j;
@@ -186,12 +199,18 @@ namespace mitten
 						if (!(d.flags & Filtered))
 						{
 							Token tmp = Token(s.substr(i, dl), f, line, column, DeliminatorTag);
-							onToken(tmp, rtn);
+							if (onToken)
+								onToken(tmp, rtn, eh);
+							else
+								rtn.push_back(tmp);
 						}
 						else
 						{
 							Token tmp = Token(s.substr(i, dl), f, line, column, DeliminatorTag, true);
-							onToken(tmp, rtn);
+							if (onToken)
+								onToken(tmp, rtn, eh);
+							else
+								rtn.push_back(tmp);
 						}
 
 						for (auto c : s.substr(i, dl))
@@ -234,7 +253,10 @@ namespace mitten
 		{
 			Token tmp = Token(s.substr(last), f, lastline, lastcolumn);
 			tmp.setTag(findTag(tmp));
-			onToken(tmp, rtn);
+			if (onToken)
+				onToken(tmp, rtn, eh);
+			else
+				rtn.push_back(tmp);
 		}
 
 		return rtn;

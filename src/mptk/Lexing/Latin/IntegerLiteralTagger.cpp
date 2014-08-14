@@ -34,27 +34,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MITTEN_UTILS_H
-#define __MITTEN_UTILS_H
+#include "IntegerLiteralTagger.h"
 
-#include <iostream>
-#include <string>
-#include <streambuf>
-#include <fstream>
-#include <stdexcept>
-
-#include "AbstractWidthString.h"
+using namespace std;
 
 namespace mitten
 {
-	/** \brief Reads a file into a string.
-	 * Loads the entire contents of a file into a dynamically-expanding string object.
-	 * If readFile is unable to open the file, it will throw a runtime_error.
-	 * \param path The path of the file to be read.
-	 * \param width The character width of the file's encoding.
-	 * \returns The contents of the file.
-	 */
-	AbstractWidthString readFile(std::string path, size_t width = 8);
-}
+	bool IntegerLiteralTagger::isIntegerLiteral(Token t)
+	{
+		return isIntegerLiteral(t.value());
+	}
 
-#endif
+	bool IntegerLiteralTagger::isIntegerLiteral(string s)
+	{
+		if (s.compare("0x") == 0)
+		{
+			return false;
+		}
+
+		std::string tmp;
+		if (s[s.size()-1] == 'h' && (isdigit(s[0]) || (s[0] >= 'a' && s[0] <= 'f') || (s[0] >= 'A' && s[0] <= 'F')))
+			tmp = "0x" + s.substr(0, s.size()-1);
+		else
+			tmp = s;
+
+		try
+		{
+			stoi(tmp, NULL, 0);
+			return true;
+		}
+		catch(invalid_argument &e)
+		{
+			return false;
+		}
+	}
+
+	int IntegerLiteralTagger::parse(Token t)
+	{
+		return parse(t.value());
+	}
+
+	int IntegerLiteralTagger::parse(string s)
+	{
+		if (s.compare("0x") == 0)
+			throw runtime_error("invalid integer format");
+
+		string tmp;
+		if (s[s.size()-1] == 'h' && (isdigit(s[0]) || (s[0] >= 'a' && s[0] <= 'f') || (s[0] >= 'A' && s[0] <= 'F')))
+			tmp = "0x" + s.substr(0, s.size()-1);
+		else
+			tmp = s;
+
+		return stoi(tmp, NULL, 0);
+	}
+}

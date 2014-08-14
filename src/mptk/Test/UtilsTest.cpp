@@ -34,57 +34,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MITTEN_INTEGER_LITERAL_TAGGER_H
-#define __MITTEN_INTEGER_LITERAL_TAGGER_H
-
 #include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include <MUnit.h>
 
-#include "Token.h"
+#include "../Core/Utils.h"
 
-namespace mitten
+using namespace std;
+using namespace mitten;
+
+int main()
 {
-	/*! \brief Identifies integer literals from tokens.
-	 */
-	class IntegerLiteralTagger
-	{
-	public:
-		bool allowDecimal; //! Set to true to allow decimal integers.
-		bool allowOctal; //! Set to true to allow octal integers.
-		bool allowHexadecimalLowercase; //! Set to true to allow hex integers with lowercase letters.
-		bool allowHexadecimalUppercase; //! Set to true to allow hex integers with uppercase letters.
-		bool allowNegative; //! Set to true to allow negative integers.
+	Test test = Test("UtilsTest");
 
-		/*! \brief Constructor
-		 * Initializes C-style integers. */
-		IntegerLiteralTagger() : allowDecimal(true), allowOctal(true), 
-			allowHexadecimalLowercase(true), allowHexadecimalUppercase(true),
-			allowNegative(true) {}
+	string withEscapes = "hi\\n\\x0A\\033[0;31mhi\\033[0;0m\\\\ \\n";
+	string withoutEscapes = "hi\n\x0A\033[0;31mhi\033[0;0m\\ \n";
+	test.assert(evaluateEscapeCodes(withEscapes).compare(withoutEscapes) == 0);
 
-		/*! \brief Checks if a token is an integer according to the configuration.
-		 * \param t Token to be checked.
-		 * \returns True only if the token is a valid integer.
-		 */
-		bool isIntegerLiteral(Token t);
-
-		/*! \brief Checks if a string is an integer according to the configuration.
-		 * \param t String to be checked.
-		 * \returns True only if the string is a valid integer.
-		 */
-		bool isIntegerLiteral(std::string s);
-
-		/*! \brief Parses the integer literal's contents.
-		 * String-to-int conversion function.
-		 */
-		int parse(Token t);
-
-		/*! \brief Parses the integer literal's contents.
-		 * String-to-int conversion function.
-		 */
-		int parse(std::string s);
-	};
+	return (int)(test.write());
 }
-
-#endif

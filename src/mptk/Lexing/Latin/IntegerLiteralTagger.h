@@ -34,54 +34,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MITTEN_CHARACTER_LITERAL_PARSER_H
-#define __MITTEN_CHARACTER_LITERAL_PARSER_H
+#ifndef __MITTEN_INTEGER_LITERAL_TAGGER_H
+#define __MITTEN_INTEGER_LITERAL_TAGGER_H
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <unordered_map>
 
-#include "Utils.h"
-#include "Token.h"
+#include "../../Core/Token.h"
 
 namespace mitten
 {
-	/*! \brief Identifies character literals from tokens.
+	/*! \brief Identifies integer literals from tokens.
 	 */
-	class CharacterLiteralTagger
+	class IntegerLiteralTagger
 	{
 	public:
-		bool allowEscapes; //! Set to true to allow escape codes
-
-		std::string inQuote; //! The syntax for the opening quote.
-		std::string unQuote; //! The syntax for the closing quote.
+		bool allowDecimal; //! Set to true to allow decimal integers.
+		bool allowOctal; //! Set to true to allow octal integers.
+		bool allowHexadecimalLowercase; //! Set to true to allow hex integers with lowercase letters.
+		bool allowHexadecimalUppercase; //! Set to true to allow hex integers with uppercase letters.
+		bool allowNegative; //! Set to true to allow negative integers.
 
 		/*! \brief Constructor
-		 * Initializes C-style characters. */
-		CharacterLiteralTagger() : allowEscapes(true), inQuote("'"), unQuote("'") {}
+		 * Initializes C-style integers. */
+		IntegerLiteralTagger() : allowDecimal(true), allowOctal(true), 
+			allowHexadecimalLowercase(true), allowHexadecimalUppercase(true),
+			allowNegative(true) {}
 
-		/*! \brief Checks if a token is a character according to the configuration.
+		/*! \brief Checks if a token is an integer according to the configuration.
 		 * \param t Token to be checked.
-		 * \returns True only if the token is a valid character.
+		 * \returns True only if the token is a valid integer.
 		 */
-		bool isCharacterLiteral(Token t);
+		bool isIntegerLiteral(Token t);
 
-		/*! \brief Checks if a string is a character according to the configuration.
+		/*! \brief Checks if a string is an integer according to the configuration.
 		 * \param t String to be checked.
-		 * \returns True only if the string is a valid character.
+		 * \returns True only if the string is a valid integer.
 		 */
-		bool isCharacterLiteral(std::string s);
+		bool isIntegerLiteral(std::string s);
 
-		/*! \brief Parses the character literal's contents.
-		 * Removes the in-quote and un-quote syntax.
+		/*! \brief Parses the integer literal's contents.
+		 * String-to-int conversion function.
 		 */
-		char parse(Token t);
+		int parse(Token t);
 
-		/*! \brief Parses the character literal's contents.
-		 * Removes the in-quote and un-quote syntax.
+		/*! \brief Parses the integer literal's contents.
+		 * String-to-int conversion function.
 		 */
-		char parse(std::string s);
+		int parse(std::string s);
 	};
 }
 

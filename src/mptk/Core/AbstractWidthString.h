@@ -34,6 +34,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+ /* NOTE: String width abstraction is a feature that will be used in version 
+  * 0.02-alpha. The source code here is unfinished and unused. */
+
 #ifndef __MITTEN_ABSTRACT_WIDTH_STRING_H
 #define __MITTEN_ABSTRACT_WIDTH_STRING_H
 
@@ -75,7 +78,12 @@ namespace mitten
 		/*! \brief Constructor.
 		 * Copy constructor to preserve memory management.
 		 */
-		AbstractWidthString(const AbstractWidthString &s) : _data(s._data), _size(s._size), _capacity(0), _width(s._width) {}
+		AbstractWidthString(const AbstractWidthString &s);
+
+		/*! \brief Constructor.
+		 * Casting from C++ strings.
+		 */
+		AbstractWidthString(std::string s);
 
 		/*! \brief Destructor.
 		 * Releases and nullifies the current string.
@@ -166,6 +174,10 @@ namespace mitten
 		/*! \brief Gets the number of characters in the string.
 		 */
 		size_t size();
+
+		/*! \brief Returns true only if the string size is 0.
+		 */
+		bool empty();
 
 		/*! \brief Gets character width of the string in bytes
 		 */
@@ -309,6 +321,20 @@ namespace mitten
 		 * \returns The index of the last instance of \p s, AbstractWidthString::npos if not in string.
 		 */
 		size_t rfind(AbstractWidthString s, size_t after = 0);
+
+		/*! \brief Finds the first instance of \p c starting from \p from.
+		 * \param s The character to look for.
+		 * \param from The start point for the find.
+		 * \returns The index of the first instance of \p c, AbstractWidthString::npos if not in string.
+		 */
+		size_t find(Char c, size_t from = 0);
+
+		/*! \brief Finds the last instance of \p c after \p after.
+		 * \param s The character to look for.
+		 * \param after The first index allowed.
+		 * \returns The index of the last instance of \p c, AbstractWidthString::npos if not in string.
+		 */
+		size_t rfind(Char c, size_t after = 0);
 
 		/*! \brief Evaluates escape codes in a string.
 	 	 * Iterates through the input string and converts all C-style escape codes into their equivalent character codes.

@@ -7,7 +7,7 @@
 include ../config.mk
 
 all : 
-	$(TEX) $(TEXFLAGS) MittenParsingToolkitAlgorithms.tex
+	$(TEX) $(TEXFLAGS) MittenLanguageSpecification.tex
 
 clean :
-	$(RM) $(RMFLAGS) $(shell echo *.aux *.log *.pdf *.toc)
+	$(RM) $(RMFLAGS) $(shell echo *.aux *.log *.pdf *.toc *.out)

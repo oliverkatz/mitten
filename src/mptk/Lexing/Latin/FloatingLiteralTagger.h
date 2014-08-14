@@ -44,7 +44,7 @@
 
 #include <math.h>
 
-#include "Token.h"
+#include "../../Core/Token.h"
 
 namespace mitten
 {

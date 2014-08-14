@@ -37,11 +37,11 @@
 #include <iostream>
 #include <MUnit.h>
 
-#include "BooleanLiteralTagger.h"
-#include "CharacterLiteralTagger.h"
-#include "FloatingLiteralTagger.h"
-#include "IntegerLiteralTagger.h"
-#include "StringLiteralTagger.h"
+#include "../Lexing/Latin/BooleanLiteralTagger.h"
+#include "../Lexing/Latin/CharacterLiteralTagger.h"
+#include "../Lexing/Latin/FloatingLiteralTagger.h"
+#include "../Lexing/Latin/IntegerLiteralTagger.h"
+#include "../Lexing/Latin/StringLiteralTagger.h"
 
 using namespace std;
 using namespace mitten;

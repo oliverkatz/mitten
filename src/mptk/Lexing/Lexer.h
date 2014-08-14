@@ -42,13 +42,13 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Token.h"
-#include "BooleanLiteralTagger.h"
-#include "CharacterLiteralTagger.h"
-#include "FloatingLiteralTagger.h"
-#include "IntegerLiteralTagger.h"
-#include "StringLiteralTagger.h"
-#include "SymbolTagger.h"
+#include "../Core/Token.h"
+#include "Latin/BooleanLiteralTagger.h"
+#include "Latin/CharacterLiteralTagger.h"
+#include "Latin/FloatingLiteralTagger.h"
+#include "Latin/IntegerLiteralTagger.h"
+#include "Latin/StringLiteralTagger.h"
+#include "Latin/SymbolTagger.h"
 
 namespace mitten
 {

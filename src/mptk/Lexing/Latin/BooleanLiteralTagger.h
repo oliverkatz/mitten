@@ -34,53 +34,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef __MITTEN_BOOLEAN_LITERAL_TAGGER_H
+#define __MITTEN_BOOLEAN_LITERAL_TAGGER_H
+
 #include <iostream>
-#include <MUnit.h>
+#include <string>
+#include <vector>
+#include <unordered_map>
 
-#include "AbstractWidthString.h"
+#include "../../Core/Token.h"
 
-using namespace std;
-using namespace mitten;
-
-int main()
+namespace mitten
 {
-	Test test = Test("AbstractWidthStringTest");
+	/*! \brief Identifies boolean literals from tokens.
+	 */
+	class BooleanLiteralTagger
+	{
+	public:
+		std::string trueToken; //! Syntax for the true token.
+		std::string falseToken; //! Syntax for the false token.
 
-	AbstractWidthString tmp8 = AbstractWidthString::fromCString8("hello, world");
-	AbstractWidthString tmp16 = AbstractWidthString::fromCString16(u"hello, world");
-	AbstractWidthString tmp32 = AbstractWidthString::fromCString32(U"hello, world");
-	AbstractWidthString slice = AbstractWidthString(tmp8);
+		/*! \brief Constructor
+		 * Initializes C++-style bools. */
+		BooleanLiteralTagger() : trueToken("true"), falseToken("false") {}
 
-	test.assert(tmp32.toString8().compare("hello, world") == 0);
-	test.assert(tmp32[0] == 'h');
-	test.assert(slice.isSlice());
-	test.assert(tmp32.isResource());
-	test.assert(tmp32.size() == string("hello, world").size());
-	test.assert(tmp32.width() == 4);
-	test.assert(tmp32.memsize() == string("hello, world").size()*4);
-	tmp32.reallocate(1024);
-	tmp32.resize(1024);
-	test.assert(tmp32.size() == 1024);
-	test.assert(tmp32.toString8().compare("hello, world") == 0);
-	tmp32.resize(1);
-	test.assert(tmp32.toString8().compare("h") == 0);
-	test.assert(tmp8.compare(tmp16) == 0);
-	test.assert(tmp8 == tmp16);
+		/*! \brief Checks if a token is a boolean according to the configuration.
+		 * \param t Token to be checked.
+		 * \returns True only if the token is a valid boolean.
+		 */
+		bool isBooleanLiteral(Token t);
 
-	tmp8.append(AbstractWidthString::fromString8("hi"));
-	test.assert(tmp8.toString8().compare("hello, worldhi") == 0);
-	test.assert(tmp8.substr(1).toString8().compare("ello, worldhi") == 0);
-	test.assert(tmp8.substr(1, 2).toString8().compare("el") == 0);
+		/*! \brief Checks if a string is a boolean according to the configuration.
+		 * \param t String to be checked.
+		 * \returns True only if the string is a valid boolean.
+		 */
+		bool isBooleanLiteral(std::string s);
 
-	AbstractWidthString tmp8b = AbstractWidthString::fromString8("hi");
-	tmp8b.insert(1, AbstractWidthString::fromString8("_"));
-	test.assert(tmp8b.toString8().compare("h_i") == 0);
-	tmp8b.erase(1, 1);
-	test.assert(tmp8b.toString8().compare("hi") == 0);
+		/*! \brief Parses the boolean literal's contents.
+		 * String-to-bool conversion function.
+		 */
+		bool parse(Token t);
 
-	test.assert(tmp16.find(AbstractWidthString::fromString8("e")) == 1);
-	test.assert(tmp16.find(AbstractWidthString::fromString8("_")) == AbstractWidthString::npos);
-	test.assert(tmp16.rfind(AbstractWidthString::fromString8("e")) == 1);
-
-	return (int)(test.write());
+		/*! \brief Parses the boolean literal's contents.
+		 * String-to-bool conversion function.
+		 */
+		bool parse(std::string s);
+	};
 }
+
+#endif

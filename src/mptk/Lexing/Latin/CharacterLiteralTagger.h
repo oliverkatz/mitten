@@ -34,64 +34,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "CharacterLiteralTagger.h"
+#ifndef __MITTEN_CHARACTER_LITERAL_PARSER_H
+#define __MITTEN_CHARACTER_LITERAL_PARSER_H
 
-using namespace std;
+#include <iostream>
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+#include "../../Core/Utils.h"
+#include "../../Core/Token.h"
 
 namespace mitten
 {
-	bool CharacterLiteralTagger::isCharacterLiteral(Token t)
+	/*! \brief Identifies character literals from tokens.
+	 */
+	class CharacterLiteralTagger
 	{
-		return isCharacterLiteral(t.value());
-	}
+	public:
+		bool allowEscapes; //! Set to true to allow escape codes
 
-	bool CharacterLiteralTagger::isCharacterLiteral(string s)
-	{
-		if (s.empty())
-			return false;
+		std::string inQuote; //! The syntax for the opening quote.
+		std::string unQuote; //! The syntax for the closing quote.
 
-		if (s.find(inQuote) == 0 && s.rfind(unQuote) == s.size()-unQuote.size())
-		{
-			if (s.size() == 1+inQuote.size()+unQuote.size())
-			{
-				return true;
-			}
-			else if (s.size() > 1+inQuote.size()+unQuote.size())
-			{
-				return allowEscapes;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
+		/*! \brief Constructor
+		 * Initializes C-style characters. */
+		CharacterLiteralTagger() : allowEscapes(true), inQuote("'"), unQuote("'") {}
 
-	char CharacterLiteralTagger::parse(Token t)
-	{
-		return parse(t.value());
-	}
+		/*! \brief Checks if a token is a character according to the configuration.
+		 * \param t Token to be checked.
+		 * \returns True only if the token is a valid character.
+		 */
+		bool isCharacterLiteral(Token t);
 
-	char CharacterLiteralTagger::parse(string s)
-	{
-		if (s.empty())
-			throw runtime_error("invalid character literal");
+		/*! \brief Checks if a string is a character according to the configuration.
+		 * \param t String to be checked.
+		 * \returns True only if the string is a valid character.
+		 */
+		bool isCharacterLiteral(std::string s);
 
-		if (s.find(inQuote) == 0 && s.rfind(unQuote) == s.size()-unQuote.size())
-		{
-			if (s.size() == 1+inQuote.size()+unQuote.size())
-			{
-				return s[inQuote.size()];
-			}
-			else if (s.size() > 1+inQuote.size()+unQuote.size())
-			{
-				string tmp = evaluateEscapeCodes(s.substr(inQuote.size(), s.size()-inQuote.size()-unQuote.size()));
-				return tmp[0];
-			}
-		}
-		else
-		{
-			throw runtime_error("invalid character literal");
-		}
-	}
+		/*! \brief Parses the character literal's contents.
+		 * Removes the in-quote and un-quote syntax.
+		 */
+		char parse(Token t);
+
+		/*! \brief Parses the character literal's contents.
+		 * Removes the in-quote and un-quote syntax.
+		 */
+		char parse(std::string s);
+	};
 }
+
+#endif

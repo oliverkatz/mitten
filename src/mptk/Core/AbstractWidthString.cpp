@@ -34,6 +34,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+ /* NOTE: String width abstraction is a feature that will be used in version 
+  * 0.02-alpha. The source code here is unfinished and unused. */
+
 #include "AbstractWidthString.h"
 
 using namespace std;
@@ -42,7 +45,7 @@ namespace mitten
 {
 	void AbstractWidthString::release()
 	{
-		if (_capacity != 0)
+		if (_capacity != 0 && _data != NULL)
 		{
 			if (_width == 1)
 			{
@@ -70,6 +73,17 @@ namespace mitten
 	const float AbstractWidthString::defaultFac = 1.5f;
 	const int AbstractWidthString::defaultOff = 1024;
 	const size_t AbstractWidthString::npos = (size_t)-1;
+
+	AbstractWidthString::AbstractWidthString(string s)
+	{
+		_size = s.size();
+		_data = (void *)new char[_size];
+		if (_data == NULL)
+			throw runtime_error("unable to allocate");
+		memcpy(_data, s.data(), _size);
+		_capacity = _size;
+		_width = 1;
+	}
 
 	AbstractWidthString::~AbstractWidthString()
 	{
@@ -349,6 +363,11 @@ namespace mitten
 		return _size;
 	}
 
+	bool AbstractWidthString::empty()
+	{
+		return (_size == 0);
+	}
+
 	size_t AbstractWidthString::width()
 	{
 		return _width;
@@ -371,11 +390,6 @@ namespace mitten
 
 	void AbstractWidthString::reallocate(size_t s)
 	{
-		if (_capacity == 0)
-		{
-			throw runtime_error("cannot reallocate slice");
-		}
-
 		if (s == 0)
 		{
 			throw runtime_error("cannot allocate no space for string");
@@ -387,7 +401,8 @@ namespace mitten
 			if (tmp == NULL)
 				throw runtime_error("unable to allocate");
 
-			memcpy(tmp, _data, s);
+			if (_data != NULL)
+				memcpy(tmp, _data, s);
 			if (s > _size)
 				memset((char *)tmp+_size, 0, s-_size);
 			else
@@ -402,7 +417,8 @@ namespace mitten
 			if (tmp == NULL)
 				throw runtime_error("unable to allocate");
 
-			memcpy(tmp, _data, s);
+			if (_data != NULL)
+				memcpy(tmp, _data, s);
 			if (s > _size)
 				memset((char16_t *)tmp+_size, 0, s-_size);
 			else
@@ -417,7 +433,8 @@ namespace mitten
 			if (tmp == NULL)
 				throw runtime_error("unable to allocate");
 
-			memcpy(tmp, _data, s);
+			if (_data != NULL)
+				memcpy(tmp, _data, s);
 			if (s > _size)
 				memset((char32_t *)tmp+_size, 0, s-_size);
 			else
@@ -600,14 +617,19 @@ namespace mitten
 		return *this;
 	}
 
+	AbstractWidthString &AbstractWidthString::operator += (AbstractWidthString::Char c)
+	{
+		return append(c);
+	}
+
 	AbstractWidthString AbstractWidthString::substr(size_t from, size_t len)
 	{
-		if (from+len >= _size)
+		if (from+len > _size)
 			throw runtime_error("out of range substring");
 
 		AbstractWidthString rtn = *this;
 		rtn._data = (void *)(((char *)rtn._data)+from*_width);
-		if (len == (size_t)-1)
+		if (len == (size_t)-1 || from+len >= _size)
 		{
 			rtn._size -= from;
 		}
@@ -653,7 +675,7 @@ namespace mitten
 
 	size_t AbstractWidthString::rfind(AbstractWidthString s, size_t after)
 	{
-		for (size_t i = _size-s._size-1; i >= after; i--)
+		for (size_t i = _size-s._size; i >= after; i--)
 		{
 			if (substr(i, s._size).compare(s) == 0)
 			{
@@ -664,9 +686,35 @@ namespace mitten
 		return npos;
 	}
 
+	size_t AbstractWidthString::find(AbstractWidthString::Char c, size_t from)
+	{
+		for (size_t i = from; i < _size; i++)
+		{
+			if (this->operator [] (i) == c)
+			{
+				return i;
+			}
+		}
+
+		return npos;
+	}
+
+	size_t AbstractWidthString::rfind(AbstractWidthString::Char c, size_t after)
+	{
+		for (size_t i = _size-1; i >= after; i--)
+		{
+			if (this->operator [] (i) == c)
+			{
+				return i;
+			}
+		}
+
+		return npos;
+	}
+
 	AbstractWidthString AbstractWidthString::evaluateEscapeCodes()
 	{
-		AbstractWidthString rtn;
+		AbstractWidthString rtn = AbstractWidthString().copy();
 
 		for (int i = 0; i < size(); i++)
 		{

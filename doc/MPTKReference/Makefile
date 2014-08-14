@@ -4,11 +4,6 @@
 #  / /\/\ \ | |_| ||  __/ | | |
 #  \/    \/_|\__|\__\___|_| |_|
 
-# File:    config.mk
-# Author:  Oliver Katz
-# Version: 0.01-alpha
-# License: Unlicensed
-
 include ../config.mk
 
 all : 

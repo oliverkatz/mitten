@@ -34,49 +34,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "IntegerLiteralTagger.h"
+#ifndef __MITTEN_UTILS_H
+#define __MITTEN_UTILS_H
 
-using namespace std;
+#include <iostream>
+#include <string>
+#include <streambuf>
+#include <fstream>
+#include <stdexcept>
+
+//#include "AbstractWidthString.h"
 
 namespace mitten
 {
-	bool IntegerLiteralTagger::isIntegerLiteral(Token t)
-	{
-		return isIntegerLiteral(t.value());
-	}
+	/*! \brief Reads a file into a string.
+	 * Loads the entire contents of a file into a dynamically-expanding string object.
+	 * If readFile is unable to open the file, it will throw a runtime_error.
+	 * \param path The path of the file to be read.
+	 * \param width The character width of the file's encoding.
+	 * \returns The contents of the file.
+	 */
+	//AbstractWidthString readFile(std::string path, size_t width = 8);
 
-	bool IntegerLiteralTagger::isIntegerLiteral(string s)
-	{
-		if (s.compare("0x") == 0)
-			return false;
+	/*! \brief Reads a file into a string.
+	 * Loads the entire contents of a file into a dynamically-expanding string object.
+	 * If readFile is unable to open the file, it will throw a runtime_error.
+	 * \param path The path of the file to be read.
+	 * \param width The character width of the file's encoding.
+	 * \returns The contents of the file.
+	 */
+	std::string readFile8(std::string path);
 
-		if (s.back() == 'h' && (isdigit(s[0]) || (s[0] >= 'a' && s[0] <= 'f') || (s[0] >= 'A' && s[0] <= 'F')))
-			s = "0x" + s.substr(0, s.size()-1);
-
-		try
-		{
-			stoi(s, NULL, 0);
-			return true;
-		}
-		catch(invalid_argument &e)
-		{
-			return false;
-		}
-	}
-
-	int IntegerLiteralTagger::parse(Token t)
-	{
-		return parse(t.value());
-	}
-
-	int IntegerLiteralTagger::parse(string s)
-	{
-		if (s.compare("0x") == 0)
-			throw runtime_error("invalid integer format");
-
-		if (s.back() == 'h' && (isdigit(s[0]) || (s[0] >= 'a' && s[0] <= 'f') || (s[0] >= 'A' && s[0] <= 'F')))
-			s = "0x" + s.substr(0, s.size()-1);
-
-		return stoi(s, NULL, 0);
-	}
+	/*! \brief Evaluates escape codes in a string.
+ 	 * Iterates through the input string and converts all C-style escape codes into their equivalent character codes.
+ 	 * \returns Evaluated string.
+ 	 */
+	std::string evaluateEscapeCodes(std::string s);
 }
+
+#endif

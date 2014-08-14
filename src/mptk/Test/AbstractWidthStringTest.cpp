@@ -34,28 +34,53 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Utils.h"
+#include <iostream>
+#include <MUnit.h>
+
+#include "../Core/AbstractWidthString.h"
 
 using namespace std;
+using namespace mitten;
 
-namespace mitten
+int main()
 {
-	AbstractWidthString readFile(string path, size_t width)
-	{
-		FILE *f = fopen(path.c_str(), "r");
-		if (f == NULL)
-			throw runtime_error("cannot open file for reading: "+path);
+	Test test = Test("AbstractWidthStringTest");
 
-		fseek(f, 0, SEEK_END);
-		long l = ftell(f);
-		fseek(f, 0, SEEK_SET);
+	AbstractWidthString tmp8 = AbstractWidthString::fromCString8("hello, world");
+	AbstractWidthString tmp16 = AbstractWidthString::fromCString16(u"hello, world");
+	AbstractWidthString tmp32 = AbstractWidthString::fromCString32(U"hello, world");
+	AbstractWidthString slice = AbstractWidthString(tmp8);
 
-		AbstractWidthString rtn = AbstractWidthString();
-		rtn.reallocate(l);
-		fread((void *)rtn.data(), width, l/width, f);
-		rtn.resize(l/width);
+	test.assert(tmp32.toString8().compare("hello, world") == 0);
+	test.assert(tmp32[0] == 'h');
+	test.assert(slice.isSlice());
+	test.assert(tmp32.isResource());
+	test.assert(tmp32.size() == string("hello, world").size());
+	test.assert(tmp32.width() == 4);
+	test.assert(tmp32.memsize() == string("hello, world").size()*4);
+	tmp32.reallocate(1024);
+	tmp32.resize(1024);
+	test.assert(tmp32.size() == string("hello, world").size());
+	test.assert(tmp32.toString8().compare("hello, world") == 0);
+	tmp32.resize(1);
+	test.assert(tmp32.toString8().compare("h") == 0);
+	test.assert(tmp8.compare(tmp16) == 0);
+	test.assert(tmp8 == tmp16);
 
-		fclose(f);
-		return rtn;
-	}
+	tmp8.append(AbstractWidthString::fromString8("hi"));
+	test.assert(tmp8.toString8().compare("hello, worldhi") == 0);
+	test.assert(tmp8.substr(1).toString8().compare("ello, worldhi") == 0);
+	test.assert(tmp8.substr(1, 2).toString8().compare("el") == 0);
+
+	AbstractWidthString tmp8b = AbstractWidthString::fromString8("hi");
+	tmp8b.insert(1, AbstractWidthString::fromString8("_"));
+	test.assert(tmp8b.toString8().compare("h_i") == 0);
+	tmp8b.erase(1, 1);
+	test.assert(tmp8b.toString8().compare("hi") == 0);
+
+	test.assert(tmp16.find(AbstractWidthString::fromString8("e")) == 1);
+	test.assert(tmp16.find(AbstractWidthString::fromString8("_")) == AbstractWidthString::npos);
+	test.assert(tmp16.rfind(AbstractWidthString::fromString8("e")) == 1);
+
+	return (int)(test.write());
 }

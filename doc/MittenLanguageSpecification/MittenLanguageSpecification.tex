@@ -66,7 +66,7 @@ Although these languages cannot be matched for their specific advantages, Mitten
 \label{sec:Versioning}
 Since Mitten has an official compiler (the Mitten Compiler MC), the standard is given the same version number as the current compiler version. For example, the current compiler version for this standard is 0.01-alpha, which means that this standard will also be numbered 0.01-alpha for its correlation with this compiler version. It is expected that the compiler will update more often than the standard, which is why it is the basis for the versioning system.
 
-The following table lists the history of the Mitten language standard and Mitten Compiler.
+The following table lists the history of the Mitten language standard and Mitten Compiler. \newline
 \begin{tabular}{|l|l|l|l|}
 \hline
 \textbf{Language Standard} & \textbf{Compiler} & \textbf{Date} & \textbf{Primary Change} \\
@@ -139,7 +139,7 @@ The lexical grammar provides certain requirements on the input data. Mitten sour
 \item UTF-32LE
 \end{itemize}
 
-The encoding of a given text file may be identified by a UTF BOM (Byte Order Marking) at the beginning of the file:
+The encoding of a given text file may be identified by a UTF BOM (Byte Order Marking) at the beginning of the file:\newline
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Encoding} & \textbf{BOM} \\
@@ -248,6 +248,7 @@ scope element = expression | scope | ...;
 \end{verbatim}
 
 \subsection{Internationalization}
+\label{sec:Internationalization}
 Mitten, as a programming language, supports a multitude of other languages through their character encodings. Mitten compilers must comply with the following requirements in order to support internationalization:
 \begin{itemize}
 \item Mitten compilers can support 1, 2, and 4 byte character encodings using input file's BOMs for encoding detection as well as a runtime option to specify a source file's encoding.
@@ -256,16 +257,13 @@ Mitten, as a programming language, supports a multitude of other languages throu
 
 The internationalization package mentioned in these requirements is a list of all built-in symbols in the language's syntax mapped to the default symbol set. The file is designed so that it does not rely on any intersection with 7-bit ASCII in its syntax. Internationalization packages for Mitten compilers will have the following extension: \verb|*.mip|. 
 
-The first byte of the file is an unsigned integer which represents the character width of the encoding used in by the language's required character encoding. For example, a language using 7-bit ASCII would specify 1, while a language using a 4-byte character encoding would specify 4.
+The first byte of the file is an unsigned integer which represents the character width of the encoding used in by the language's required character encoding. For example, a language using 7-bit ASCII would specify \verb|1|, while a language using a 4-byte character encoding would specify \verb|4|.
 
-The second byte is of the file is an unsigned integer which represents the length of the BOM in bytes to look for. If the text file is not expected to use a BOM, this byte should be 0. The next n bytes of the file will contain the expected BOM where n is the length of the BOM specified by the second byte of the file.
+The second byte is of the file is an unsigned integer which represents the length of the BOM in bytes to look for. If the text file is not expected to use a BOM, this byte should be \verb|0|. The next $n$ bytes of the file will contain the expected BOM where $n$ is the length of the BOM specified by the second byte of the file. For example, for UTF-32BE, The first 6 bytes of the internationalization package would be: \verb|04 04 00 00 FE FF|.
 
-For example, for UTF-32BE, The first 6 byte of the internationalization package would be: 04 04 00 00 FE FF.
-
-The next n bytes of the file, where n is the character width given by the first byte of the file, represents the separator character of the file which will be used in the remainder of the file. This completes the header of the package.
-
-For a 7-bit ASCII language with a newline separator character, the file header would be: 01 00 0A.
+The next $n$ bytes of the file, where $n$ is the character width given by the first byte of the file, represents the separator character of the file which will be used in the remainder of the file. This completes the header of the package. For a 7-bit ASCII language with a newline separator character, the file header would be: \verb|01 00 0A|.
 
 \section{The Preprocessor}
+The preprocesor handles lexical and semantic macros, conditional code, repetitions of code, the inclusion of files, and compiler configuration. 
 
 \end{document}

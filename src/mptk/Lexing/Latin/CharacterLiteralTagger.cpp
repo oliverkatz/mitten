@@ -34,57 +34,66 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MITTEN_STRING_LITERAL_TAGGER_H
-#define __MITTEN_STRING_LITERAL_TAGGER_H
+#include "CharacterLiteralTagger.h"
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
-
-#include "Utils.h"
-#include "Token.h"
+using namespace std;
 
 namespace mitten
 {
-	/*! \brief Identifies string literals from tokens.
-	 */
-	class StringLiteralTagger
+	bool CharacterLiteralTagger::isCharacterLiteral(Token t)
 	{
-	public:
-		bool allowEscapes; //! Set to true to allow the use of C-style escape codes.
+		return isCharacterLiteral(t.value());
+	}
 
-		std::string inQuote; //! The opening quote syntax.
-		std::string unQuote; //! The closing quote syntax.
+	bool CharacterLiteralTagger::isCharacterLiteral(string s)
+	{
+		if (s.empty())
+		{
+			return false;
+		}
 
-		/*! \brief Constructor
-		 * Initializes C-style strings. */
-		StringLiteralTagger() : allowEscapes(true), inQuote("\""), unQuote("\"") {}
+		if (s.find(inQuote) == 0 && s.rfind(unQuote) == s.size()-unQuote.size())
+		{
+			if (s.size() == 1+inQuote.size()+unQuote.size())
+			{
+				return true;
+			}
+			else if (s.size() > 1+inQuote.size()+unQuote.size())
+			{
+				return allowEscapes;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
 
-		/*! \brief Checks if a token is a string according to the configuration.
-		 * \todo Optimize for O(1), not O(n^2).
-		 * \param t Token to be checked.
-		 * \returns True only if the token is a valid string.
-		 */
-		bool isStringLiteral(Token t);
+	char CharacterLiteralTagger::parse(Token t)
+	{
+		return parse(t.value());
+	}
 
-		/*! \brief Checks if a string is a string according to the configuration.
-		 * \todo Optimize for O(1), not O(n^2).
-		 * \param t String to be checked.
-		 * \returns True only if the string is a valid string.
-		 */
-		bool isStringLiteral(std::string s);
+	char CharacterLiteralTagger::parse(string s)
+	{
+		if (s.empty())
+			throw runtime_error("invalid character literal");
 
-		/*! \brief Parses the string literal's contents.
-		 * Removes in-quote and un-quote syntax. 
-		 */
-		std::string parse(Token t);
-
-		/*! \brief Parses the string literal's contents.
-		 * Removes in-quote and un-quote syntax. 
-		 */
-		std::string parse(std::string s);
-	};
+		if (s.find(inQuote) == 0 && s.rfind(unQuote) == s.size()-unQuote.size())
+		{
+			if (s.size() == 1+inQuote.size()+unQuote.size())
+			{
+				return s[inQuote.size()];
+			}
+			else if (s.size() > 1+inQuote.size()+unQuote.size())
+			{
+				string tmp = evaluateEscapeCodes(s.substr(inQuote.size(), s.size()-inQuote.size()-unQuote.size()));
+				return tmp[0];
+			}
+		}
+		else
+		{
+			throw runtime_error("invalid character literal");
+		}
+	}
 }
-
-#endif

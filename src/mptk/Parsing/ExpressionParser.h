@@ -46,10 +46,10 @@
 
 #include <limits.h>
 
-#include "Token.h"
-#include "AST.h"
-#include "ASTBuilder.h"
-#include "ErrorHandler.h"
+#include "../Core/Token.h"
+#include "../Core/AST.h"
+#include "../Core/ASTBuilder.h"
+#include "../Core/ErrorHandler.h"
 
 #define MITTEN_MAX_PRECEDENCE INT_MAX
 

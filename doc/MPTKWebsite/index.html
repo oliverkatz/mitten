@@ -1,74 +1,311 @@
 <html>
 	<head>
 		<title>MPTK</title>
+		<meta name="title" content="MPTK" />
+		<meta name="description" content="The Mitten Parser Toolkit 0.01-alpha" />
+		<meta name="author" content="Oliver Katz">
 
-		<link rel="stylesheet" type="text/css" href="main.css" />
-
-		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open%20Sans" />
-
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato" />
+
+		<style>
+		body
+		{
+			-webkit-font-smoothing: antialiased;
+			font-family: Open Sans, Sans;
+			font-size: 12pt;
+			background-color: #fefefe;
+			color: #303030;
+			padding: 0px;
+			margin: 0px;
+			text-align: left;
+		}
+
+		h1
+		{
+			font-family: Lato, Sans;
+			font-size: 24pt;
+			text-align: center;
+		}
+
+		h2
+		{
+			font-family: Lato, Sans;
+			font-size: 18pt;
+			text-align: center;
+
+			text-shadow: 1px 1px rgba(0, 0, 0, 0.1);
+		}
+
+		h3
+		{
+			font-family: Lato, Sans;
+			font-size: 12pt;
+			text-align: center;
+		}
+
+		.code
+		{
+			font-family: Monaco, Monospace;
+			font-size: 8pt;
+			background: linear-gradient(#222222, #333333);
+			color: #eeeeee;
+			margin-left: -20px;
+			margin-right: -20px;
+			padding: 10px;
+
+			text-shadow: 1px 1px rgba(0, 0, 0, 0.3);
+		}
+
+		.light_code
+		{
+			font-family: Monaco, Monospace;
+			font-size: 10pt;
+			margin-left: 10px;
+			margin-right: 10px;
+			padding: 10px;
+
+			border-left: 2px solid #dddddd;
+		}
+
+		.wrapper
+		{
+			width: 600px;
+			background-color: #ffffff;
+			top: 0px;
+			margin-top: 0px;
+			margin-left: auto;
+			margin-right: auto;
+			box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
+			letter-spacing: -1px;
+		}
+
+		.inner_wrapper
+		{
+			padding: 20px;
+			padding-top: 80px;
+		}
+
+		.banner
+		{
+			position: fixed;
+			width: 600px;
+			height: 70px;
+			background-color: #777777;
+			color: #eeeeee;
+			padding-top: 0px;
+			padding-bottom: 10px;
+			margin-bottom: 0px;
+
+			text-shadow: 2px 2px rgba(0, 0, 0, 0.1);
+			opacity: 0.9;
+			z-index: 200;
+		}
+
+		.code_green
+		{
+			color: #AAFF00;
+		}
+
+		.code_blue
+		{
+			color: #00AAFF;
+		}
+
+		.code_pink
+		{
+			color: #FF00AA;
+		}
+
+		.code_indent
+		{
+			margin-left: 20px;
+		}
+
+		.page
+		{
+			height: 100%;
+			perspective: 1000px;
+		}
+
+		a:link
+		{
+			text-decoration: none;
+			color: #555555;
+		}
+
+		a:visited
+		{
+			text-decoration: none;
+			color: #555555;
+		}
+
+		a:hover
+		{
+			text-decoration: none;
+			color: #FF00AA;
+		}
+
+		a:active
+		{
+			text-decoration: none;
+			color: #FF00AA;
+		}
+
+		.fade_in
+		{
+			opacity: 0.0;
+			transition: opacity 0.3s ease-in;
+		}
+		</style>
 	</head>
 
 	<body>
-		<div id="TitleBar">
-			<a href="index.html">Mitten Parsing ToolKit (MPTK)</a> <span class="Divider">|</span>
-			<a href="download.html">Download</a> <span class="Divider">|</span>
-			<a href="javascript:void(0);">Tutorial</a> <span class="Divider">|</span>
-			<a href="javascript:void(0);">Reference</a> <span class="Divider">|</span>
-			<a href="javascript:void(0);">About</a>
-		</div>
-		<div id="Background">
-		</div>
-		<div id="Wrapper">
-			<div class="Title">Complex Syntaxes</div>
-			<div class="Section">
-				<div class="Code">
-					include(std);<br>
-					<br>
-					void main()<br>
-					{<br>
-					<span class="CodeIndent"></span>print("hello, world");<br>
-					}<br>
+		<div class="wrapper">
+			<div class="banner">
+				<h1>Mitten Parsing ToolKit (MPTK)</h1>
+			</div>
+
+			<div class="inner_wrapper">
+				<div class="page">
+					<h2>Complex Syntaxes Done Easily</h2>
+
+					The Mitten Parsing ToolKit was developed for the Mitten programming language, but it can be used for any compiler. It has a powerful and flexible parsing engine written in C++ that lets you create front-ends for even complex languages with only a few lines of code.<br>
+
+					<h3>Source Code</h3>
+					<div class="code">
+						<span class="code_green">include</span>(<span class="code_blue">std</span>);<br>
+						<br>
+						<span class="code_green">void</span> <span class="code_blue">main</span>()<br>
+						{<br>
+							<span class="code_indent"></span><span class="code_blue">print</span>(<span class="code_pink">"hello, world\n"</span>);<br>
+						}<br>
+					</div><br>
+
+					The small sample of Mitten source code above can be parsed with an equally small parser.<br><br>
+
+					<div style="float: left; width: 250px;">
+						<h3>Lexical Tokenizer</h3>
+
+						<div class="code">
+							<span class="code_green">Lexer</span> <span class="code_blue">lexer</span>;<br>
+							<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>("\n") = <span class="code_green">Filtered</span>;<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>(" ") = <span class="code_green">Filtered</span>;<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>("\t") = <span class="code_green">Filtered</span>;<br>
+							<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>(<span class="code_pink">"("</span>);<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>(<span class="code_pink">","</span>);<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>(<span class="code_pink">")"</span>);<br>
+							<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>(<span class="code_pink">"{"</span>);<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>(<span class="code_pink">";"</span>);<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>(<span class="code_pink">"}"</span>);<br>
+							<br>
+							<span class="code_blue">lexer</span>.<span class="code_blue">deliminate</span>(<span class="code_pink">"\""</span>, <span class="code_pink">"\""</span>);<br>
+						</div>
+					</div>
+
+					<div style="float: right; width: 250px;">
+						<h3>Semantic Parser</h3>
+
+						<div class="code">
+							<span class="code_green">StructureParser</span> parser;<br>
+							<br>
+							<span class="code_blue">parser</span>.<span class="code_blue">bind</span>(<span class="code_pink">"("</span>, <span class="code_pink">","</span>, <span class="code_pink">")"</span>);<br>
+							<span class="code_blue">parser</span>.<span class="code_blue">bind</span>(<span class="code_pink">"{"</span>, <span class="code_pink">";"</span>, <span class="code_pink">"}"</span>);<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+							<br>
+						</div>
+					</div>
+
+					<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+					MPTK's brevity lets you quickly prototype fully-functional compilers while still keeping the integrity needed for industrial-strength front ends.
 				</div>
 
-				Even the most complex syntaxes with recursive elements and influences from C-like languages can be easily parsed with MPTK.
-			</div>
+				<div class="page" style="height: 33%;">
+					<h2>Efficient</h2>
 
-			<div class="Title">Done Easily</div>
-			<div class="Section">
-				<div class="Code">
-					Lexer lexer;<br>
-					lexer.deliminate("\n") = Filtered;<br>
-					lexer.deliminate(" ") = Filtered;<br>
-					lexer.deliminate("\t") = Filtered;<br>
-					lexer.deliminate("(");<br>
-					lexer.deliminate(")");<br>
-					lexer.deliminate("{");<br>
-					lexer.deliminate("}");<br>
-					lexer.deliminate(";");<br>
-					lexer.deliminate("\"", "\"");<br>
+					MPTK's parsing engine only needs to run through the source code once to perform all the tasks it needs to generate easy-to-use ASTs. This means that it completes with other traditional parsing options.
 				</div>
 
-				The API between you and the parsing engine is easy to use an intuitive. Heavy-duty syntaxes can be parsed with less than a hundred lines of code.
-			</div>
+				<div class="page" style="height: 66%;">
+					<h2>Flexible</h2>
 
-			<div class="Title">Flexible</div>
-			<div class="Section">
-				<div class="Code">
-					MPTK is capable of handling unusual syntaxes like reStructured Text::<br>
-<br>
-						<span class="CodeIndent"></span>In all shapes and forms.<br>
+					Every parser and tool contained in the MPTK engine can be extended with easy-to-use public callback members.<br><br>
+
+					<div class="code">
+						void myOnToken(Token t, vector&lt;Token&gt; &amp;v)<br>
+						{<br>
+							<span class="code_indent"></span>cout &lt;&lt; "'" &lt;&lt; t.value() &lt;&lt; "'\n";<br>
+						}<br>
+						<br>
+						lexer.onToken = myOnToken;<br>
+					</div>
+
+					<br><br>
+
+					Not only are MPTK's tools extendable, but they are also highly configurable. The same lexer than is so effective for C-like programming languages is just as useful in handling markdown-like languages.<br><br>
+
+					<div class="light_code">
+						MPTK is capable of handling unusual syntaxes like reStructured Text::<br><br>
+							<span class="code_indent"></span>... in all shapes and forms.<br>
+					</div>
 				</div>
 
-				The parsing engine's flexibility and extendability are what let MPTK handle such a wide variety of input languages.
-			</div>
+				<script>
+				function show_download()
+				{
+					document.getElementById("download").style["opacity"] = "1.0";
+				}
+				</script>
 
-			<div class="Title">Efficient</div>
-			<div class="Section">
-				MPTK's parsing engine only needs to run through the source code once to perform all the tasks it needs to generate easy-to-use ASTs. 
-			</div>
+				<div class="page" style="height: 66%;">
+					<h2>
+					<span style="float: left"><a href="javascript:void(0);">Tutorial</a></span>
+					<span style="float: center"><a href="javascript:void(0);">Reference</a></span>
+					<span style="float: right"><a href="javascript:show_download();">Download</a></span>
+					</h2>
 
-			<div id="Copyright">Copyright 2014 Oliver Katz</div>
+					<br><br>
+
+					<center><div class="light_code fade_in" id="download">
+						$ git clone <a href="https://github.com/oliverkatz/mitten">https://github.com/oliverkatz/mitten.git</a>
+					</div></center>
+				</div>
+
+				<span style="color: #bbb">Copyright 2014 Oliver Katz</span>
+			</div>
 		</div>
-	</body>
+
+		<script>
+		function on_scroll()
+		{
+			var pages = document.getElementsByClassName("page");
+
+			for (var i = 0; i < pages.length; i++)
+			{
+				var pos = pages[i].getBoundingClientRect().top;
+				var diff = pos-window.innerHeight/2;
+				diff = 2*diff/window.innerHeight;
+				if (diff > 0)
+					pages[i].style["opacity"] = 1.0-Math.abs(diff);
+				else
+					pages[i].style["opacity"] = "1.0";
+			}
+		}
+
+		window.addEventListener("scroll", on_scroll, false);
+		</script>
+	</body
 </html>

@@ -79,6 +79,11 @@ namespace mitten
 		 */
 		Token() : _line(1), _column(0), _file("--") {}
 
+		/*! \brief Constructor.
+		 * Intializes the line and column number to the beginning of the file.
+		 */
+		Token(std::string v) : _value(v), _line(1), _column(0), _file("--") {}
+
 		/*! \brief Constructor
 		 * Sets all of the information in the token.
 		 * \param v The value of the token.

@@ -43,6 +43,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <stdexcept>
+#include <functional>
 
 #include "../Core/Token.h"
 #include "../Core/AST.h"
@@ -101,7 +102,7 @@ namespace mitten
 		 * The first argument is the parsed node. The second argument is a reference to the current 
 		 * AST builder object. The last argument is a reference to the current error handler object.
 		 */
-		std::function<void (AST, ASTBuilder &, ErrorHandler &)> onNode;
+		std::function<void (AST &, ASTBuilder &, ErrorHandler &, StructureParser &)> onNode;
 	
 		/*! \brief Constructor.
 		 * Creates a new structure parser with no bounds.
@@ -136,6 +137,11 @@ namespace mitten
 		 * \param s The name of the macro.
 		 */
 		bool isMacroDefined(std::string s);
+
+		/*! \brief Gets the value of a macro.
+		 * \param s The name of the macro.
+		 */
+		AST getMacroValue(std::string s);
 
 		/*! \brief Runs parser.
 		 * Requires the use of an input token vector and an error handler with which to store errors.

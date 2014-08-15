@@ -34,43 +34,82 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Token.h"
+#include <iostream>
+#include <MUnit.h>
 
-namespace mitten
+#include "../Core/Token.h"
+#include "../Core/AST.h"
+#include "../Lexing/Lexer.h"
+#include "../Parsing/StructureParser.h"
+
+using namespace std;
+using namespace mitten;
+
+int nmacro = 0;
+
+void myOnNode(AST &a, ASTBuilder &b, ErrorHandler &eh, StructureParser &p)
 {
-	int Token::line()
+	if (a.isLeaf() && p.isMacroDefined(a.leaf().value()))
 	{
-		return _line;
+		a = p.getMacroValue(a.leaf().value());
+		nmacro++;
 	}
+}
 
-	int Token::column()
-	{
-		return _column;
-	}
+int main()
+{
+	Test test = Test("StructureParserTest");
 
-	std::string Token::value()
-	{
-		return _value;
-	}
+	string page = "include(std);\n\nvoid main()\n{\n\tprint(\"hello, world\\n\");\n}\n\n";
+	Lexer lexer;
+	lexer.deliminate("(");
+	lexer.deliminate(")");
+	lexer.deliminate(",");
 
-	TokenTag Token::tag()
-	{
-		return _tag;
-	}
+	lexer.deliminate("{");
+	lexer.deliminate("}");
+	lexer.deliminate(";");
 
-	TokenTag &Token::setTag(TokenTag t)
-	{
-		_tag = t;
-		return _tag;
-	}
+	lexer.deliminate(" ") = Filtered;
+	lexer.deliminate("\t") = Filtered;
+	lexer.deliminate("\n") = Filtered;
 
-	std::string Token::file()
-	{
-		return _file;
-	}
+	lexer.deliminate("\"", "\"");
 
-	bool Token::filtered()
-	{
-		return _filtered;
-	}
+	InternalErrorHandler eh;
+
+	vector<Token> toks = lexer.lex(page, "--", eh);
+
+	StructureParser parser;
+
+	parser.bind("expression", "(", ")", "argument", ",");
+	parser.bind("scope", "{", "}", "line", ";");
+
+	AST ast = parser.parse(toks, eh);
+
+	test.assert(eh.empty());
+
+	vector<Token> toks2 = {
+		Token("A")
+	};
+
+	ast = parser.parse(toks2, eh);
+
+	test.assert(ast.isBranch());
+	test.assert(ast.size() == 1);
+	test.assert(ast[0].isLeaf());
+	test.assert(ast[0].leaf().value().compare("A") == 0);
+
+	parser.onNode = myOnNode;
+	parser.defineMacro("A", AST::createLeaf(Token("5")));
+
+	ast = parser.parse(toks2, eh);
+
+	test.assert(ast.isBranch());
+	test.assert(ast.size() == 1);
+	test.assert(ast[0].isLeaf());
+	test.assert(ast[0].leaf().value().compare("5") == 0);
+	test.assert(nmacro == 1);
+
+	return (int)(test.write());
 }

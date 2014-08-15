@@ -74,6 +74,11 @@ namespace mitten
 		return (semanticMacros.find(s) != semanticMacros.end());
 	}
 
+	AST StructureParser::getMacroValue(string s)
+	{
+		return semanticMacros[s];
+	}
+
 	AST StructureParser::parse(vector<Token> toks, ErrorHandler &e)
 	{
 		ASTBuilder builder;
@@ -98,7 +103,8 @@ namespace mitten
 				builder.ascend();
 				builder.ascend();
 				boundStack.pop();
-				onNode(builder.head(), builder, eh);
+				if (onNode)
+					onNode(builder.head(), builder, e, *this);
 				if (!boundStack.empty() && (head->size() > 0 && bounds[boundStack.top()].endIsParentSplit))
 				{
 					builder.append(AST::createNode(bounds[boundStack.top()].elementName));
@@ -108,7 +114,8 @@ namespace mitten
 			else if (!boundStack.empty() && bounds[boundStack.top()].split.compare(i.value()) == 0)
 			{
 				builder.ascend();
-				onNode(builder.head(), builder, eh);
+				if (onNode)
+					onNode(builder.head(), builder, e, *this);
 				builder.append(AST::createNode(bounds[boundStack.top()].elementName));
 				builder.descend();
 			}
@@ -131,7 +138,8 @@ namespace mitten
 			else
 			{
 				builder.append(i);
-				onNode(builder.head(), builder, eh);
+				if (onNode)
+					onNode(builder.head().rightmost(), builder, e, *this);
 			}
 		}
 
@@ -140,7 +148,8 @@ namespace mitten
 			e.incompleteStructureBound(toks[0], boundStack.top(), bounds[boundStack.top()].end);
 		}
 
-		onNode(builder.root(), builder, eh);
+		if (onNode)
+			onNode(builder.root(), builder, e, *this);
 		return builder.root();
 	}
 }

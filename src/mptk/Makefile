@@ -26,12 +26,40 @@ libMPTK.a : $(OBJ)
 clean :
 	$(RM) $(RMFLAGS) $(OBJ) libMPTK.a Test/AbstractWidthStringTest Test/LiteralTaggerTest Test/UtilsTest $(shell rm -rf *.mut Test/*.mut Test/*.dSYM)
 
-tests : Test/LiteralTaggerTest Test/UtilsTest
-	./Test/LiteralTaggerTest
+tests : Test/UtilsTest Test/ASTTest Test/ASTBuilderTest Test/ReconstructionTest Test/TokenTest Test/LiteralTaggerTest Test/LexerTest Test/StructureParserTest Test/ExpressionParserTest
 	./Test/UtilsTest
+	./Test/ASTTest
+	./Test/ASTBuilderTest
+	./Test/ReconstructionTest
+	./Test/TokenTest
+	./Test/LiteralTaggerTest
+	./Test/LexerTest
+	./Test/StructureParserTest
+	./Test/ExpressionParserTest
 
 Test/UtilsTest : Test/UtilsTest.cpp libMPTK.a
 	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
 
+Test/ASTTest : Test/ASTTest.cpp libMPTK.a
+	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
+
+Test/ASTBuilderTest : Test/ASTBuilderTest.cpp libMPTK.a
+	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
+
+Test/ReconstructionTest : Test/ReconstructionTest.cpp libMPTK.a
+	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
+
+Test/TokenTest : Test/TokenTest.cpp libMPTK.a
+	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
+
 Test/LiteralTaggerTest : Test/LiteralTaggerTest.cpp libMPTK.a
+	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
+
+Test/LexerTest : Test/LexerTest.cpp libMPTK.a
+	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
+
+Test/StructureParserTest : Test/StructureParserTest.cpp libMPTK.a
+	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK
+
+Test/ExpressionParserTest : Test/ExpressionParserTest.cpp libMPTK.a
 	$(CXX) $(CXXFLAGS) $< -o $@ -lMUnit -lMPTK

@@ -34,43 +34,91 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Token.h"
+#include <iostream>
+#include <MUnit.h>
 
-namespace mitten
+#include "../Core/Token.h"
+#include "../Core/Reconstruction.h"
+#include "../Lexing/Lexer.h"
+
+using namespace std;
+using namespace mitten;
+
+int ntoks = 0;
+
+void myOnToken(Token t, vector<Token> &v, ErrorHandler &e)
 {
-	int Token::line()
+	ntoks++;
+}
+
+int main()
+{
+	Test test = Test("LexerTest");
+
+	Lexer lexer;
+	try
 	{
-		return _line;
+		lexer.deliminate("");
+	}
+	catch(runtime_error &e)
+	{
+		test.assert("deliminating empty string safety");
 	}
 
-	int Token::column()
-	{
-		return _column;
-	}
+	lexer.deliminate("(");
+	lexer.deliminate(")");
+	lexer.deliminate(",");
 
-	std::string Token::value()
-	{
-		return _value;
-	}
+	lexer.deliminate("{");
+	lexer.deliminate("}");
+	lexer.deliminate(";");
 
-	TokenTag Token::tag()
-	{
-		return _tag;
-	}
+	lexer.deliminate(" ") = Filtered;
+	lexer.deliminate("\t") = Filtered;
+	lexer.deliminate("\n") = Filtered;
 
-	TokenTag &Token::setTag(TokenTag t)
-	{
-		_tag = t;
-		return _tag;
-	}
+	lexer.deliminate("\"", "\"");
 
-	std::string Token::file()
-	{
-		return _file;
-	}
+	string page = "include(std);\n\nvoid main()\n{\n\tprint(\"hello, world\\n\");\n}\n\n";
 
-	bool Token::filtered()
-	{
-		return _filtered;
-	}
+	InternalErrorHandler eh;
+	vector<Token> toks = lexer.lex(page, "--", eh);
+
+	test.assert(reconstructFromTokenVector(toks).compare(page) == 0);
+
+	vector<Token> avalue = {
+		Token("5")
+	};
+	lexer.defineMacro("A", avalue);
+
+	page = "A;\n";
+	toks = lexer.lex(page, "--", eh);
+
+	test.assert(toks.size() == 3);
+	test.assert(toks[0].value().compare("5") == 0);
+
+	vector<Token> avalue2 = {
+	};
+	lexer.defineMacro("A", avalue2);
+
+	toks = lexer.lex(page, "--", eh);
+
+	test.assert(toks.size() == 2);
+
+	vector<Token> avalue3 = {
+		Token("5"),
+		Token("+"),
+		Token("2")
+	};
+	lexer.defineMacro("A", avalue3);
+
+	toks = lexer.lex(page, "--", eh);
+
+	test.assert(toks.size() == 5);
+
+	lexer.onToken = myOnToken;
+	toks = lexer.lex(page, "--", eh);
+	test.assert(ntoks == 5);
+
+	return (int)(test.write());
 }

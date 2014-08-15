@@ -117,6 +117,16 @@ namespace mitten
 		append(source, "cannot operate on an operator");
 	}
 
+	void InternalErrorHandler::macroShadowsExistingDefinition(Token source)
+	{
+		append(source, "macro definition shadows existing definition");
+	}
+
+	void InternalErrorHandler::useOfUndefinedMacro(Token source)
+	{
+		append(source, "use of undefined macro");
+	}
+
 	bool InternalErrorHandler::empty()
 	{
 		return (count == 0);

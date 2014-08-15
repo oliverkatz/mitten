@@ -34,43 +34,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Token.h"
+#include <iostream>
+#include <MUnit.h>
 
-namespace mitten
+#include "../Core/Token.h"
+
+using namespace std;
+using namespace mitten;
+
+int main()
 {
-	int Token::line()
-	{
-		return _line;
-	}
+	Test test = Test("TokenTest");
 
-	int Token::column()
-	{
-		return _column;
-	}
+	Token tmp = Token("hi", "--", 5, 2);
+	test.assert(tmp.value().compare("hi") == 0);
+	test.assert(tmp.file().compare("--") == 0);
+	test.assert(tmp.line() == 5);
+	test.assert(tmp.column() == 2);
 
-	std::string Token::value()
-	{
-		return _value;
-	}
-
-	TokenTag Token::tag()
-	{
-		return _tag;
-	}
-
-	TokenTag &Token::setTag(TokenTag t)
-	{
-		_tag = t;
-		return _tag;
-	}
-
-	std::string Token::file()
-	{
-		return _file;
-	}
-
-	bool Token::filtered()
-	{
-		return _filtered;
-	}
+	return (int)(test.write());
 }

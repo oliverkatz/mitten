@@ -34,43 +34,36 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Token.h"
+#include <iostream>
+#include <MUnit.h>
 
-namespace mitten
+#include "../Core/Token.h"
+#include "../Core/AST.h"
+
+using namespace std;
+using namespace mitten;
+
+int main()
 {
-	int Token::line()
-	{
-		return _line;
-	}
+	Test test = Test("ASTTest");
 
-	int Token::column()
-	{
-		return _column;
-	}
+	AST leaf = AST::createLeaf(Token("hi"));
 
-	std::string Token::value()
-	{
-		return _value;
-	}
+	test.assert(leaf.isLeaf());
+	test.assert(leaf.leaf().value().compare("hi") == 0);
 
-	TokenTag Token::tag()
-	{
-		return _tag;
-	}
+	AST branch = AST::createNode("yo");
 
-	TokenTag &Token::setTag(TokenTag t)
-	{
-		_tag = t;
-		return _tag;
-	}
+	test.assert(branch.isBranch());
+	test.assert(branch.name().compare("yo") == 0);
 
-	std::string Token::file()
-	{
-		return _file;
-	}
+	branch.append(leaf);
+	branch.append(leaf);
 
-	bool Token::filtered()
-	{
-		return _filtered;
-	}
+	test.assert(branch.size() == 2);
+
+	test.assert(branch.rightmost().isLeaf());
+	test.assert(branch.rightmost().leaf().value().compare("hi") == 0);
+
+	return (int)(test.write());
 }

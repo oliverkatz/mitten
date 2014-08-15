@@ -41,6 +41,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <functional>
 
 #include "../Core/Token.h"
 #include "../Core/ErrorHandler.h"

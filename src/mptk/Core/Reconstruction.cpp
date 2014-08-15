@@ -40,7 +40,7 @@ using namespace std;
 
 namespace mitten
 {
-	string reconstructFromTokenVector(vector<Token> toks, bool autoTabs)
+	string reconstructFromTokenVector(vector<Token> toks)
 	{
 		string page;
 
@@ -52,7 +52,7 @@ namespace mitten
 		return page;
 	}
 
-	string reconstructFromAST(AST ast, bool autoTabs)
+	string reconstructFromAST(AST ast)
 	{
 		return "";
 	}

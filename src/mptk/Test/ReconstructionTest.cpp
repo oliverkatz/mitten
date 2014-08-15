@@ -34,43 +34,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Token.h"
+#include <iostream>
+#include <MUnit.h>
 
-namespace mitten
+#include "../Core/Token.h"
+#include "../Lexing/Lexer.h"
+#include "../Core/Reconstruction.h"
+
+using namespace std;
+using namespace mitten;
+
+int main()
 {
-	int Token::line()
-	{
-		return _line;
-	}
+	Test test = Test("ReconstructionTest");
 
-	int Token::column()
-	{
-		return _column;
-	}
+	Lexer lexer;
+	lexer.deliminate(" ") = Filtered;
+	lexer.deliminate(",");
+	lexer.deliminate("\n") = Filtered;
 
-	std::string Token::value()
-	{
-		return _value;
-	}
+	InternalErrorHandler eh;
+	vector<Token> toks = lexer.lex("hello, world\n", "--", eh);
 
-	TokenTag Token::tag()
-	{
-		return _tag;
-	}
+	string str = reconstructFromTokenVector(toks);
+	test.assert(str.compare("hello, world\n") == 0);
 
-	TokenTag &Token::setTag(TokenTag t)
-	{
-		_tag = t;
-		return _tag;
-	}
-
-	std::string Token::file()
-	{
-		return _file;
-	}
-
-	bool Token::filtered()
-	{
-		return _filtered;
-	}
+	return (int)(test.write());
 }

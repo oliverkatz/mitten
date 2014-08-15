@@ -34,43 +34,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Token.h"
+#include <iostream>
+#include <MUnit.h>
 
-namespace mitten
+#include "../Core/Token.h"
+#include "../Core/AST.h"
+#include "../Lexing/Lexer.h"
+#include "../Parsing/StructureParser.h"
+#include "../Parsing/ExpressionParser.h"
+
+using namespace std;
+using namespace mitten;
+
+int main()
 {
-	int Token::line()
-	{
-		return _line;
-	}
+	Test test = Test("ExpressionParserTest");
 
-	int Token::column()
-	{
-		return _column;
-	}
+	Lexer lexer;
+	lexer.deliminate("(");
+	lexer.deliminate(")");
+	lexer.deliminate(",");
 
-	std::string Token::value()
-	{
-		return _value;
-	}
+	lexer.deliminate(" ") = Filtered;
+	lexer.deliminate("\t") = Filtered;
+	lexer.deliminate("\n") = Filtered;
 
-	TokenTag Token::tag()
-	{
-		return _tag;
-	}
+	StructureParser sp;
+	sp.bind("expression", "(", ")", "argument", ",");
 
-	TokenTag &Token::setTag(TokenTag t)
-	{
-		_tag = t;
-		return _tag;
-	}
+	InternalErrorHandler eh;
 
-	std::string Token::file()
-	{
-		return _file;
-	}
+	AST expr0 = sp.parse(lexer.lex("2*(3+1)+4", "--", eh), eh);
 
-	bool Token::filtered()
-	{
-		return _filtered;
-	}
+	ExpressionParser ep;
+
+	ep.setExpressionBound("expression");
+	ep.setExpressionElement("argument");
+	ep.setFunctionNode("fcall");
+	ep.setOperationUnaryLeftNode("op_u_l");
+	ep.setOperationUnaryRightNode("op_u_r");
+	ep.setOperationBinaryNode("op_b");
+	ep.addBinaryOperator("+");
+	ep.addBinaryOperator("*");
+
+	AST ast = ep.parse(expr0, eh);
+	cout << ast.display() << "\n";
+
+	return (int)(test.write());
 }

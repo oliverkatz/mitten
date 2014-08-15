@@ -34,43 +34,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Token.h"
+#include <iostream>
+#include <MUnit.h>
 
-namespace mitten
+#include "../Core/Token.h"
+#include "../Core/AST.h"
+#include "../Core/ASTBuilder.h"
+
+using namespace std;
+using namespace mitten;
+
+int main()
 {
-	int Token::line()
-	{
-		return _line;
-	}
+	Test test = Test("ASTBuilderTest");
 
-	int Token::column()
-	{
-		return _column;
-	}
+	ASTBuilder builder;
 
-	std::string Token::value()
-	{
-		return _value;
-	}
+	builder.append(AST::createNode("global"));
+	test.assert(builder.head().isBranch());
+	test.assert(builder.head().name().compare("global") == 0);
 
-	TokenTag Token::tag()
-	{
-		return _tag;
-	}
+	builder.descend();
+	builder.append(AST::createLeaf(Token("hi")));
+	builder.append(AST::createLeaf(Token("hi")));
+	test.assert(builder.head().isBranch());
+	test.assert(builder.head().isBranch());
+	test.assert(builder.head().size() == 2);
 
-	TokenTag &Token::setTag(TokenTag t)
-	{
-		_tag = t;
-		return _tag;
-	}
+	builder.ascend();
+	test.assert(builder.head().size() == 1);
 
-	std::string Token::file()
-	{
-		return _file;
-	}
-
-	bool Token::filtered()
-	{
-		return _filtered;
-	}
+	return (int)(test.write());
 }

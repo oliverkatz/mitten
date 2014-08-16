@@ -65,15 +65,15 @@ namespace mitten
 		 */
 		typedef struct OperatorInfo
 		{
-			bool unary; //! Set tp true for unary, false for binary.
-			bool leftAssociative; //! Set to true if unary operator is left associative (note that it can be both left and right associative).
-			bool rightAssociative; //! Set to true if unary operator is right associative (note that it can be both left and right associative).
-			int precedence; //! Precedence (larger numbers are higher precedence).
+			bool binary; //! Whether or not the operator can be used as a binary operator.
+			bool unaryLeftAssociative; //! Whether or not the operator can be used as a unary (left-associative) operator.
+			bool unaryRightAssociative; //! Whether or not the operator can be used as a unary (right-associative) operator.
+			int precedence; //! The precedence index of the operator.
 
 			/*! \brief Constructor.
 			 * Initializes empty operator declaration.
 			 */
-			OperatorInfo() : unary(true), leftAssociative(false), rightAssociative(false) {}
+			OperatorInfo() : binary(false), unaryLeftAssociative(false), unaryRightAssociative(false), precedence(-1) {}
 
 			/*! \brief Constructor.
 			 * Initializes full operator declaration.
@@ -82,7 +82,7 @@ namespace mitten
 			 * \param r True for right associative.
 			 * \param p Precedence.
 			 */
-			OperatorInfo(bool u, bool l, bool r, int p) : unary(u), leftAssociative(l), rightAssociative(r), precedence(p) {}
+			OperatorInfo(bool b, bool l, bool r, int p) : binary(b), unaryLeftAssociative(l), unaryRightAssociative(r), precedence(p) {}
 		} OperatorInfo;
 
 		int maxPrecedence; //! Highest precedence used so far.
@@ -104,6 +104,8 @@ namespace mitten
 		 * \todo Replace this with token tags.
 		 */
 		virtual bool isLiteral(std::string s);
+
+		AST expressionify(AST ast, ErrorHandler &eh);
 
 	public:
 		/*! \brief Constructor.

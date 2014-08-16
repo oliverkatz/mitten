@@ -132,31 +132,31 @@ namespace mitten
 	{
 		if (p == -1)
 			p = maxPrecedence++;
-		operators[o] = OperatorInfo(true, true, false, p);
+		operators[o] = OperatorInfo(false, true, false, p);
 	}
 
 	void ExpressionParser::addUnaryRightOperator(string o, int p)
 	{
 		if (p == -1)
 			p = maxPrecedence++;
-		operators[o] = OperatorInfo(true, false, true, p);
+		operators[o] = OperatorInfo(false, false, true, p);
 	}
 
 	void ExpressionParser::addUnaryBothOperator(string o, int p)
 	{
 		if (p == -1)
 			p = maxPrecedence++;
-		operators[o] = OperatorInfo(true, true, true, p);
+		operators[o] = OperatorInfo(false, true, true, p);
 	}
 
 	void ExpressionParser::addBinaryOperator(string o, int p)
 	{
 		if (p == -1)
 			p = maxPrecedence++;
-		operators[o] = OperatorInfo(false, false, false, p);
+		operators[o] = OperatorInfo(true, false, false, p);
 	}
 
-	AST ExpressionParser::parse(AST ast, ErrorHandler &e)
+	/*AST ExpressionParser::parse(AST ast, ErrorHandler &e)
 	{
 		if (ast.isLeaf())
 			return ast;
@@ -420,5 +420,15 @@ namespace mitten
 		}
 
 		return AST();
+	}*/
+
+	AST ExpressionParser::expressionify(AST a, ErrorHandler &eh)
+	{
+		return a;
+	}
+
+	AST ExpressionParser::parse(AST a, ErrorHandler &eh)
+	{
+		return expressionify(a, eh);
 	}
 }

@@ -413,79 +413,190 @@ Many programming languages include algebraic expressions with simple rules. MPTK
 \end{description}
 
 \subsubsection{Overview}
-While the previous algorithms have all been iterative, this algorithm is recursive. It must be to deal with the recursive nature of the AST input. Another point of interest of the expression parser algorithm is that it iterates over the AST branches in reverse order. This fixes many problems with lookahead and optimizes the precedence sorting algorithm. The algorithm can be thought of as the lovechild of the Shunting-Yard algorithm and the Heapify algorithm.
-
-\textit{NOTE: Expression objects are given in Lisp-like syntax.}
+While the previous algorithms have all been iterative, this algorithm is recursive. It must be to deal with the recursive nature of the AST input.
 
 \subsubsection{Algorithm}
-The algorithm is split into two mutually recursive functions: $expressionify$ and $precedenceSort$.
-
+$a$ is the input AST branch, while $A$ is the input AST passed to $parseExpression$. $i$ is the parsing iterator used by $parseExpression$. $B$ is the number of branches in $A$. \newline
 \begin{algorithm}[H]
-\caption{$expressionify(A)$}
+\caption{$parseValue(a, A, i, stack)$}
 
-$root\gets$ new expression object\;
-$head\gets$ a reference to $root$\;
-$stack\gets []$\;
-
-\For{all AST branches $b$ in $A$ taken in reverse order}{
-	\uIf{$b$ is a binary operator}{
-		$e\gets$ the top element popped from the stack\;
-		overwrite $head$ with a new expression object with precedence -1: $(b (new expression object) e)$\;
-		$head\gets$ a reference to the $new expression object$ created in the previous step\;
+\uIf{a is an expression bound}{
+	\uIf{the number of branches in a $\neq 1$}{
+		throw exception\;
 	}
-	\uElseIf{$b$ is a unary left operator}{
-		push $b$ to $stack$\;
+	\uElseIf {a[i] is an expression element} {
+		$value\gets parseExpression(a[i])$\;
 	}
-	\uElseIf{$b$ is a unary right operator}{
-		$e\gets$ the top element popped from the stack\;
-		create a new expression object with precedence -1: $(b e)$\;
-		push this new object to $stack$\;
-	}
-	\uElseIf{$b$ is a literal or a symbol}{
-		\uIf{top element $e$ of stack is a unary left operator}{
-			create a new expression object with precedence -1: $(e b)$\;
-			push to $stack$\;
-		}
-		\uElseIf{top element $e$ of stack is an expression with a precedence of 0 or higher or an argument list}{
-			create a new expression object with precedence -1: $(b e)$\;
-			push to $stack$\;
-		}
-		\uElseIf{top element $e$ of stack is an expression, symbol, or literal}{
-			throw error: improper expression form\;
-		}
-		\uElseIf{top element $e$ of stack is an expression}{
-			push $e$ to $stack$\;
-		}
-		\Else{
-			throw error: unknown token in expression stack\;
-		}
-	}
-	\Else{
-		throw error: unknown token in expression\;
+	\Else {
+		throw exception\;
 	}
 }
+\uElseIf{a is a literal} {
+	$value\gets a$\;
+}
+\uElseIf{a is a symbol} {
+	\uIf{a is not the last branch in A and A[i+1] is an expression bound}{
+		$value\gets$ a new AST node describing a function call\;
+		value's function symbol is a\;
+		\For{arguments $p$ in A[i+1]} {
+			append argument to function call AST $value$\;
+		}
+		$i++$\;
+	}
+	\Else {
+		$value\gets a$\;
+	}
+}
+\uElseIf{a is a non-expression bound} { % this is just for freaky shit
+	$value\gets a$\;
+}
 
-\uIf{$stack$ is empty and $head$ references an incomplete expression}{
-	throw error: incomplete expression\;
+\uIf{stack is not empty and the top element of the stack is an operator}{
+	$o\gets$ top operator element of the stack\;
+	\uIf{$o$ is a binary operator}{
+		pop the top element from the stack\;
+		\uIf{stack is empty}{
+			throw exception\;
+		}
+		\uElseIf{top element is not an expression or a pre-parsed node}{
+			throw exception\;
+		}
+		\Else {
+			$lvalue\gets$ pop the top expression from the stack\;
+			\uIf{precedence of $o >$ precedence of $lvalue$}{
+				$tmp\gets$ new binary expression\;
+				tmp's left operand is the rightmost node of $lvalue$\;
+				tmp's right operand is $value$\;
+				tmp's operator is $o$\;
+				lvalue's rightmost node is set to be tmp\;
+				push lvalue to the top of $stack$\;
+			}
+			\Else {
+				$tmp\gets$ new binary expression\;
+				tmp's left operand is $lvalue$\;
+				tmp's right operand is $value$\;
+				tmp's operator is $o$\;
+				push tmp to the top of $stack$\;
+			}
+		}
+	}
+	\uElseIf{$o$ is a unary operator}{
+		\If{$o$ is right associative}{
+			pop top item from stack\;
+			$tmp\gets$ new unary right expression\;
+			tmp's operator is $o$\;
+			tmp's operand is $value$\;
+			push tmp to the top of $stack$\;
+		}
+	}
 }
-\uElseIf{$stack$ has one element}{
-	overwrite $head$ with the top element of $stack$\;
-}
-\Else{
-	throw error: incomplete expression\;
+\Else {
+	push $value$ to the top of $stack$\;
 }
 
-return $root$\;
+return $value$\;
 \end{algorithm}
 
 \newpage
+
+$A$ is the input AST. $B$ is the number of branches in $A$. \newline
 \begin{algorithm}[H]
-\caption{$precedenceSort(A)$}
+\caption{$parseOperator(A, stack)$}
 
+\uIf{$a$ is a binary operator} {
+	push $a$ to the top of $stack$\;
+}
+\ElseIf{$a$ is a unary operator} {
+	\uIf{$a$ can be both left and right associative}{
+		\uIf{$stack$ is empty or the top element of $stack$ is an operator}{
+			push $a$ to the stack\;
+		}
+		\ElseIf{top element of $stack$ is an expression}{
+			$value\gets$ popped top element of $stack$\;
+			\uIf{precedence of $a >$ precedence of $value$}{
+				$tmp\gets$ new unary left expression\;
+				tmp's operand is the rightmode node of $value$\;
+				tmp's operator is $a$\;
+				set $value$'s rightmost node to $tmp$\;
+				push $value$ to the top of the stack\;
+			}
+			\Else {
+				$tmp\gets$ new unary left expression\;
+				tmp's operand is $value$\;
+				tmp's operator is $a$\;
+				push $tmp$ to the top of the stack\;
+			}
+		}
+	}
+	\uElseIf{$a$ is only left associative}{
+		\If{top element of $stack$ is an operator}{
+			$value\gets$ popped top expression of $stack$\;
+			\uIf{precedence of $a >$ precedence of $value$}{
+				$tmp\gets$ new unary left expression\;
+				tmp's operand is $value$'s rightmost node\;
+				tmp's operator is $a$\;
+				$value$'s rightmode node is set to $tmp$\;
+				push $value$ to top of $stack$\;
+			}
+			\Else {
+				$tmp\gets$ new unary left expression\;
+				tmp's operand is $value$\;
+				tmp's operator is $a$\;
+				push $value$ to the top of $stack$\;
+			}
+		}
+	}
+	\ElseIf{$a$ is only right associative} {
+		push $a$ to the top of $stack$\;
+	}
+}
 
+return $value$\;
+\end{algorithm}
+
+\newpage
+Note that for all prior algorithms in this section, $stack$ is passed by reference. $A$ is the input AST. $B$ is the number of branches in $A$. \newline
+\begin{algorithm}[H]
+\caption{$parseExpression(A)$}
+
+$stack\gets$ []\; % what the fuck is this??
+\For{$i\gets 0, B$}{
+	$a\gets A[i]$\;
+	\uIf{a is an expression bound, a literal token, or a symbol}{
+		$value\gets parseValue(a, stack)$\;
+	}
+	\uElseIf{$a$ is an operator} {
+		$value\gets parseOperator(a, stack)$\;
+	}
+	\Else{
+		throw exception\;
+	}
+}
+
+\uIf{$stack$ is empty} {
+	return empty expression AST\;
+}
+\uElseIf{$stack$ has length of 1}{
+	\uIf{top element of $stack$ is an operator} {
+		throw exception\;
+	}
+	\Else {
+		$res\gets$ popped top expression off $stack$\;
+		\uIf {$res$ is a token} {
+			return expression value node created from $res$ \;
+		}
+		\Else {
+			return $res$ \;
+		}
+	}
+}
+\Else {
+	throw exception\;
+}
 \end{algorithm}
 
 \subsubsection{Running Time Analysis}
+This procedure traverses every node in the AST tree once, so it has a running time of $O(N)$ where $N$ is the number of nodes in the AST tree. In the worst case, this is equivalent to the number of tokens in the expression passed to the structure parser.
 
 \begin{thebibliography}{9}
 \bibitem{ISO_CharacterEncodings}

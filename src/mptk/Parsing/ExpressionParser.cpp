@@ -132,51 +132,113 @@ namespace mitten
 	{
 		if (p == -1)
 			p = maxPrecedence++;
-		operators[o] = OperatorInfo(false, true, false, p);
+		operators[o] = OperatorInfo(true, true, false, p);
 	}
 
 	void ExpressionParser::addUnaryRightOperator(string o, int p)
 	{
 		if (p == -1)
 			p = maxPrecedence++;
-		operators[o] = OperatorInfo(false, false, true, p);
+		operators[o] = OperatorInfo(true, false, true, p);
 	}
 
 	void ExpressionParser::addUnaryBothOperator(string o, int p)
 	{
 		if (p == -1)
 			p = maxPrecedence++;
-		operators[o] = OperatorInfo(false, true, true, p);
+		operators[o] = OperatorInfo(true, true, true, p);
 	}
 
 	void ExpressionParser::addBinaryOperator(string o, int p)
 	{
 		if (p == -1)
 			p = maxPrecedence++;
-		operators[o] = OperatorInfo(true, false, false, p);
+		operators[o] = OperatorInfo(false, false, false, p);
 	}
 
-	/*AST ExpressionParser::parse(AST ast, ErrorHandler &e)
+	bool ExpressionParser::isExpression(AST a)
 	{
+		if (a.isBranch())
+			return (a.name().compare(expressionBound) == 0);
+		else
+			return false;
+	}
+
+	bool ExpressionParser::isExpressionElement(AST a)
+	{
+		if (a.isBranch())
+			return (a.name().compare(expressionElement) == 0);
+		else
+			return false;
+	}
+
+	bool ExpressionParser::isLiteral(AST a)
+	{
+		if (a.isLeaf())
+			return isLiteral(a.leaf().value());
+		else
+			return false;
+	}
+
+	bool ExpressionParser::isSymbol(AST a)
+	{
+		if (a.isLeaf())
+			return isSymbol(a.leaf().value());
+		else
+			return false;
+	}
+
+	bool ExpressionParser::isOperator(AST a)
+	{
+		if (a.isLeaf())
+			return (operators.find(a.leaf().value()) != operators.end());
+		else
+			return false;
+	}
+
+	int ExpressionParser::getPrecedenceOfNode(AST a)
+	{
+		int ptmp = MITTEN_MAX_PRECEDENCE;
+		if (a.isBranch())
+		{
+			if (a.name().compare(operationUnaryLeftNode) == 0)
+			{
+				ptmp = operators[a[1].leaf().value()].precedence;
+			}
+			else if (a.name().compare(operationUnaryRightNode) == 0)
+			{
+				ptmp = operators[a[0].leaf().value()].precedence;
+			}
+			else if (a.name().compare(operationBinaryNode) == 0)
+			{
+				ptmp = operators[a[1].leaf().value()].precedence;
+			}
+		}
+
+		return ptmp;
+	}
+
+	AST ExpressionParser::parse(AST ast, ErrorHandler &e)
+	{
+		stack<AST> expressionStack;
+
 		if (ast.isLeaf())
 			return ast;
-
-		stack<AST> expressionStack;
 
 		for (int i = 0; i < ast.size(); i++)
 		{
 			AST a = ast[i];
 			AST value;
 
-			if ((a.isBranch() && a.name().compare(expressionBound) == 0) || (a.isLeaf() && (isLiteral(a.leaf().value()) || isSymbol(a.leaf().value()))))
+			if (isExpression(a) || isLiteral(a) || isSymbol(a))
 			{
-				if (a.isBranch() && a.name().compare(expressionBound) == 0)
+				if (isExpression(a))
 				{
 					if (a.size() != 1)
 					{
 						e.unexpectedArgumentList(a.rightmost().leaf());
 					}
-					else if (a[0].isBranch() && a[0].name().compare(expressionElement) == 0)
+					else if (isExpressionElement(a[0]))
 					{
 						value = parse(a[0], e);
 					}
@@ -185,13 +247,13 @@ namespace mitten
 						e.expectedExpression(a.rightmost().leaf());
 					}
 				}
-				else if (a.isLeaf() && isLiteral(a.leaf().value()))
+				else if (isLiteral(a))
 				{
 					value = a;
 				}
-				else if (a.isLeaf() && isSymbol(a.leaf().value()))
+				else if (isSymbol(a))
 				{
-					if (i != ast.size()-1 && (ast[i+1].isBranch() && ast[i+1].name().compare(expressionBound) == 0))
+					if (i != ast.size()-1 && isExpression(ast[i+1]))
 					{
 						value = AST::createNode(functionNode);
 						value.append(a);
@@ -208,12 +270,12 @@ namespace mitten
 						value = a;
 					}
 				}
-				else if (a.isBranch() && a.name().compare(expressionBound) != 0)
+				else if (isExpression(a))
 				{
 					value = a;
 				}
 
-				if (!expressionStack.empty() && (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value()) != operators.end()))
+				if (!expressionStack.empty() && isOperator(expressionStack.top()))
 				{
 					string o = expressionStack.top().leaf().value();
 					AST oast = expressionStack.top();
@@ -226,7 +288,7 @@ namespace mitten
 						{
 							e.operationRequiredLeftOperand(oast.leaf());
 						}
-						else if (expressionStack.top().isBranch() && expressionStack.top().name().compare(expressionBound) != 0)
+						else if (isExpression(expressionStack.top()))
 						{
 							e.operationRequiredLeftOperand(oast.leaf());
 						}
@@ -235,26 +297,7 @@ namespace mitten
 							AST lvalue = expressionStack.top();
 							expressionStack.pop();
 
-							int ptmp = maxPrecedence+1;
-							if (lvalue.isBranch())
-							{
-								if (lvalue.name().compare(operationUnaryLeftNode) == 0)
-								{
-									ptmp = operators[lvalue[1].leaf().value()].precedence;
-								}
-								else if (lvalue.name().compare(operationUnaryRightNode) == 0)
-								{
-									ptmp = operators[lvalue[0].leaf().value()].precedence;
-								}
-								else if (lvalue.name().compare(operationBinaryNode) == 0)
-								{
-									ptmp = operators[lvalue[1].leaf().value()].precedence;
-								}
-								else
-								{
-									ptmp = MITTEN_MAX_PRECEDENCE;
-								}
-							}
+							int ptmp = getPrecedenceOfNode(lvalue);
 
 							if (operators[o].precedence > ptmp)
 							{
@@ -289,7 +332,7 @@ namespace mitten
 					expressionStack.push(value);
 				}
 			}
-			else if (a.isLeaf() && operators.find(a.leaf().value()) != operators.end())
+			else if (isOperator(a))
 			{
 				if (!operators[a.leaf().value()].unary)
 				{
@@ -299,31 +342,12 @@ namespace mitten
 				{
 					if (operators[a.leaf().value()].leftAssociative && operators[a.leaf().value()].rightAssociative)
 					{
-						if (expressionStack.empty() || (!expressionStack.empty() && (expressionStack.top().isBranch() && expressionStack.top().name().compare(expressionBound) == 0)))
+						if (expressionStack.empty() || (!expressionStack.empty() && isExpression(expressionStack.top())))
 						{
 							value = expressionStack.top();
 							expressionStack.pop();
 
-							int ptmp = maxPrecedence+1;
-							if (value.isBranch())
-							{
-								if (value.name().compare(operationUnaryLeftNode) == 0)
-								{
-									ptmp = operators[value[1].leaf().value()].precedence;
-								}
-								else if (value.name().compare(operationUnaryRightNode) == 0)
-								{
-									ptmp = operators[value[0].leaf().value()].precedence;
-								}
-								else if (value.name().compare(operationBinaryNode) == 0)
-								{
-									ptmp = operators[value[1].leaf().value()].precedence;
-								}
-								else
-								{
-									ptmp = MITTEN_MAX_PRECEDENCE;
-								}
-							}
+							int ptmp = getPrecedenceOfNode(value);
 
 							if (operators[a.leaf().value()].precedence > ptmp)
 							{
@@ -344,31 +368,12 @@ namespace mitten
 					}
 					else if (operators[a.leaf().value()].leftAssociative && !operators[a.leaf().value()].rightAssociative)
 					{
-						if (!expressionStack.empty() && (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value()) != operators.end()))
+						if (!expressionStack.empty() && (isOperator(expressionStack.top())))
 						{
 							value = expressionStack.top();
 							expressionStack.pop();
 
-							int ptmp = maxPrecedence+1;
-							if (value.isBranch())
-							{
-								if (value.name().compare(operationUnaryLeftNode) == 0)
-								{
-									ptmp = operators[value[1].leaf().value()].precedence;
-								}
-								else if (value.name().compare(operationUnaryRightNode) == 0)
-								{
-									ptmp = operators[value[0].leaf().value()].precedence;
-								}
-								else if (value.name().compare(operationBinaryNode) == 0)
-								{
-									ptmp = operators[value[1].leaf().value()].precedence;
-								}
-								else
-								{
-									ptmp = MITTEN_MAX_PRECEDENCE;
-								}
-							}
+							int ptmp = getPrecedenceOfNode(value);
 
 							if (operators[a.leaf().value()].precedence > ptmp)
 							{
@@ -405,7 +410,7 @@ namespace mitten
 		}
 		else if (expressionStack.size() == 1)
 		{
-			if (expressionStack.top().isLeaf() && operators.find(expressionStack.top().leaf().value()) != operators.end())
+			if (isOperator(expressionStack.top()))
 			{
 				e.cannotOperateOnAnOperator(expressionStack.top().leaf());
 			}
@@ -420,15 +425,5 @@ namespace mitten
 		}
 
 		return AST();
-	}*/
-
-	AST ExpressionParser::expressionify(AST a, ErrorHandler &eh)
-	{
-		return a;
-	}
-
-	AST ExpressionParser::parse(AST a, ErrorHandler &eh)
-	{
-		return expressionify(a, eh);
 	}
 }

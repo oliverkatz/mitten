@@ -59,12 +59,17 @@ int main()
 	lexer.deliminate("\t") = Filtered;
 	lexer.deliminate("\n") = Filtered;
 
+	lexer.deliminate("*");
+	lexer.deliminate("+");
+
 	StructureParser sp;
 	sp.bind("expression", "(", ")", "argument", ",");
 
 	InternalErrorHandler eh;
 
 	AST expr0 = sp.parse(lexer.lex("2*(3+1)+4", "--", eh), eh);
+
+	test.assert(!eh.dump());
 
 	ExpressionParser ep;
 
@@ -78,7 +83,20 @@ int main()
 	ep.addBinaryOperator("*");
 
 	AST ast = ep.parse(expr0, eh);
-	cout << ast.display() << "\n";
+
+	test.assert(!eh.dump());
+
+	eh.clear();
+	AST expr1 = sp.parse(lexer.lex("3+f(5)", "--", eh), eh);
+	test.assert(!eh.dump());
+	ast = ep.parse(expr1, eh);
+	test.assert(!eh.dump());
+
+	eh.clear();
+	AST expr2 = sp.parse(lexer.lex("f(5)+3", "--", eh), eh);
+	test.assert(!eh.dump());
+	ast = ep.parse(expr2, eh);
+	test.assert(!eh.dump());
 
 	return (int)(test.write());
 }

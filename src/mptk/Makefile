@@ -24,7 +24,7 @@ libMPTK.a : $(OBJ)
 	$(AR) $(ARFLAGS) libMPTK.a $^
 
 clean :
-	$(RM) $(RMFLAGS) $(OBJ) libMPTK.a Test/AbstractWidthStringTest Test/LiteralTaggerTest Test/UtilsTest $(shell rm -rf *.mut Test/*.mut Test/*.dSYM)
+	$(RM) $(RMFLAGS) $(OBJ) libMPTK.a Test/AbstractWidthStringTest Test/LiteralTaggerTest Test/UtilsTest Test/ASTBuilderTest Test/ASTTest Test/ExpressionParserTest Test/LexerTest Text/ReconstructionTest Test/StructureParserTest Test/TokenTest $(shell rm -rf *.mut Test/*.mut Test/*.dSYM)
 
 tests : Test/UtilsTest Test/ASTTest Test/ASTBuilderTest Test/ReconstructionTest Test/TokenTest Test/LiteralTaggerTest Test/LexerTest Test/StructureParserTest Test/ExpressionParserTest
 	./Test/UtilsTest

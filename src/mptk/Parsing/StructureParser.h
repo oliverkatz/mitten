@@ -92,6 +92,7 @@ namespace mitten
 
 		std::string globalBoundName; //! AST node name for the global bound (often 'global').
 		std::string globalSplitName; //! AST node name for the global bound element (i.e. a line of code).
+		std::string globalSplitToken; //! The token which is used for the global split element (i.e. a line of code in the global context).
 		std::unordered_map<std::string, Bound> bounds; //! List of bounds sorted by start-point.
 		std::unordered_set<std::string> boundEnds; //! Set of all bound end-points - used for error checking.
 		
@@ -121,6 +122,19 @@ namespace mitten
 		 * \returns A reference to the newly created bound declaration.
 		 */
 		Bound &bind(std::string n, std::string st, std::string e, std::string en = "", std::string sp = "");
+
+		/*! \brief Sets a global split token.
+		 * The global split token exists for element separators in the global scope.
+		 * \param en The element name.
+		 * \param sp The split token.
+		 */
+		void setGlobalSplit(std::string en, std::string sp);
+
+		/*! \brief Sets the global bound name.
+		 * The global bound is the highest-level node. This dictates the name of that node.
+		 * \param n The node name.
+		 */
+		void setGlobalBoundName(std::string n);
 		
 		/*! \brief Defines a new macro.
 		 * \param s The name of the macro.

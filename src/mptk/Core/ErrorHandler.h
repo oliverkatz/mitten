@@ -87,7 +87,7 @@ namespace mitten
 		
 		/*! \brief Error for the re-definition of an existing macro.
 		 */
-		virtual void macroShadowsExistingDefinition(Token source) =0;
+		virtual void macroAlreadyDefined(Token source) =0;
 		
 		/*! \brief Error for the use of an undefined macro.
 		 */
@@ -165,7 +165,7 @@ namespace mitten
 		/*! \brief Implemented method.
 		 * See the ErrorHandler base class.
 		 */
-		virtual void macroShadowsExistingDefinition(Token source);
+		virtual void macroAlreadyDefined(Token source);
 		
 		/*! \brief Implemented method.
 		 * See the ErrorHandler base class.

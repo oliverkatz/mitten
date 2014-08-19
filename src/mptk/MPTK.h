@@ -42,13 +42,13 @@
 #define MPTK_VERSION_STR "0.01-alpha"
 #define MPTK_VERSION 0x001
 
-#include "Utils.h"
-#include "Token.h"
-#include "Lexer.h"
-#include "AST.h"
-#include "ErrorHandler.h"
-#include "StructureParser.h"
-#include "ExpressionParser.h"
-#include "Reconstruction.h"
+#include "Core/Utils.h"
+#include "Core/Token.h"
+#include "Lexing/Lexer.h"
+#include "Core/AST.h"
+#include "Core/ErrorHandler.h"
+#include "Parsing/StructureParser.h"
+#include "Parsing/ExpressionParser.h"
+#include "Core/Reconstruction.h"
 
 #endif

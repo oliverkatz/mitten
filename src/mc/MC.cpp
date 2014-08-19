@@ -39,7 +39,7 @@
 
 #include "util/CommandLineParser.h"
 #include "language/MittenErrorHandler.h"
- #include "language/MittenSource.h"
+#include "language/MittenSource.h"
 
 using namespace std;
 using namespace mitten;
@@ -68,17 +68,11 @@ int main(int argc, char *argv[])
 
 	for (auto i : clp.freeArguments)
 	{
-		MittenSource source;
-		source.readSourceFile(i);
+		MittenSource source = MittenSource::fromFile(i);
 
-		if (source.lex(true))
+		if (source.compile())
 		{
 			return 3;
-		}
-
-		if (source.dumpErrors())
-		{
-			return 5;
 		}
 	}
 

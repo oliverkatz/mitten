@@ -58,6 +58,17 @@ namespace mitten
 		boundEnds.insert(e);
 		return bounds[st];
 	}
+
+	void StructureParser::setGlobalBoundName(string n)
+	{
+		globalBoundName = n;
+	}
+
+	void StructureParser::setGlobalSplit(string en, string sp)
+	{
+		globalSplitName = en;
+		globalSplitToken = sp;
+	}
 	
 	void StructureParser::defineMacro(string s, AST v)
 	{
@@ -83,6 +94,12 @@ namespace mitten
 	{
 		ASTBuilder builder;
 		stack<string> boundStack;
+
+		if (!globalSplitToken.empty())
+		{
+			builder.append(AST::createNode(globalSplitName));
+			builder.descend();
+		}
 
 		for (auto i : toks)
 		{
@@ -117,6 +134,14 @@ namespace mitten
 				if (onNode)
 					onNode(builder.head(), builder, e, *this);
 				builder.append(AST::createNode(bounds[boundStack.top()].elementName));
+				builder.descend();
+			}
+			else if (boundStack.empty() && globalSplitToken.compare(i.value()) == 0)
+			{
+				builder.ascend();
+				if (onNode)
+					onNode(builder.head(), builder, e, *this);
+				builder.append(AST::createNode(globalSplitName));
 				builder.descend();
 			}
 			else if (boundEnds.find(i.value()) != boundEnds.end())

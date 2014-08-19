@@ -117,7 +117,7 @@ namespace mitten
 		append(source, "cannot operate on an operator");
 	}
 
-	void InternalErrorHandler::macroShadowsExistingDefinition(Token source)
+	void InternalErrorHandler::macroAlreadyDefined(Token source)
 	{
 		append(source, "macro definition shadows existing definition");
 	}

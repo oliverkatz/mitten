@@ -40,123 +40,88 @@ using namespace std;
 
 namespace mitten
 {
-	int multiLineMacroPattern(int from, std::string s)
-	{
-		bool multi = false;
-
-		for (int i = from; i < s.size(); i++)
-		{
-			if (s[i] == '\n')
-			{
-				if (!multi)
-				{
-					return i-from+1;
-				}
-			}
-			else if (s[i] == '#' && (i < s.size()-1 && s[i+1] == '{'))
-			{
-				multi = true;
-			}
-			else if (s[i] == '#' && (i < s.size()-1 && s[i+1] == '}'))
-			{
-				if (multi)
-				{
-					return i-from+2;
-				}
-			}
-		}
-
-		return s.size()-from;
-	}
-
 	MittenSource::MittenSource()
 	{
+		lexer.deliminate(" ") = Filtered;
+		lexer.deliminate("\t") = Filtered;
+		lexer.deliminate("\n") = Filtered;
+		lexer.deliminate("(");
+		lexer.deliminate(")");
+		lexer.deliminate(",");
+		lexer.deliminate("{");
+		lexer.deliminate("}");
+		lexer.deliminate(";");
+		lexer.deliminate("[");
+		lexer.deliminate("]");
+		lexer.deliminate("\"", "\"");
+		lexer.deliminate("'", "'");
+		lexer.deliminate("\"\"\"", "\"\"\"");
+		lexer.deliminate("//", "\n") = Filtered;
+		lexer.deliminate("/*", "*/") = Filtered;
+		lexer.deliminate("+");
+		lexer.deliminate("-");
+		lexer.deliminate("*");
+		lexer.deliminate("/");
+		lexer.deliminate("%");
+		lexer.deliminate("&");
+		lexer.deliminate("|");
+		lexer.deliminate("^");
+		lexer.deliminate("<<");
+		lexer.deliminate(">>");
+		lexer.deliminate("~");
+		lexer.deliminate("&&");
+		lexer.deliminate("||");
+		lexer.deliminate("^^");
+		lexer.deliminate("!");
+		lexer.deliminate("=");
+		lexer.deliminate("+=");
+		lexer.deliminate("-=");
+		lexer.deliminate("*=");
+		lexer.deliminate("/=");
+		lexer.deliminate("%=");
+		lexer.deliminate("&=");
+		lexer.deliminate("|=");
+		lexer.deliminate("^=");
+		lexer.deliminate("<<=");
+		lexer.deliminate(">>=");
+		lexer.deliminate("~=");
+		lexer.deliminate("==");
+		lexer.deliminate("!=");
+		lexer.deliminate("<");
+		lexer.deliminate("<=");
+		lexer.deliminate(">");
+		lexer.deliminate(">=");
+		lexer.deliminate(":");
+
+		structureParser.setGlobalBoundName("global");
+		structureParser.setGlobalSplit("line", ";");
+		structureParser.bind("expression", "(", ")", "argument", ",");
+		structureParser.bind("scope", "{", "}", "line", ";");
 	}
 
-	bool MittenSource::readSourceFile(string p)
+	MittenSource MittenSource::fromString(string s)
 	{
-		path = p;
-		try
-		{
-			page = readFile(path);
-		}
-		catch (runtime_error &e)
-		{
-			return true;
-		}
-
-		return false;
+		MittenSource rtn;
+		rtn.path = "--";
+		rtn.body = s;
+		return rtn;
 	}
 
-	bool MittenSource::setSourceString(string s)
+	MittenSource MittenSource::fromFile(string p)
 	{
-		path = "--";
-		page = s;
-
-		return (s.empty());
+		MittenSource rtn;
+		rtn.path = p;
+		rtn.body = readFile8(p);
+		return rtn;
 	}
 
-	bool MittenSource::lex(bool verbose)
+	bool MittenSource::compile()
 	{
-		if (page.empty())
-			return true;
+		vector<Token> toks = lexer.lex(body, path, meh);
+		AST ast = structureParser.parse(toks, meh);
 
-		toks = lexer.lex(page, path);
+		cout << ast.display() << "\n";
 
-		if (verbose)
-		{
-			cout << "lex " << path << ":\n";
-			cout << string(50, '=') << "\n";
-
-			int line = 1;
-			for (auto i : toks)
-			{
-				if (i.line() != line)
-				{
-					cout << "\n";
-					line = i.line();
-				}
-
-				cout << "'" << i.value() << "' ";
-			}
-
-			cout << "\n\n";
-		}
-
-		return false;
-	}
-
-	string MittenSource::reconstruct()
-	{
-		if (!toks.empty())
-		{
-			return reconstructFromTokenVector(toks);
-		}
-		else
-		{
-			return page;
-		}
-	}
-
-	void MittenSource::clear()
-	{
-		page.clear();
-		toks.clear();
-		meh.clear();
-	}
-
-	bool MittenSource::areErrors()
-	{
-		return !meh.empty();
-	}
-
-	bool MittenSource::dumpErrors()
-	{
 		return meh.dump();
-	}
-
-	void MittenSource::clearErrors()
-	{
-		meh.clear();
 	}
 }

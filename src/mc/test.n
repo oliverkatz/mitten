@@ -1,8 +1,6 @@
-#define A 5
-A
+include(std);
 
-#define L #{
-	hello, world
-#}
-
-L
+void main()
+{
+	print("hello, world");
+}

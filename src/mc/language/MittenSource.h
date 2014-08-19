@@ -34,45 +34,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MITTEN_LANGUAGE_MITTEN_SOURCE_H
-#define __MITTEN_LANGUAGE_MITTEN_SOURCE_H
+#ifndef __MITTEN_SOURCE_H
+#define __MITTEN_SOURCE_H
 
 #include <iostream>
-#include <string>
-#include <vector>
 #include <MPTK.h>
-
 #include "MittenErrorHandler.h"
-#include "MittenLexer.h"
 
 namespace mitten
 {
 	class MittenSource
 	{
 	protected:
-		MittenLexer lexer;
-
 		std::string path;
-		std::string page;
-		std::vector<Token> toks;
-
+		std::string body;
 		MittenErrorHandler meh;
+		Lexer lexer;
+		StructureParser structureParser;
 
 	public:
 		MittenSource();
 
-		bool readSourceFile(std::string p);
-		bool setSourceString(std::string s);
+		static MittenSource fromString(std::string s);
+		static MittenSource fromFile(std::string p);
 
-		bool lex(bool verbose = false);
-
-		std::string reconstruct();
-
-		void clear();
-
-		bool areErrors();
-		bool dumpErrors();
-		void clearErrors();
+		bool compile();
 	};
 }
 

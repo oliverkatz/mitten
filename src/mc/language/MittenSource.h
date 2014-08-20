@@ -58,6 +58,10 @@ namespace mitten
 		static MittenSource fromString(std::string s);
 		static MittenSource fromFile(std::string p);
 
+		static void onNode(AST &a, ASTBuilder &b, ErrorHandler &e, StructureParser &p);
+
+		AST parse();
+		bool compileFromAST(AST a);
 		bool compile();
 	};
 }

@@ -140,6 +140,26 @@ namespace mitten
 		append(source, "use of undefind macro");
 	}
 
+	void MittenErrorHandler::improperIncludeFormat(Token source)
+	{
+		append(source, "include directive improperly formatted");
+	}
+
+	void MittenErrorHandler::includeRequiresArgumentList(Token source)
+	{
+		append(source, "include directive requires argument list");
+	}
+
+	void MittenErrorHandler::includeRequiresOneArgument(Token source)
+	{
+		append(source, "include directive requires only one argument");
+	}
+
+	void MittenErrorHandler::includeRequiresModuleOrFileName(Token source)
+	{
+		append(source, "include directive requires either a module name or a filename as an argument");
+	}
+
 	bool MittenErrorHandler::empty()
 	{
 		return (errorCount == 0);

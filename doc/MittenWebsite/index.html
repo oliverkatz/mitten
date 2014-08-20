@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<title>Mitten</title>
+
+		<style>
+			#titlebar
+			{
+				position: absolute;
+				width: 100%;
+				height: 80px;
+				background-color: #333333;
+				opacity: 0.90;
+				box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+
+				left: 0px;
+				top: 0px;
+			}
+
+			#backdrop
+			{
+				background-color: #993333;
+				left: 0px;
+				top: 0px;
+				width: 100%;
+				height: 600px;
+				position: absolute;
+				z-index: -100;
+			}
+
+			#wrapper
+			{
+				background-color: #555555;
+				left: 0px;
+				top: 600px;
+				position: absolute;
+				width: 100%;
+				height: 600px;
+				z-index: -50;
+
+				box-shadow: -1px -1px 5px rgba(0, 0, 0, 0.3);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="titlebar">
+			<a href="javascript:void(0);">Mitten</a>
+			<a href="javascript:void(0);">Docs</a>
+			<a href="javascript:void(0);">MPTK</a>
+		</div>
+
+		<div id="backdrop">
+
+		</div>
+
+		<div id="wrapper">
+
+		</div>
+	</body>
+</html>

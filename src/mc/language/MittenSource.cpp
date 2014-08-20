@@ -97,6 +97,7 @@ namespace mitten
 		structureParser.setGlobalSplit("line", ";");
 		structureParser.bind("expression", "(", ")", "argument", ",");
 		structureParser.bind("scope", "{", "}", "line", ";");
+		structureParser.onNode = onNode;
 	}
 
 	MittenSource MittenSource::fromString(string s)
@@ -115,13 +116,73 @@ namespace mitten
 		return rtn;
 	}
 
-	bool MittenSource::compile()
+	void MittenSource::onNode(AST &a, ASTBuilder &b, ErrorHandler &e, StructureParser &p)
+	{
+		MittenErrorHandler &meh = dynamic_cast<MittenErrorHandler &>(e);
+
+		if (a.isBranch() && a.name().compare("line") == 0)
+		{
+			cout << "LINE: " << a.display() << "\n";
+
+			if (a.size() == 2)
+			{
+				if (a[0].isLeaf() && a[0].leaf().value().compare("include") == 0)
+				{
+					if (a[1].isBranch())
+					{
+						if (a[1].size() == 1)
+						{
+							if (a[1][0].size() == 1)
+							{
+								if (a[1][0][0].isLeaf())
+								{
+									Token inc = a[1][0][0].leaf();
+									if (inc.tag() == SymbolTag)
+										cout << "INCLUDE MODULE '" << inc.value() << "'\n";
+									else if (inc.tag() == StringLiteralTag)
+										cout << "INCLUDE FILE '" << inc.value() << "'\n";
+									else
+										meh.includeRequiresModuleOrFileName(a[0].leaf());
+								}
+								else
+								{
+									meh.includeRequiresModuleOrFileName(a[0].leaf());
+								}
+							}
+							else
+							{
+								meh.includeRequiresOneArgument(a[0].leaf());
+							}
+						}
+						else
+						{
+							meh.includeRequiresOneArgument(a[0].leaf());
+						}
+					}
+					else
+					{
+						meh.includeRequiresArgumentList(a[0].leaf());
+					}
+				}
+			}
+		}
+	}
+
+	AST MittenSource::parse()
 	{
 		vector<Token> toks = lexer.lex(body, path, meh);
-		AST ast = structureParser.parse(toks, meh);
+		return structureParser.parse(toks, meh);
+	}
 
-		cout << ast.display() << "\n";
+	bool MittenSource::compileFromAST(AST a)
+	{
+		cout << a.display() << "\n";
 
 		return meh.dump();
+	}
+
+	bool MittenSource::compile()
+	{
+		compileFromAST(parse());
 	}
 }

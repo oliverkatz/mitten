@@ -21,4 +21,4 @@ mc : $(OBJ) MC.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ -lMPTK
 
 clean :
-	$(RM) $(RMFLAGS) $(OBJ) MC.o mc MPP.o mpp
+	$(RM) $(RMFLAGS) -r $(OBJ) MC.o mc MPP.o mc.dSYM

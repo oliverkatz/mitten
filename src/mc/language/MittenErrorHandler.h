@@ -53,7 +53,7 @@ namespace mitten
 		std::string errorPage;
 		int errorCount;
 
-		virtual void append(Token source, std::string message);
+		void append(Token source, std::string message);
 
 	public:
 		MittenErrorHandler() : errorCount(0) {}
@@ -61,20 +61,25 @@ namespace mitten
 		void setFilePath(std::string f);
 		void setFileBody(std::string b);
 
-		virtual void mismatchedStructureBounds(Token source, std::string start, std::string end);
-		virtual void incompleteStructureBound(Token source, std::string start, std::string end);
-		virtual void unexpectedArgumentList(Token source);
-		virtual void expectedExpression(Token source);
-		virtual void operationRequiredLeftOperand(Token source);
-		virtual void unexpectedTokenInExpression(Token source);
-		virtual void cannotOperateOnAnOperator(Token source);
+		void mismatchedStructureBounds(Token source, std::string start, std::string end);
+		void incompleteStructureBound(Token source, std::string start, std::string end);
+		void unexpectedArgumentList(Token source);
+		void expectedExpression(Token source);
+		void operationRequiredLeftOperand(Token source);
+		void unexpectedTokenInExpression(Token source);
+		void cannotOperateOnAnOperator(Token source);
 
-		virtual void cannotNestBlockComments(Token source);
-		virtual void incompleteBlockComment(Token source);
-		virtual void insufficientDirectiveArguments(Token source);
-		virtual void unknownDirective(Token source);
-		virtual void macroAlreadyDefined(Token source);
-		virtual void useOfUndefinedMacro(Token source);
+		void cannotNestBlockComments(Token source);
+		void incompleteBlockComment(Token source);
+		void insufficientDirectiveArguments(Token source);
+		void unknownDirective(Token source);
+		void macroAlreadyDefined(Token source);
+		void useOfUndefinedMacro(Token source);
+
+		void improperIncludeFormat(Token source);
+		void includeRequiresArgumentList(Token source);
+		void includeRequiresOneArgument(Token source);
+		void includeRequiresModuleOrFileName(Token source);
 
 		bool empty();
 		bool dump();

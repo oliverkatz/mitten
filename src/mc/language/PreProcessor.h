@@ -34,58 +34,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MITTEN_LANGUAGE_MITTEN_ERROR_HANDLER_H
-#define __MITTEN_LANGUAGE_MITTEN_ERROR_HANDLER_H
+#ifndef __MITTEN_PRE_PROCESSOR_H
+#define __MITTEN_PRE_PROCESSOR_H
 
 #include <iostream>
-#include <string>
-#include <vector>
 #include <MPTK.h>
+#include "MittenErrorHandler.h"
 
 namespace mitten
 {
-	class MittenErrorHandler : public ErrorHandler
+	class PreProcessor
 	{
 	protected:
-		std::string filePath;
-		std::vector<std::string> fileBody;
-
-		std::string errorPage;
-		int errorCount;
-
-		void append(Token source, std::string message);
+		bool isLine(AST a);
+		bool isIncludeDirective(AST a);
+		bool expectDirectiveCall(AST a, MittenErrorHandler &meh);
 
 	public:
-		MittenErrorHandler() : errorCount(0) {}
-
-		void setFilePath(std::string f);
-		void setFileBody(std::string b);
-
-		void mismatchedStructureBounds(Token source, std::string start, std::string end);
-		void incompleteStructureBound(Token source, std::string start, std::string end);
-		void unexpectedArgumentList(Token source);
-		void expectedExpression(Token source);
-		void operationRequiredLeftOperand(Token source);
-		void unexpectedTokenInExpression(Token source);
-		void cannotOperateOnAnOperator(Token source);
-
-		void cannotNestBlockComments(Token source);
-		void incompleteBlockComment(Token source);
-		void insufficientDirectiveArguments(Token source);
-		void unknownDirective(Token source);
-		void macroAlreadyDefined(Token source);
-		void useOfUndefinedMacro(Token source);
-
-		void directiveCallRequiresArgumentList(Token source);
-
-		void improperIncludeFormat(Token source);
-		void includeRequiresArgumentList(Token source);
-		void includeRequiresOneArgument(Token source);
-		void includeRequiresModuleOrFileName(Token source);
-
-		bool empty();
-		bool dump();
-		void clear();
+		void processNode(AST a, MittenErrorHandler &meh);
 	};
 }
 

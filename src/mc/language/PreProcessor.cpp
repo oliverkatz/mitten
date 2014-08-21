@@ -34,59 +34,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MITTEN_LANGUAGE_MITTEN_ERROR_HANDLER_H
-#define __MITTEN_LANGUAGE_MITTEN_ERROR_HANDLER_H
+#include "PreProcessor.h"
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <MPTK.h>
+using namespace std;
 
 namespace mitten
 {
-	class MittenErrorHandler : public ErrorHandler
+	bool PreProcessor::isLine(AST a)
 	{
-	protected:
-		std::string filePath;
-		std::vector<std::string> fileBody;
+		return ((a.isBranch() && a.name().compare("line") == 0) && a.size() > 0);
+	}
 
-		std::string errorPage;
-		int errorCount;
+	bool PreProcessor::isIncludeDirective(AST a)
+	{
+		return (a[0].isLeaf() && a[0].leaf().value().compare("include") == 0);
+	}
 
-		void append(Token source, std::string message);
+	bool PreProcessor::expectDirectiveCall(AST a, MittenErrorHandler &meh)
+	{
+		if (a.size() == 2)
+		{
+			if (a[1].isBranch())
+			{
+				if (a[1].size() == 1)
+				{
 
-	public:
-		MittenErrorHandler() : errorCount(0) {}
+				}
+				else
+				{
+					meh.directiveCallExpectsOnlyOneArgument(a[0].leaf());
+				}
+			}
+			else
+			{
+				meh.argumentListMustBeBranch(a[0].leaf());
+			}
+		}
+		else
+		{
+			meh.directiveCallRequiresArgumentList(a[0].leaf());
+		}
+	}
 
-		void setFilePath(std::string f);
-		void setFileBody(std::string b);
+	void PreProcessor::processNode(AST a, MittenErrorHandler &mehs)
+	{
+		if (isLine())
+		{
+			if (isIncludeDirective(a))
+			{
 
-		void mismatchedStructureBounds(Token source, std::string start, std::string end);
-		void incompleteStructureBound(Token source, std::string start, std::string end);
-		void unexpectedArgumentList(Token source);
-		void expectedExpression(Token source);
-		void operationRequiredLeftOperand(Token source);
-		void unexpectedTokenInExpression(Token source);
-		void cannotOperateOnAnOperator(Token source);
-
-		void cannotNestBlockComments(Token source);
-		void incompleteBlockComment(Token source);
-		void insufficientDirectiveArguments(Token source);
-		void unknownDirective(Token source);
-		void macroAlreadyDefined(Token source);
-		void useOfUndefinedMacro(Token source);
-
-		void directiveCallRequiresArgumentList(Token source);
-
-		void improperIncludeFormat(Token source);
-		void includeRequiresArgumentList(Token source);
-		void includeRequiresOneArgument(Token source);
-		void includeRequiresModuleOrFileName(Token source);
-
-		bool empty();
-		bool dump();
-		void clear();
-	};
+			}
+		}
+	}
 }
-
-#endif
